@@ -103,7 +103,7 @@
           <div class="box"><div class="box-title">/etc/passwd</div><p>Lisible par tous. Format : <code>nom:x:UID:GID:GECOS:home:shell</code>. Le <code>x</code> renvoie le mot de passe vers <code>/etc/shadow</code>. Un shell <code>/sbin/nologin</code> ou <code>/bin/false</code> désactive la connexion.</p></div>
           <div class="box"><div class="box-title">/etc/shadow</div><p>Lisible uniquement par root. Contient le hash, la date du dernier changement, les durées min/max, l'avertissement, l'inactivité et l'expiration. C'est là que sont stockés les mots de passe.</p></div>
         </div>
-        <pre><code>Salim:x:1029:1001:Salim Ben:/home/salim:/bin/bash
+        <pre><code>Alice:x:1029:1001:Alice Martin:/home/alice:/bin/bash
 # champs : login, mdp, UID, GID, commentaire, home, shell
 
 # erreur classique : GID non numérique + shell /bin/passwd invalide</code></pre>
@@ -168,7 +168,7 @@ find / -perm -4000 -type f 2>/dev/null   # lister les SUID</code></pre>
         <h3>Syntaxe</h3>
         <pre><code>login/group host = (utilisateur cible) commande(s)
 
-salim ALL = (ALL) /bin/date
+alice ALL = (ALL) /bin/date
 yann ALL = (ALL) NOPASSWD: /sbin/reboot
 %webadmin ALL = (ALL) /etc/init.d/apache2
 %wheel ALL = (ALL) ALL, !/bin/su</code></pre>
