@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Sécurité des Systèmes d'exploitation — Cap sur le DE</title>
+<meta name="description" content="Fiche Sécurité des OS : Linux, permissions, SUID, sudo, durcissement, buffer overflow, Windows, annales corrigées.">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body style="--subject-color:var(--os);--subject-soft:var(--os-soft)">
+
+<header class="topbar">
+  <div class="wrap topbar-inner">
+    <a class="brand" href="index.html"><span class="brand-mark">DE</span><span>Cap sur le DE<small>ST2 · 5 matières</small></span></a>
+    <nav class="nav-links" aria-label="Navigation principale"><a href="index.html">Accueil</a><a href="plan.html">Plan</a><a href="eh.html">Hacking</a><a href="reseau.html">Réseaux</a><a href="os.html" class="active">OS</a><a href="si.html">SI</a><a href="vs.html">Virtualisation</a><a href="last-minute.html">J-1</a></nav>
+    <div class="top-actions">
+      <button class="icon-btn" id="btn-search" aria-label="Rechercher"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></button>
+      <button class="icon-btn" id="btn-theme" aria-label="Changer de thème"></button>
+      <div class="progress-pill"><svg class="ring" id="top-ring" viewBox="0 0 24 24"><circle class="bg" cx="12" cy="12" r="9"/><circle class="fg" cx="12" cy="12" r="9" stroke-dasharray="56.5" stroke-dashoffset="56.5"/></svg><span class="pp-text" id="top-progress-text">0 %</span></div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="subject-hero" data-watermark="OS">
+    <div class="kicker">Matière 3 · ST2SSE</div>
+    <h1>Sécurité des OS</h1>
+    <p>Le DE combine des définitions précises (SUID, sudo, PAM, UAC, LSASS) et des questions de raisonnement (pourquoi c'est dangereux, comment protéger). Linux et Windows comptent autant l'un que l'autre.</p>
+    <div class="subject-meta"><span class="chip">QCM + questions longues</span><span class="chip">Linux + Windows</span><span class="chip">Barème souvent 45/20/55</span><span class="chip">Mécanismes &amp; risques</span></div>
+    <div class="progress-line"><div class="bar"><i></i></div><span id="subject-progress-text">0/15 notions</span></div>
+  </section>
+
+  <div class="subject-layout">
+    <aside class="toc">
+      <h4>Dans cette fiche</h4>
+      <a href="#archi">1 · Architecture des OS</a>
+      <a href="#principes">2 · Principes &amp; niveaux ANSSI</a>
+      <a href="#comptes">3 · Comptes Linux</a>
+      <a href="#perms">4 · Permissions &amp; umask</a>
+      <a href="#suid">5 · SUID, SGID, sticky</a>
+      <a href="#sudo">6 · Sudo</a>
+      <a href="#pam">7 · PAM, capabilities, MAC</a>
+      <a href="#durci">8 · Durcissement Linux</a>
+      <a href="#logs">9 · Logs, audit, patch</a>
+      <a href="#bof">10 · Buffer overflow</a>
+      <a href="#winarchi">11 · Windows : architecture</a>
+      <a href="#winsec">12 · Windows : modèle de sécurité</a>
+      <a href="#winauth">13 · Windows : authentification</a>
+      <a href="#wincis">14 · Windows : CIS &amp; EAL</a>
+      <a href="#annales">15 · Annales corrigées</a>
+      <a href="#quiz">Quiz express</a>
+      <a href="#flashcards">Flashcards</a>
+      <div class="toc-tools"><button class="btn" data-action="expand">Déplier</button><button class="btn" data-action="collapse">Replier</button></div>
+    </aside>
+
+    <div class="content">
+      <div class="box exam">
+        <div class="box-title">Stratégie de copie</div>
+        <p>Pour une question « risque » : <strong>1) le mécanisme</strong>, <strong>2) l'attaque</strong>, <strong>3) la conséquence</strong>, <strong>4) la mesure</strong>. Exemple SUID : « un binaire root s'exécute avec l'EUID 0 ; s'il est vulnérable, un utilisateur obtient root ; d'où la minimisation, l'audit et les capabilities ».</p>
+        <p>Les QCM sont souvent des définitions du cours. Ne surinterprète pas : la réponse est celle du cours, pas la nuance technique avancée.</p>
+      </div>
+
+      <section class="note" id="archi" data-topic="os-1">
+        <div class="note-head"><div class="note-num">1</div><h2>Architecture des OS &amp; noyaux</h2><label class="topic-check"><input type="checkbox" data-topic="os-1">Validé</label></div>
+        <p>Le noyau est le programme qui gère les ressources matérielles et fournit aux applications une interface (appels système). Il s'exécute en <strong>mode noyau</strong> (privilégié) ; les applications en <strong>mode utilisateur</strong>.</p>
+        <div class="table-wrap"><table><thead><tr><th>Type de noyau</th><th>Principe</th><th>Avantages</th><th>Inconvénients / exemples</th></tr></thead><tbody>
+          <tr><td><strong>Monolithique non modulaire</strong></td><td>Tout le code (noyau + pilotes) dans un seul bloc binaire.</td><td>Performant, simple à concevoir.</td><td>Difficile à maintenir ; une erreur peut tout bloquer. Anciens Unix.</td></tr>
+          <tr><td><strong>Monolithique modulaire</strong></td><td>Noyau de base + modules chargeables à chaud.</td><td>Maintenance, chargement dynamique, performances.</td><td>Une erreur de module peut déstabiliser le système. <strong>Linux</strong>.</td></tr>
+          <tr><td><strong>Micro-noyau</strong></td><td>Noyau minimal (ordonnanceur, IPC, mémoire) ; services et pilotes en espace utilisateur.</td><td>Robustesse, isolation, maintenance.</td><td>Beaucoup d'appels système/IPC, performances moindres. QNX, L4.</td></tr>
+          <tr><td><strong>Hybride</strong></td><td>Combine micro-noyau et code monolithique pour les fonctions critiques.</td><td>Compromis performance/robustesse.</td><td><strong>Windows</strong> (Executive + Kernel), <strong>macOS XNU</strong> (Mach + BSD).</td></tr>
+          <tr><td><strong>Exo-noyau</strong></td><td>Noyau minimal qui protège et multiplexe le matériel ; les abstractions sont dans les applications.</td><td>Grande flexibilité.</td><td>Complexité pour les applications.</td></tr>
+        </tbody></table></div>
+        <p><strong>Linux :</strong> noyau monolithique modulaire, chargement à chaud, l'interface graphique ne fait pas partie du noyau. Une distribution = noyau + outils GNU + gestionnaires de paquets + logiciels. Le premier programme lancé en mode utilisateur est <strong>systemd</strong> (PID 1) sur la plupart des distributions modernes.</p>
+        <div class="box key"><div class="box-title">QCM</div><p>Un noyau est « un programme souvent écrit en C ou en assembleur » et « une partie du code qui s'exécute en mode privilégié ». Il n'inclut pas Bash. Linux est monolithique modulaire ; macOS est hybride (Mach + BSD) ; un micro-noyau contient l'ordonnanceur et l'IPC.</p></div>
+      </section>
+
+      <section class="note" id="principes" data-topic="os-2">
+        <div class="note-head"><div class="note-num">2</div><h2>Principes &amp; niveaux de durcissement</h2><label class="topic-check"><input type="checkbox" data-topic="os-2">Validé</label></div>
+        <h3>Les 4 principes</h3>
+        <div class="table-wrap"><table><thead><tr><th>Principe</th><th>Définition</th><th>Exemple</th></tr></thead><tbody>
+          <tr><td><strong>Minimisation</strong></td><td>Réduire la complexité et la surface d'attaque au strict nécessaire ; facilite le suivi et la mise à jour.</td><td>Désinstaller les services inutiles, système minimal, un seul rôle par serveur.</td></tr>
+          <tr><td><strong>Moindre privilège</strong></td><td>Chaque entité n'a que les droits strictement nécessaires ; en cas de compromission, les dégâts sont limités (<em>fail securely</em>).</td><td>Apache lance un processus root puis passe à <code>www-data</code> ; sudo au lieu de root.</td></tr>
+          <tr><td><strong>Défense en profondeur</strong></td><td>Plusieurs couches indépendantes et complémentaires ; chaque couche doit être franchie.</td><td>Auth + chiffrement + firewall + logs + EDR.</td></tr>
+          <tr><td><strong>Veille &amp; maintenance</strong></td><td>Surveiller les vulnérabilités, appliquer les correctifs, journaliser et archiver.</td><td>Patch management, CERT, logs centralisés.</td></tr>
+        </tbody></table></div>
+        <p>Le <strong>durcissement</strong> consiste à vérifier que ces principes sont respectés et à contrôler méthodiquement la conformité par rapport à un référentiel (CIS, ANSSI, STIG, Microsoft Security Baseline). Ce n'est pas un test d'intrusion.</p>
+
+        <h3>Les 4 niveaux ANSSI</h3>
+        <div class="table-wrap"><table><thead><tr><th>Niveau</th><th>Contexte</th><th>Exemples de mesures</th></tr></thead><tbody>
+          <tr><td><strong>Minimal</strong></td><td>Tout système, systématiquement.</td><td>Correctifs, limitation des services réseau, PAM robuste, mots de passe complexes.</td></tr>
+          <tr><td><strong>Intermédiaire</strong></td><td>Services protégés par plusieurs couches de sécurité.</td><td>Sudo, journalisation déportée, iptables entrant, partitionnement fin, suppression des setuid inutiles, LDAP.</td></tr>
+          <tr><td><strong>Renforcé</strong></td><td>Systèmes exposés à des flux non authentifiés ou de sources nombreuses.</td><td>iptables local/sortant, auditd, blocage du chargement de modules, suppression des programmes inutiles, chroot, scripts d'audit.</td></tr>
+          <tr><td><strong>Élevé</strong></td><td>Données sensibles accessibles depuis des réseaux non maîtrisés.</td><td>SELinux RBAC, AppArmor, confinement fort.</td></tr>
+        </tbody></table></div>
+        <div class="box warn"><div class="box-title">Piège</div><p>Le niveau dépend de la <strong>sensibilité des données</strong> et de la <strong>robustesse des contrôles d'accès</strong>, pas de la difficulté de la mesure. Un serveur exposé publiquement avec des données sensibles = renforcé/élevé.</p></div>
+      </section>
+
+      <section class="note" id="comptes" data-topic="os-3">
+        <div class="note-head"><div class="note-num">3</div><h2>Comptes Linux &amp; fichiers sensibles</h2><label class="topic-check"><input type="checkbox" data-topic="os-3">Validé</label></div>
+        <div class="grid-2">
+          <div class="box"><div class="box-title">/etc/passwd</div><p>Lisible par tous. Format : <code>nom:x:UID:GID:GECOS:home:shell</code>. Le <code>x</code> renvoie le mot de passe vers <code>/etc/shadow</code>. Un shell <code>/sbin/nologin</code> ou <code>/bin/false</code> désactive la connexion.</p></div>
+          <div class="box"><div class="box-title">/etc/shadow</div><p>Lisible uniquement par root. Contient le hash, la date du dernier changement, les durées min/max, l'avertissement, l'inactivité et l'expiration. C'est là que sont stockés les mots de passe.</p></div>
+        </div>
+        <pre><code>Salim:x:1029:1001:Salim Ben:/home/salim:/bin/bash
+# champs : login, mdp, UID, GID, commentaire, home, shell
+
+# erreur classique : GID non numérique + shell /bin/passwd invalide</code></pre>
+        <h3>UID, GID et comptes de service</h3>
+        <ul><li><strong>UID 0</strong> = root. Un seul compte doit avoir l'UID 0 ; un doublon est une porte dérobée.</li><li><strong>UID dupliqué</strong> = confusion d'identité, contournement des permissions, audit impossible.</li><li>Chaque service doit avoir son propre compte système, sans shell de connexion, et être désactivé s'il n'est pas utilisé.</li><li>Le compte <code>nobody</code> partagé par plusieurs services permet à un service de contrôler l'autre (signaux, ptrace, fichiers).</li><li>Les sessions doivent expirer après inactivité (TMOUT, sshd <code>ClientAliveInterval</code>).</li></ul>
+        <div class="box key"><div class="box-title">Commandes</div><p><code>id</code>, <code>whoami</code>, <code>getent passwd</code>, <code>awk -F: '{print $1,$3}' /etc/passwd</code>, <code>passwd -l user</code>, <code>usermod -L</code>, <code>chage -l user</code>, <code>lastlog</code>.</p></div>
+      </section>
+
+      <section class="note" id="perms" data-topic="os-4">
+        <div class="note-head"><div class="note-num">4</div><h2>Permissions &amp; umask</h2><label class="topic-check"><input type="checkbox" data-topic="os-4">Validé</label></div>
+        <p>Trois catégories (propriétaire, groupe, autres) et trois droits (lecture <code>r=4</code>, écriture <code>w=2</code>, exécution <code>x=1</code>).</p>
+        <div class="table-wrap"><table><thead><tr><th>Valeur</th><th>Droits</th><th>Usage</th></tr></thead><tbody>
+          <tr><td>7</td><td>rwx</td><td>Lecture + écriture + exécution.</td></tr>
+          <tr><td>6</td><td>rw-</td><td>Fichier de données.</td></tr>
+          <tr><td>5</td><td>r-x</td><td>Exécutable / répertoire traversable.</td></tr>
+          <tr><td>4</td><td>r--</td><td>Lecture seule.</td></tr>
+          <tr><td>0</td><td>---</td><td>Aucun droit.</td></tr>
+        </tbody></table></div>
+        <h3>Calcul de l'umask</h3>
+        <p>Les droits par défaut sont <strong>666</strong> pour un fichier et <strong>777</strong> pour un répertoire. L'umask retire des droits :</p>
+        <pre><code>umask 022  → fichier 666 - 022 = 644 (rw-r--r--)
+             répertoire 777 - 022 = 755 (rwxr-xr-x)
+
+umask 027  → fichier 666 - 027 = 640 (rw-r-----)
+             répertoire 777 - 027 = 750 (rwxr-x---)
+
+umask 002  → fichier 666 - 002 = 664 (rw-rw-r--)
+             répertoire 777 - 002 = 775 (rwxrwxr-x)</code></pre>
+        <p><strong>ANSSI recommande umask 0027.</strong> Le umask par défaut est souvent 0022, trop permissif. Pour un répertoire, le droit <code>x</code> permet d'y entrer et de traverser ; pour un fichier, il permet de l'exécuter.</p>
+        <div class="box key"><div class="box-title">À retenir</div><p>Un fichier créé avec umask 002 a les droits <strong>0664</strong> ; avec umask 0027, <strong>0640</strong>. Les répertoires accessibles à tous en écriture doivent avoir le <strong>sticky bit</strong>.</p></div>
+        <p><strong>ACL :</strong> au-delà du modèle traditionnel, <code>setfacl</code>/<code>getfacl</code> permettent des droits fins par utilisateur. Le modèle traditionnel ne permet pas de retirer un privilège particulier selon le contexte (d'où SELinux/AppArmor).</p>
+      </section>
+
+      <section class="note" id="suid" data-topic="os-5">
+        <div class="note-head"><div class="note-num">5</div><h2>SUID, SGID, sticky bit</h2><label class="topic-check"><input type="checkbox" data-topic="os-5">Validé</label></div>
+        <div class="table-wrap"><table><thead><tr><th>Bit</th><th>Valeur</th><th>Effet</th><th>Exemple</th></tr></thead><tbody>
+          <tr><td><strong>SUID</strong></td><td>4</td><td>Le programme s'exécute avec l'EUID du propriétaire, pas celui de l'utilisateur.</td><td><code>/usr/bin/passwd</code> (root) permet de changer son mot de passe.</td></tr>
+          <tr><td><strong>SGID</strong></td><td>2</td><td>Sur un fichier : s'exécute avec le GID du groupe. Sur un répertoire : les nouveaux fichiers héritent du groupe.</td><td>Répertoire d'équipe.</td></tr>
+          <tr><td><strong>Sticky</strong></td><td>1</td><td>Dans un répertoire world-writable, seul le propriétaire peut supprimer son fichier.</td><td><code>/tmp</code> (1777).</td></tr>
+        </tbody></table></div>
+        <pre><code>chmod 4755 programme    # SUID
+chmod 2755 repertoire   # SGID
+chmod 1777 /tmp         # sticky
+find / -perm -4000 -type f 2>/dev/null   # lister les SUID</code></pre>
+        <h3>Pourquoi le SUID root est dangereux</h3>
+        <p>Un binaire SUID root s'exécute avec <strong>EUID 0</strong>, même si l'utilisateur est standard. S'il est vulnérable, l'attaquant obtient root. Le risque dépend de la qualité du programme, pas de l'intention.</p>
+        <div class="table-wrap"><table><thead><tr><th>Surface d'attaque</th><th>Exemple concret</th><th>Conséquence</th></tr></thead><tbody>
+          <tr><td><strong>Entrées utilisateur</strong></td><td>Buffer overflow dans un argument, format string.</td><td>Exécution de code avec EUID 0.</td></tr>
+          <tr><td><strong>Variables d'environnement</strong></td><td><code>PATH</code>, <code>LD_PRELOAD</code>, <code>IFS</code> non nettoyés.</td><td>Chargement d'une bibliothèque ou commande malveillante.</td></tr>
+          <tr><td><strong>Race condition / TOCTOU</strong></td><td>Fichier temporaire créé puis remplacé entre la vérification et l'utilisation.</td><td>Écriture dans un fichier sensible.</td></tr>
+          <tr><td><strong>Appels système / shell</strong></td><td><code>system()</code>, <code>popen()</code> avec une entrée non validée.</td><td>Injection de commande avec privilèges root.</td></tr>
+          <tr><td><strong>Descripteurs / signaux</strong></td><td>Héritage de fichiers ouverts, gestion de signaux.</td><td>Fuite d'informations ou contournement.</td></tr>
+        </tbody></table></div>
+        <h3>Bonnes pratiques</h3>
+        <ul><li>Minimiser le nombre de binaires SUID ; auditer régulièrement.</li><li>N'activer le bit que sur des programmes <strong>de confiance</strong>, conçus pour cela.</li><li>Nettoyer l'environnement (<code>PATH</code>, <code>LD_*</code>, <code>IFS</code>), valider les entrées.</li><li>Abandonner les privilèges dès que possible (<code>setuid</code>/<code>seteuid</code>).</li><li>Utiliser les <strong>capabilities</strong> plutôt que root complet (ex. <code>cap_net_bind_service</code> pour bind sur le port 80).</li><li>Compiler avec les protections mémoire (PIE, canary, RELRO, FORTIFY).</li></ul>
+        <div class="box key"><div class="box-title">Peut-on supprimer totalement le SUID ?</div><p>Non : certains programmes légitimes en ont besoin (<code>passwd</code>, <code>sudo</code>, historiquement <code>ping</code>). On peut le réduire fortement et le remplacer par des capabilities ou des services privilégiés mieux contrôlés.</p></div>
+      </section>
+
+      <section class="note" id="sudo" data-topic="os-6">
+        <div class="note-head"><div class="note-num">6</div><h2>Sudo</h2><label class="topic-check"><input type="checkbox" data-topic="os-6">Validé</label></div>
+        <p><code>sudo</code> permet à un utilisateur d'exécuter une commande avec les privilèges d'un autre compte, selon une politique écrite dans <code>/etc/sudoers</code> et <code>/etc/sudoers.d/</code>. Il permet la traçabilité (logs) et évite le partage du mot de passe root.</p>
+        <h3>Syntaxe</h3>
+        <pre><code>login/group host = (utilisateur cible) commande(s)
+
+salim ALL = (ALL) /bin/date
+yann ALL = (ALL) NOPASSWD: /sbin/reboot
+%webadmin ALL = (ALL) /etc/init.d/apache2
+%wheel ALL = (ALL) ALL, !/bin/su</code></pre>
+        <h3>Les pièges de configuration</h3>
+        <div class="table-wrap"><table><thead><tr><th>Configuration</th><th>Problème</th><th>Attaque</th></tr></thead><tbody>
+          <tr><td><code>NOPASSWD</code></td><td>Aucune réauthentification.</td><td>Quiconque accède au compte exécute la commande.</td></tr>
+          <tr><td><code>ALL=(ALL) ALL</code></td><td>Root complet déguisé.</td><td>Escalade immédiate.</td></tr>
+          <tr><td>Wildcard <code>/etc/httpd/*</code></td><td>Le shell peut développer des chemins.</td><td><code>sudoedit /etc/httpd/../shadow</code> → lecture/écriture de <code>/etc/shadow</code>.</td></tr>
+          <tr><td>Éditeur autorisé (<code>vi</code>, <code>vim</code>)</td><td>Shell escape depuis l'éditeur.</td><td><code>:!sh</code> → shell root.</td></tr>
+          <tr><td>Script utilisateur autorisé</td><td>Le script est modifiable par l'utilisateur.</td><td>L'utilisateur remplace le contenu et obtient root.</td></tr>
+          <tr><td>Commande avec arguments non fixés</td><td>Arguments arbitraires.</td><td><code>systemctl</code>, <code>find -exec</code>, <code>tar --checkpoint-action</code>…</td></tr>
+        </tbody></table></div>
+        <h3>Directives recommandées</h3>
+        <ul><li><code>use_pty</code> : exécuter dans un pseudo-terminal, empêche les processus en arrière-plan de survivre.</li><li><code>requiretty</code> : imposer un terminal de login.</li><li><code>noexec</code> : interdire l'exécution de commandes depuis sudo (tag NOEXEC).</li><li><code>umask=0027</code> : masque restrictif.</li><li><code>ignore_dot</code> : ignorer <code>.</code> dans le PATH.</li><li><code>env_reset</code> : réinitialiser l'environnement.</li><li><code>passwd_timeout=1</code> : délai court.</li><li><code>logfile="/var/log/sudo.log"</code> : journaliser.</li></ul>
+        <div class="box key"><div class="box-title">Pseudo-terminal</div><p>Un pseudo-terminal (pty) permet d'interagir à distance avec l'entrée/sortie standard, comme SSH. Il est <strong>conseillé avec sudo</strong> car il isole la session et empêche un programme malveillant de rester en arrière-plan après la commande.</p></div>
+        <div class="box warn"><div class="box-title">Règle d'or</div><p>Ne jamais autoriser un utilisateur à écrire dans un fichier exécuté ensuite par root. <code>sudoedit</code> édite une copie temporaire avec les droits de l'utilisateur, puis applique la modification de façon contrôlée : c'est plus sûr qu'un éditeur lancé en root.</p></div>
+      </section>
+
+      <section class="note" id="pam" data-topic="os-7">
+        <div class="note-head"><div class="note-num">7</div><h2>PAM, capabilities, MAC</h2><label class="topic-check"><input type="checkbox" data-topic="os-7">Validé</label></div>
+        <h3>PAM</h3>
+        <p>PAM (<em>Pluggable Authentication Modules</em>) centralise l'authentification et la gestion de session. Les applications appellent PAM ; PAM applique une pile de modules définie dans <code>/etc/pam.d/</code>.</p>
+        <ul><li><strong>auth</strong> : vérifier l'identité.</li><li><strong>account</strong> : vérifier que le compte est autorisé (expiration, horaire).</li><li><strong>password</strong> : changer le mot de passe.</li><li><strong>session</strong> : préparer l'environnement (montage, limites).</li></ul>
+        <p>Modules utiles : <code>pam_unix</code>, <code>pam_pwquality</code> (complexité), <code>pam_faillock</code> (verrouillage), <code>pam_mkhomedir</code>, <code>pam_namespace</code>, <code>pam_tally2</code>. PAM permet donc la <strong>centralisation de l'authentification</strong> et l'<strong>application d'une politique de mot de passe</strong>.</p>
+        <h3>Capabilities</h3>
+        <p>Découpent les privilèges root en unités granulaires. Au lieu de donner tout root à un binaire, on lui donne seulement <code>cap_net_bind_service</code>, <code>cap_net_raw</code>, etc.</p>
+        <pre><code>getcap -r / 2>/dev/null
+setcap cap_net_bind_service=+ep /usr/bin/mon_service
+capsh --print</code></pre>
+        <h3>SELinux / AppArmor</h3>
+        <div class="grid-2">
+          <div class="box"><div class="box-title">SELinux</div><p>Contrôle d'accès obligatoire (MAC) basé sur des contextes et une politique. Modes : <em>enforcing</em>, <em>permissive</em>, <em>disabled</em>. Commandes : <code>getenforce</code>, <code>sestatus</code>, <code>ls -Z</code>, <code>chcon</code>, <code>restorecon</code>, <code>semanage</code>. Il ajoute une couche au DAC traditionnel.</p></div>
+          <div class="box"><div class="box-title">AppArmor</div><p>MAC basé sur des profils par chemin. Plus simple que SELinux. Modes : <em>enforce</em>, <em>complain</em>. Utile pour confiner un service (web, base de données).</p></div>
+        </div>
+        <p><strong>Différence DAC / MAC :</strong> DAC = le propriétaire décide (modèle Unix). MAC = une politique globale décide, même si le propriétaire autorise. SELinux/AppArmor sont des techniques de <strong>cloisonnement</strong> et de <strong>contrôle d'accès obligatoire</strong>.</p>
+        <h3>chroot</h3>
+        <p><code>chroot</code> change la racine d'un processus. Il faut copier les bibliothèques (<code>ldd</code>), les devices (<code>/dev/null</code>, <code>zero</code>, <code>random</code>) et les fichiers de configuration. Ce n'est pas une frontière de sécurité forte : un root peut s'échapper ; il faut abandonner les privilèges et combiner avec namespaces/SELinux.</p>
+      </section>
+
+      <section class="note" id="durci" data-topic="os-8">
+        <div class="note-head"><div class="note-num">8</div><h2>Durcissement Linux</h2><label class="topic-check"><input type="checkbox" data-topic="os-8">Validé</label></div>
+        <h3>Partitionnement &amp; montage</h3>
+        <ul><li>Séparer <code>/</code>, <code>/boot</code>, <code>/home</code>, <code>/tmp</code>, <code>/var</code>, <code>/var/log</code> pour éviter la saturation et isoler les données.</li><li>Options de montage : <code>nodev</code> (ignore les devices), <code>nosuid</code> (ignore SUID/SGID), <code>noexec</code> (ignore l'exécution).</li><li><code>/tmp</code> avec son propre FS ou tmpfs et <code>noexec</code> : un attaquant ne peut pas y installer de code exécutable.</li><li><code>/boot</code> non monté automatiquement, accessible uniquement à root ; <code>System.map</code> protégé (aide à construire des exploits noyau).</li><li>Chiffrement LUKS pour les données au repos.</li><li>Mot de passe GRUB pour empêcher la modification des options de démarrage.</li></ul>
+        <h3>Comptes &amp; services</h3>
+        <ul><li>Désactiver les comptes inutilisés et les comptes de service (mot de passe invalide, shell nologin).</li><li>Un compte dédié par service ; pas de <code>nobody</code> partagé.</li><li>Interdire la connexion root à distance (<code>PermitRootLogin no</code>), utiliser sudo et des clés SSH.</li><li>Expiration des sessions, bannière, limitation des tentatives.</li><li>Désactiver les services et paquets inutiles ; réduire la surface d'attaque.</li></ul>
+        <h3>Sysctl : les paramètres à connaître</h3>
+        <div class="table-wrap"><table><thead><tr><th>Paramètre</th><th>Valeur</th><th>Effet / attaque évitée</th></tr></thead><tbody>
+          <tr><td><code>kernel.randomize_va_space</code></td><td>2</td><td>ASLR complet : randomise pile, tas, bibliothèques ; complique buffer overflow/ROP.</td></tr>
+          <tr><td><code>kernel.kptr_restrict</code></td><td>1</td><td>Cache les adresses du noyau dans <code>/proc</code> (info leak).</td></tr>
+          <tr><td><code>kernel.dmesg_restrict</code></td><td>1</td><td>Réserve <code>dmesg</code> aux privilégiés (adresses, modules, versions).</td></tr>
+          <tr><td><code>fs.suid_dumpable</code></td><td>0</td><td>Interdit les core dumps des binaires SUID (fuite de secrets).</td></tr>
+          <tr><td><code>fs.protected_symlinks</code> / <code>hardlinks</code></td><td>1</td><td>Protège contre les attaques symlink/TOCTOU dans <code>/tmp</code>.</td></tr>
+          <tr><td><code>vm.mmap_min_addr</code></td><td>65536</td><td>Empêche le mapping à l'adresse 0 (null pointer dereference).</td></tr>
+          <tr><td><code>net.ipv4.tcp_syncookies</code></td><td>1</td><td>Mitige les SYN floods.</td></tr>
+          <tr><td><code>net.ipv4.conf.all.rp_filter</code></td><td>1</td><td>Reverse path filtering : anti-IP spoofing.</td></tr>
+          <tr><td><code>net.ipv4.conf.all.accept_redirects</code></td><td>0</td><td>Refuse les ICMP Redirect (MITM / routage détourné).</td></tr>
+          <tr><td><code>net.ipv4.conf.all.accept_source_route</code></td><td>0</td><td>Refuse le source routing (contournement de filtrage).</td></tr>
+          <tr><td><code>net.ipv4.ip_forward</code></td><td>0</td><td>Empêche la machine de servir de routeur (pivoting).</td></tr>
+          <tr><td><code>kernel.sysrq</code></td><td>0</td><td>Désactive les commandes noyau via la touche magique.</td></tr>
+        </tbody></table></div>
+        <p>Appliquer avec <code>sysctl -p</code> ou dans <code>/etc/sysctl.d/</code>. Toujours tester avant production : certains paramètres peuvent casser des services (ex. <code>rp_filter</code> sur du routage asymétrique).</p>
+        <h3>Démarrage</h3>
+        <p><strong>GRUB</strong> : mot de passe, permissions sur <code>/boot/grub/grub.cfg</code>, secure boot. <strong>Initramfs</strong> : protéger les secrets. <strong>Modules noyau</strong> : blacklister les modules inutiles (ex. squashfs, usb-storage) pour réduire la surface.</p>
+      </section>
+
+      <section class="note" id="logs" data-topic="os-9">
+        <div class="note-head"><div class="note-num">9</div><h2>Journalisation, audit &amp; patch management</h2><label class="topic-check"><input type="checkbox" data-topic="os-9">Validé</label></div>
+        <h3>Journalisation centralisée</h3>
+        <p>Les logs doivent être <strong>déportés</strong> vers un serveur central, de préférence en temps réel, et protégés en intégrité.</p>
+        <div class="grid-2">
+          <div class="box tip"><div class="box-title">Intérêts</div><ul><li>Conservation des preuves si le serveur est compromis.</li><li>Détection et corrélation multi-serveurs.</li><li>L'attaquant ne peut pas effacer ses traces localement.</li><li>Conformité et audit.</li></ul></div>
+          <div class="box warn"><div class="box-title">Inconvénients</div><ul><li>Charge réseau.</li><li>Point de défaillance unique (SPOF).</li><li>Latence possible.</li><li>Le serveur de logs doit être lui-même sécurisé.</li></ul></div>
+        </div>
+        <p><strong>Bonnes pratiques :</strong> NTP pour synchroniser les horodatages, TLS pour le transport, rotation/compression, rétention définie, accès restreint, alertes sur événements critiques, test de la chaîne de collecte. Outils : <code>rsyslog</code>, <code>journald</code>, <code>auditd</code>, SIEM (ELK, Splunk, Wazuh).</p>
+        <h3>Patch management</h3>
+        <p>Une mise à jour peut casser une application métier : incompatibilité, régression, arrêt de service. Dans une grande entreprise avec des applications critiques :</p>
+        <ol>
+          <li>Veille et inventaire des vulnérabilités.</li>
+          <li>Environnement de test miroir (même OS, mêmes applications).</li>
+          <li>Tests de non-régression et validation métier.</li>
+          <li>Déploiement pilote sur un sous-ensemble.</li>
+          <li>Déploiement progressif (rolling) avec fenêtre de maintenance.</li>
+          <li>Snapshot/sauvegarde avant application, procédure de rollback.</li>
+          <li>Haute disponibilité / cluster pour éviter l'arrêt.</li>
+          <li>Vérification post-déploiement et documentaire.</li>
+        </ol>
+        <h3>Intégrité &amp; malwares</h3>
+        <p><strong>AIDE/Tripwire</strong> : baseline des fichiers, détection de modification. <strong>Antivirus</strong> : signatures + comportement. <strong>EPP</strong> : antivirus + HIPS + firewall + gestion centralisée. <strong>EDR</strong> : détection, investigation, remédiation par comportement. <strong>XDR</strong> : EDR étendu au cloud et à l'hyperviseur. <strong>Rootkit</strong> : malware qui modifie le noyau ou les bibliothèques pour masquer sa présence.</p>
+      </section>
+
+      <section class="note" id="bof" data-topic="os-10">
+        <div class="note-head"><div class="note-num">10</div><h2>Buffer overflow &amp; protections mémoire</h2><label class="topic-check"><input type="checkbox" data-topic="os-10">Validé</label></div>
+        <p>Un buffer overflow se produit quand un programme écrit <strong>plus de données que la taille allouée</strong> dans un tampon. Les données débordent sur les variables voisines, notamment l'adresse de retour sur la pile. L'attaquant peut alors détourner l'exécution vers son shellcode.</p>
+        <pre><code>void f(char *input) {
+  char buf[20];
+  strcpy(buf, input);   // pas de contrôle de taille
+}</code></pre>
+        <h3>Protections Linux</h3>
+        <div class="table-wrap"><table><thead><tr><th>Protection</th><th>Rôle</th><th>Option / commande</th></tr></thead><tbody>
+          <tr><td><strong>ASLR</strong></td><td>Randomise les adresses (pile, tas, libs).</td><td><code>kernel.randomize_va_space=2</code></td></tr>
+          <tr><td><strong>NX / DEP</strong></td><td>Marque la pile et le tas non exécutables.</td><td>NX bit matériel.</td></tr>
+          <tr><td><strong>Stack canary</strong></td><td>Valeur sentinelle avant l'adresse de retour ; détecte l'écrasement.</td><td><code>-fstack-protector</code></td></tr>
+          <tr><td><strong>PIE</strong></td><td>Exécutable position-independent, compatible ASLR.</td><td><code>-fPIE -pie</code></td></tr>
+          <tr><td><strong>RELRO</strong></td><td>Protège la GOT (table des symboles) en lecture seule.</td><td><code>-Wl,-z,relro,-z,now</code></td></tr>
+          <tr><td><strong>FORTIFY_SOURCE</strong></td><td>Vérifie les fonctions dangereuses (<code>strcpy</code>, <code>sprintf</code>).</td><td><code>-D_FORTIFY_SOURCE=2</code></td></tr>
+        </tbody></table></div>
+        <h3>Protections Windows</h3>
+        <div class="table-wrap"><table><thead><tr><th>Protection</th><th>Rôle</th></tr></thead><tbody>
+          <tr><td><strong>DEP</strong></td><td>Data Execution Prevention : zones de données non exécutables.</td></tr>
+          <tr><td><strong>ASLR</strong></td><td>Randomisation des DLL, exécutables, pile et tas.</td></tr>
+          <tr><td><strong>/GS (stack cookies)</strong></td><td>Canaries de pile du compilateur MSVC.</td></tr>
+          <tr><td><strong>CFG</strong></td><td>Control Flow Guard : valide les appels indirects.</td></tr>
+          <tr><td><strong>SafeSEH / SEHOP</strong></td><td>Protection des gestionnaires d'exceptions structurées.</td></tr>
+          <tr><td><strong>Device Guard / CIG</strong></td><td>Code Integrity Guard : seuls les binaires signés s'exécutent.</td></tr>
+        </tbody></table></div>
+        <div class="box key"><div class="box-title">Réponse type</div><p>Sous Linux : ASLR, NX, canary, PIE, RELRO, FORTIFY, compilation sécurisée, revue de code, langages sûrs. Sous Windows : DEP, ASLR, /GS, CFG, SafeSEH/SEHOP, Device Guard. La protection est multicouche : une seule mesure ne suffit pas.</p></div>
+      </section>
+
+      <section class="note" id="winarchi" data-topic="os-11">
+        <div class="note-head"><div class="note-num">11</div><h2>Windows : architecture interne</h2><label class="topic-check"><input type="checkbox" data-topic="os-11">Validé</label></div>
+        <p>Windows est un noyau <strong>hybride</strong>. On distingue le mode utilisateur (applications, services, DLL) et le mode noyau (Executive, Kernel, HAL, pilotes, hyperviseur).</p>
+        <div class="table-wrap"><table><thead><tr><th>Composant</th><th>Rôle</th></tr></thead><tbody>
+          <tr><td><strong>Object Manager</strong></td><td>Création, nommage, référencement et destruction des objets (process, thread, fichier, token, clé de registre).</td></tr>
+          <tr><td><strong>Process Manager</strong></td><td>Processus et threads.</td></tr>
+          <tr><td><strong>Memory Manager</strong></td><td>Mémoire virtuelle, pagination, protection.</td></tr>
+          <tr><td><strong>I/O Manager</strong></td><td>Entrées/sorties et pilotes.</td></tr>
+          <tr><td><strong>Configuration Manager</strong></td><td>Registre Windows.</td></tr>
+          <tr><td><strong>Security Reference Monitor (SRM)</strong></td><td>Contrôle d'accès, vérification des droits, audit. Il applique la politique de sécurité.</td></tr>
+          <tr><td><strong>Cache Manager</strong></td><td>Cache des fichiers.</td></tr>
+          <tr><td><strong>Kernel</strong></td><td>Ordonnancement, interruptions, exceptions, synchronisation, changement de contexte.</td></tr>
+          <tr><td><strong>HAL</strong></td><td>Couche d'abstraction matérielle.</td></tr>
+          <tr><td><strong>Pilotes</strong></td><td>Interagissent avec le matériel ; beaucoup tournent en mode noyau, donc critiques.</td></tr>
+          <tr><td><strong>Hyperviseur / VBS</strong></td><td>Frontière de sécurité, utilisé par Credential Guard et l'isolation virtuelle.</td></tr>
+        </tbody></table></div>
+        <div class="box key"><div class="box-title">QCM</div><p><code>NTDLL.DLL</code> tourne en mode utilisateur. L'Executive, les pilotes et le HAL sont en mode noyau. Le SRM fait partie de l'Executive et applique le contrôle d'accès.</p></div>
+      </section>
+
+      <section class="note" id="winsec" data-topic="os-12">
+        <div class="note-head"><div class="note-num">12</div><h2>Windows : modèle de sécurité</h2><label class="topic-check"><input type="checkbox" data-topic="os-12">Validé</label></div>
+        <h3>Le token d'accès</h3>
+        <p>À l'authentification, Windows construit un <strong>access token</strong> qui représente le contexte de sécurité : SID de l'utilisateur, SID des groupes, privilèges, niveau d'intégrité, session de logon. Chaque processus hérite d'un token.</p>
+        <h3>Security descriptor, DACL, SACL</h3>
+        <ul><li><strong>Propriétaire</strong> (SID).</li><li><strong>DACL</strong> : liste des autorisations/refus (qui peut faire quoi).</li><li><strong>SACL</strong> : liste d'audit (quels accès journaliser).</li><li><strong>ACE</strong> : entrée individuelle de la DACL/SACL.</li></ul>
+        <p>Le <strong>SRM</strong> compare le token de l'appelant au descripteur de sécurité de l'objet. Un refus explicite l'emporte généralement sur une autorisation.</p>
+        <h3>SID</h3>
+        <p>Identifiant de sécurité unique et immuable d'un compte, d'un groupe ou d'une machine. Il est utilisé dans les ACL et les tokens, pas « positionné sur une ressource ». SID bien connus : <code>S-1-5-18</code> (SYSTEM), <code>S-1-5-19</code> (LocalService), <code>S-1-5-20</code> (NetworkService), <code>S-1-5-32-544</code> (Administrateurs).</p>
+        <h3>UAC &amp; niveaux d'intégrité</h3>
+        <p><strong>UAC</strong> permet à un administrateur de travailler avec un <strong>token filtré</strong> (privilèges réduits) et d'élever ses droits uniquement quand c'est nécessaire. Une opération administrative déclenche une demande de consentement ; le programme élevé tourne avec un token complet. UAC applique le <strong>moindre privilège</strong>, il n'empêche pas un administrateur déterminé d'obtenir ses droits.</p>
+        <div class="table-wrap"><table><thead><tr><th>Niveau d'intégrité</th><th>Exemple</th></tr></thead><tbody>
+          <tr><td><strong>Low</strong></td><td>Processus très restreint, sandbox (navigateur).</td></tr>
+          <tr><td><strong>Medium</strong></td><td>Application utilisateur standard.</td></tr>
+          <tr><td><strong>High</strong></td><td>Processus élevé via UAC (administrateur).</td></tr>
+          <tr><td><strong>System</strong></td><td>Processus système critiques.</td></tr>
+        </tbody></table></div>
+        <p><strong>MIC</strong> (Mandatory Integrity Control) complète les ACL : un processus de niveau inférieur ne peut pas modifier un objet de niveau supérieur, même si la DACL l'autorise.</p>
+        <h3>Comptes de service</h3>
+        <div class="table-wrap"><table><thead><tr><th>Compte</th><th>Privilèges</th><th>Réseau</th><th>Usage</th></tr></thead><tbody>
+          <tr><td><strong>LocalSystem</strong></td><td>Très élevés</td><td>Compte machine</td><td>Services système critiques.</td></tr>
+          <tr><td><strong>LocalService</strong></td><td>Faibles</td><td>Anonyme/limité</td><td>Services avec peu de droits locaux.</td></tr>
+          <tr><td><strong>NetworkService</strong></td><td>Faibles à modérés</td><td>Compte machine</td><td>Services ayant besoin du réseau.</td></tr>
+          <tr><td><strong>Compte dédié</strong></td><td>Selon configuration</td><td>Selon configuration</td><td>Bonnes pratiques : moindre privilège.</td></tr>
+        </tbody></table></div>
+      </section>
+
+      <section class="note" id="winauth" data-topic="os-13">
+        <div class="note-head"><div class="note-num">13</div><h2>Windows : authentification &amp; protections</h2><label class="topic-check"><input type="checkbox" data-topic="os-13">Validé</label></div>
+        <h3>Le chemin d'une ouverture de session</h3>
+        <ol>
+          <li><strong>Winlogon</strong> gère les sessions interactives : ouverture/fermeture, verrouillage, Ctrl+Alt+Suppr, lancement de l'environnement utilisateur.</li>
+          <li><strong>LogonUI</strong> affiche l'interface de connexion et collecte les identifiants via les credential providers.</li>
+          <li><strong>LSASS</strong> authentifie, applique la politique locale, crée le token et gère certains secrets.</li>
+          <li><strong>SAM</strong> contient les comptes locaux ; <strong>Active Directory</strong> gère les comptes de domaine.</li>
+        </ol>
+        <div class="box key"><div class="box-title">Les 3 composants à ne pas confondre</div><ul><li><strong>Winlogon</strong> : sessions interactives, Ctrl+Alt+Del, lancement de l'environnement.</li><li><strong>LSASS</strong> : authentification, politique, token, secrets.</li><li><strong>SRM</strong> : contrôle d'accès aux objets, audit.</li></ul></div>
+        <h3>NTLM vs Kerberos</h3>
+        <div class="table-wrap"><table><thead><tr><th></th><th>NTLM</th><th>Kerberos</th></tr></thead><tbody>
+          <tr><td>Type</td><td>Challenge-response, hash NTLM.</td><td>Tickets, KDC, TGT/TGS.</td></tr>
+          <tr><td>Contexte</td><td>Comptes locaux, workgroup, compatibilité.</td><td>Active Directory.</td></tr>
+          <tr><td>Attaques</td><td>Pass-the-Hash, relay NTLM.</td><td>Pass-the-Ticket, Kerberoasting, Golden Ticket.</td></tr>
+          <tr><td>Protection</td><td>Réduire NTLM, Credential Guard, SMB signing, EPA.</td><td>Durcissement Kerberos, comptes de service, surveillance.</td></tr>
+        </tbody></table></div>
+        <h3>Credential dumping &amp; LSASS</h3>
+        <p>LSASS manipule en mémoire des hashs NTLM, tickets Kerberos et parfois des mots de passe. Un <strong>dump mémoire</strong> (Mimikatz, procdump, Task Manager) permet de les extraire et de les réutiliser (Pass-the-Hash, Pass-the-Ticket).</p>
+        <div class="box danger"><div class="box-title">Pourquoi c'est critique</div><p>Un dump de LSASS peut compromettre l'identité sans connaître le mot de passe. Sur un contrôleur de domaine, il peut mener à la compromission totale du domaine.</p></div>
+        <h3>Protections</h3>
+        <ul><li><strong>LSA Protection / RunAsPPL</strong> : LSASS en processus protégé ; empêche le dump sauf driver signé.</li><li><strong>Credential Guard</strong> : isolation des secrets via VBS (Virtualization-Based Security), donc l'hyperviseur.</li><li><strong>TPM</strong> : protection matérielle des clés.</li><li><strong>Désactiver WDigest</strong> : évite de stocker les mots de passe en clair en mémoire.</li><li><strong>Windows Defender / EDR</strong> : détection des outils de dump.</li><li><strong>Moindre privilège</strong> : limiter les comptes admin, utiliser des comptes dédiés et des postes d'administration (PAW).</li><li><strong>Surveillance</strong> : alertes sur l'accès à LSASS, 4624/4672/4688.</li></ul>
+        <h3>Windows Hello</h3>
+        <p>Authentification sans transmission du mot de passe : PIN, visage, empreinte. Le PIN sert localement à déverrouiller une clé cryptographique liée à l'appareil ; la clé privée ne quitte normalement pas le terminal. Réduit le phishing et le vol de mot de passe.</p>
+        <h3>Si MPSSVC (firewall Windows) est vulnérable</h3>
+        <p>Les mécanismes qui limitent les dégâts : isolation du service (SID restreint), ASLR, DEP, CFG, MIC/AppContainer, signature de code, moindre privilège, segmentation, EDR. Un service vulnérable ne doit pas automatiquement donner SYSTEM.</p>
+      </section>
+
+      <section class="note" id="wincis" data-topic="os-14">
+        <div class="note-head"><div class="note-num">14</div><h2>Windows : CIS, EAL &amp; audit</h2><label class="topic-check"><input type="checkbox" data-topic="os-14">Validé</label></div>
+        <h3>Les recommandations CIS de l'annale</h3>
+        <div class="table-wrap"><table><thead><tr><th>Recommandation</th><th>Pourquoi</th></tr></thead><tbody>
+          <tr><td><strong>Exiger Ctrl+Alt+Del</strong> (désactiver « ne pas exiger »)</td><td>Séquence d'attention sécurisée interceptée par le noyau ; empêche les faux écrans de connexion et le phishing.</td></tr>
+          <tr><td><strong>Interdire l'énumération anonyme SAM/partages</strong></td><td>Empêche un attaquant de lister les comptes et partages sans authentification ; réduit la surface de reconnaissance.</td></tr>
+          <tr><td><strong>UAC : détecter les installations et demander l'élévation</strong></td><td>Bloque l'installation silencieuse de malware ; applique le moindre privilège.</td></tr>
+          <tr><td><strong>Désactiver le service de géolocalisation</strong></td><td>Protection de la vie privée, réduction de la surface d'attaque, minimisation.</td></tr>
+          <tr><td><strong>Activer Secure Boot</strong></td><td>Vérifie la signature de la chaîne de démarrage ; bloque bootkits et rootkits.</td></tr>
+          <tr><td><strong>Aucun partage accessible anonymement</strong></td><td>Empêche la fuite de données et l'accès non authentifié.</td></tr>
+        </tbody></table></div>
+        <h3>EAL4+ et C2</h3>
+        <p><strong>Common Criteria</strong> (ISO/IEC 15408) définit des niveaux d'assurance <strong>EAL1 à EAL7</strong>. <strong>EAL4+</strong> correspond à une conception méthodique, des tests et une revue de sécurité ; c'est le niveau courant des OS grand public. <strong>C2</strong> est une classe du TCSEC (norme américaine) : contrôle d'accès discrétionnaire, authentification, audit, protection mémoire.</p>
+        <p>Pourquoi difficiles à dépasser : complexité des OS (millions de lignes), coût et durée de certification, nécessité de preuves formelles (EAL7), incompatibilité avec certaines fonctionnalités grand public, accès au code source, évolutions permanentes.</p>
+        <h3>Security by design</h3>
+        <p>Intégrer la sécurité dès la conception, pas en rustine. Cela implique un cycle SDL : formation, exigences de sécurité, modélisation des menaces, revue de code, tests, réponse aux incidents. Microsoft l'applique depuis 2003 (Trustworthy Computing).</p>
+        <h3>Audit &amp; événements Windows</h3>
+        <div class="table-wrap"><table><thead><tr><th>Événement</th><th>Signification</th></tr></thead><tbody>
+          <tr><td><strong>4624</strong></td><td>Ouverture de session réussie.</td></tr>
+          <tr><td><strong>4625</strong></td><td>Échec d'ouverture de session (brute force).</td></tr>
+          <tr><td><strong>4634</strong></td><td>Fermeture de session.</td></tr>
+          <tr><td><strong>4648</strong></td><td>Connexion avec des identifiants explicites.</td></tr>
+          <tr><td><strong>4672</strong></td><td>Privilèges spéciaux attribués (admin).</td></tr>
+          <tr><td><strong>4688</strong></td><td>Création de processus.</td></tr>
+          <tr><td><strong>4720 / 4726</strong></td><td>Création / suppression de compte.</td></tr>
+          <tr><td><strong>4740</strong></td><td>Compte verrouillé.</td></tr>
+        </tbody></table></div>
+        <p><code>auditpol /get /category:*</code> affiche la politique d'audit. Les profils de pare-feu Windows sont <strong>Domain</strong>, <strong>Private</strong>, <strong>Public</strong> ; le profil Public est le plus restrictif car le réseau est non maîtrisé. <strong>SMBv1</strong> doit être désactivé (EternalBlue/WannaCry) ; la signature SMB protège contre le relay et le tampering.</p>
+        <h3>Hardening Windows : sources</h3>
+        <p>Microsoft Security Baselines (GPO/ADMX/PowerShell), CIS Benchmarks, ANSSI, BSI, CISA, STIG. Outils : HardeningKitty, scripts PowerShell, GPO. Vérifier : services inutiles, comptes locaux, UAC, Defender, firewall, SMB, RDP (NLA), PowerShell logging, LAPS, BitLocker, Secure Boot.</p>
+      </section>
+
+      <section class="note" id="annales" data-topic="os-15">
+        <div class="note-head"><div class="note-num">15</div><h2>Annales : QCM &amp; questions ouvertes</h2><label class="topic-check"><input type="checkbox" data-topic="os-15">Validé</label></div>
+
+        <h3>Corrigé express — banque QCM Moodle</h3>
+        <div class="table-wrap"><table><thead><tr><th>Question</th><th>Réponse</th><th>Justification</th></tr></thead><tbody>
+          <tr><td>Noyau d'un OS</td><td>a, c</td><td>Programme en C/assembleur, s'exécute en mode privilégié.</td></tr>
+          <tr><td>Minimisation</td><td>a, b</td><td>Suivi/mise à jour efficace + réduction de la surface d'attaque.</td></tr>
+          <tr><td>Apache root puis www-data</td><td>b</td><td>Moindre privilège.</td></tr>
+          <tr><td>SELinux</td><td>b, d</td><td>Cloisonnement + contrôle d'accès obligatoire (MAC).</td></tr>
+          <tr><td>Défense en profondeur</td><td>a, b</td><td>Facilite la détection et la remédiation.</td></tr>
+          <tr><td>Auth + chiffrement + firewall</td><td>a</td><td>Défense en profondeur.</td></tr>
+          <tr><td>Répertoire sur disque séparé</td><td>c</td><td><code>/home</code> (données utilisateurs).</td></tr>
+          <tr><td>umask 002</td><td>0664</td><td>666 − 002 = 664.</td></tr>
+          <tr><td>Bit SUID</td><td>b</td><td>Uniquement si le programme est de confiance.</td></tr>
+          <tr><td>Premier programme utilisateur</td><td>d</td><td><code>systemd</code>.</td></tr>
+          <tr><td>Mots de passe</td><td>a</td><td><code>/etc/shadow</code>.</td></tr>
+          <tr><td>Noyau Linux</td><td>b</td><td>Monolithique modulaire (modules chargés à chaud).</td></tr>
+          <tr><td>Erreur dans /etc/passwd</td><td>GID + shell</td><td>GID non numérique ; <code>/bin/passwd</code> n'est pas un shell valide.</td></tr>
+          <tr><td>Lister les SUID</td><td>c</td><td><code>find / -perm -4000 -type f</code>.</td></tr>
+          <tr><td>Droit d'ouvrir un répertoire</td><td>c</td><td><code>execute</code>.</td></tr>
+          <tr><td>Modèle traditionnel</td><td>c</td><td>Ne permet pas de retirer un privilège selon le contexte.</td></tr>
+          <tr><td>umask ANSSI</td><td>0027</td><td>Recommandation ANSSI.</td></tr>
+          <tr><td>Répertoires world-writable</td><td>b</td><td>Sticky bit.</td></tr>
+          <tr><td>PAM</td><td>a, c</td><td>Centralise l'authentification + politique de mot de passe.</td></tr>
+          <tr><td>sudo</td><td>a</td><td>Délègue des droits et privilèges.</td></tr>
+          <tr><td><code>NOPASSWD: sudoedit /etc/httpd/*</code></td><td>b</td><td>Risqué (wildcard + traversée <code>..</code>).</td></tr>
+          <tr><td>Pseudo-terminal</td><td>a, c</td><td>Interaction à distance + conseillé avec sudo.</td></tr>
+          <tr><td>Noyau monolithique non modulaire</td><td>b, c</td><td>Difficile à concevoir, performant.</td></tr>
+          <tr><td>Directives sudo</td><td>b, c, d</td><td><code>requiretty</code>, <code>noexec</code>, <code>use_pty</code>.</td></tr>
+          <tr><td>Faiblesses SUID</td><td>a, b, c, d</td><td>Entrées, sorties, environnement, processus non contrôlés.</td></tr>
+          <tr><td>Buffer overflow</td><td>c</td><td>Écrire plus de données que la capacité mémoire.</td></tr>
+          <tr><td>Rootkit</td><td>a</td><td>Modifie les fichiers système/noyau pour masquer l'intrus.</td></tr>
+          <tr><td>EAL Windows/Linux</td><td>EAL4+</td><td>Niveau d'assurance Common Criteria.</td></tr>
+          <tr><td>Composant en mode utilisateur</td><td>a</td><td><code>NTDLL.DLL</code>.</td></tr>
+          <tr><td>SRM</td><td>b</td><td>Dans l'Executive ; contrôle d'accès et audit.</td></tr>
+          <tr><td>SID</td><td>c</td><td>Identifiant de sécurité.</td></tr>
+          <tr><td>Micro-noyau</td><td>a, b</td><td>Ordonnanceur + IPC.</td></tr>
+          <tr><td>Protections buffer overflow Windows</td><td>a, c</td><td>DEP + ASLR.</td></tr>
+          <tr><td>macOS</td><td>a, b</td><td>Hybride, FreeBSD + Mach.</td></tr>
+          <tr><td>Durcissement OS</td><td>a, b</td><td>Principes + conformité méthodique.</td></tr>
+          <tr><td>Serveur multi-couches</td><td>b</td><td>Niveau intermédiaire ANSSI.</td></tr>
+          <tr><td>Mesures minimales</td><td>b, d</td><td>Mises à jour + suppression des programmes inutiles.</td></tr>
+        </tbody></table></div>
+
+        <h3>Questions ouvertes 2024</h3>
+        <details class="q-open"><summary>1 · Mise à jour d'un système avec applications métier critiques</summary><div class="details-body"><p><strong>Problème :</strong> incompatibilité, régression, arrêt de service. <strong>Processus :</strong> inventaire, veille, test miroir, non-régression, pilote, déploiement progressif, fenêtre de maintenance, snapshot/sauvegarde, rollback, haute disponibilité, communication. <strong>Principe :</strong> veille &amp; maintenance + défense en profondeur.</p></div></details>
+        <details class="q-open"><summary>2 · Journalisation centralisée temps réel</summary><div class="details-body"><p><strong>Intérêts :</strong> preuves conservées, détection rapide, corrélation, l'attaquant ne peut pas effacer localement. <strong>Inconvénients :</strong> charge réseau, SPOF, latence, sécurisation du serveur de logs. <strong>Bonnes pratiques :</strong> NTP, TLS, rotation, rétention, accès restreint, alertes.</p></div></details>
+        <details class="q-open"><summary>3 · Set-UID root : risque, surfaces, bonnes pratiques, abandon ?</summary><div class="details-body"><p>Voir section 5. Risque = escalade de privilèges. Surfaces = entrées, environnement, TOCTOU, shell, descripteurs. Bonnes pratiques = minimiser, auditer, nettoyer, abandonner les privilèges, capabilities. Abandon total impossible (passwd, sudo), mais réduction forte possible.</p></div></details>
+        <details class="q-open"><summary>4 · Le point dans PATH</summary><div class="details-body"><p>Si <code>.</code> est dans le PATH, le shell cherche d'abord dans le répertoire courant. Un attaquant place un faux <code>ls</code> ou <code>sudo</code> dans un répertoire où root travaille ; root l'exécute avec ses droits. Exemple : <code>echo '#!/bin/bash' &gt; /tmp/ls</code>, puis root fait <code>cd /tmp; ls</code>. Solution : retirer <code>.</code> et les répertoires world-writable du PATH, utiliser des chemins absolus, <code>ignore_dot</code> dans sudo.</p></div></details>
+        <details class="q-open"><summary>5 · Firewall Linux basé sur une ISO : démarche</summary><div class="details-body"><p>Appliquer les principes : système minimal (pas de GUI, services essentiels), dépôts signés, partitioning, <code>noexec/nosuid/nodev</code>, SELinux/AppArmor, kernel sysctl, SSH par clés + 2FA, interface d'admin en HTTPS, firewall iptables/nftables deny all, logs centralisés, IDS/IPS, mises à jour signées, rollback, documentation, tests. Chaque choix doit être relié à un principe (minimisation, moindre privilège, défense en profondeur).</p></div></details>
+        <details class="q-open"><summary>6 · Windows : Security by design, EAL4+/C2, Winlogon/LSASS/SRM</summary><div class="details-body"><p>Voir sections 12 à 14. Security by design = sécurité dès la conception (SDL). EAL4+ = Common Criteria, C2 = TCSEC. Winlogon = sessions ; LSASS = authentification/token/secrets ; SRM = contrôle d'accès/audit.</p></div></details>
+        <details class="q-open"><summary>7 · Vulnérabilité dans MPSSVC : qu'est-ce qui limite les dégâts ?</summary><div class="details-body"><p>Isolation du service (SID restreint), ASLR, DEP, CFG, MIC/AppContainer, signature de code, moindre privilège, segmentation, EDR. Le service ne doit pas tourner avec des privilèges excessifs.</p></div></details>
+        <details class="q-open"><summary>8 · LSASS memory dumping : danger et protection</summary><div class="details-body"><p>Danger : extraction de hashs/tickets, Pass-the-Hash/Ticket, compromission du domaine. Protection : Credential Guard, LSA Protection/PPL, désactiver WDigest, Defender/EDR, moindre privilège, surveillance des accès, TPM.</p></div></details>
+        <details class="q-open"><summary>9 · Niveau ANSSI « Renforcé » : situation, isolation, journalisation</summary><div class="details-body"><p>Situation : serveur exposé à Internet, données sensibles, infrastructure critique. Isolation : namespaces, SELinux/AppArmor, chroot, conteneurs, VM. Journalisation : centralisation, intégrité, NTP, TLS, rétention, alertes, rotation, séparation des privilèges.</p></div></details>
+        <details class="q-open"><summary>10 · Protéger contre le buffer overflow sous Linux et Windows</summary><div class="details-body"><p>Linux : ASLR, NX/DEP, canary, PIE, RELRO, FORTIFY, compilation sécurisée. Windows : DEP, ASLR, /GS, CFG, SafeSEH/SEHOP, Device Guard. Les deux : validation des entrées, revue de code, langages sûrs, tests.</p></div></details>
+      </section>
+
+      <section class="note" id="quiz"><div class="note-head"><div class="note-num">?</div><h2>Quiz express</h2></div><p class="muted small">10 questions tirées au hasard. Objectif : 8/10.</p><div class="quiz-shell" data-quiz="os" data-count="10"></div></section>
+      <section class="note" id="flashcards"><div class="note-head"><div class="note-num">⚡</div><h2>Flashcards</h2></div><button class="btn primary" data-flashcards="os">Lancer les flashcards →</button><span class="small muted" style="margin-left:8px">Espace = retourner · ← → = naviguer</span></section>
+
+      <div class="box exam">
+        <div class="box-title">Dernière minute — OS</div>
+        <ul class="two-col-list">
+          <li>Minimisation, moindre privilège, défense en profondeur, veille.</li>
+          <li>umask 0027 → fichier 640, répertoire 750.</li>
+          <li>SUID = EUID du propriétaire ; find -perm -4000.</li>
+          <li>Sticky = /tmp ; SGID = héritage de groupe.</li>
+          <li>sudo : use_pty, noexec, requiretty, umask 0027.</li>
+          <li>PAM = auth centralisée + politique mdp.</li>
+          <li>SELinux/AppArmor = MAC + cloisonnement.</li>
+          <li>ASLR=2, NX, canary, PIE, RELRO.</li>
+          <li>Winlogon = session ; LSASS = auth ; SRM = accès.</li>
+          <li>UAC = token filtré + élévation ; MIC = intégrité.</li>
+          <li>Credential Guard = VBS ; LSA Protection = PPL.</li>
+          <li>4625 = échec de logon ; 4672 = privilèges admin.</li>
+        </ul>
+      </div>
+
+      <div class="hero-actions no-print"><a class="btn" href="si.html">Matière suivante : SI →</a><a class="btn ghost" href="last-minute.html">Dernière minute</a><button class="btn ghost" data-action="print">Imprimer la fiche</button></div>
+    </div>
+  </div>
+</main>
+
+<footer class="footer"><div class="wrap"><span>Sécurité des OS · synthèse cours + TP + annales Moodle/2024.</span><span><a href="index.html">Accueil</a> · <a href="plan.html">Plan</a></span></div></footer>
+
+<nav class="mobile-nav" aria-label="Navigation mobile"><a href="index.html"><span>⌂</span>Accueil</a><a href="plan.html"><span>▦</span>Plan</a><a href="eh.html"><span>EH</span>Hacking</a><a href="reseau.html"><span>SR</span>Réseaux</a><a href="os.html" class="active"><span>OS</span>OS</a><a href="si.html"><span>SI</span>SI</a><a href="vs.html"><span>VS</span>Virtu.</a><a href="last-minute.html"><span>⚡</span>J-1</a></nav>
+
+<div class="search-overlay" id="search-overlay"><div class="search-box"><div class="search-input-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="search-input" type="search" placeholder="Rechercher une notion, un outil, une commande…" autocomplete="off"><span class="kbd">Échap</span></div><div class="search-results" id="search-results"></div></div></div>
+
+<div class="fc-overlay" id="fc-overlay"><div class="fc-modal"><div class="fc-head"><strong>Flashcards · OS</strong><span class="fc-count" id="fc-count">1 / 1</span><button class="icon-btn" id="fc-close" aria-label="Fermer">✕</button></div><div class="fc-card" id="fc-card"><div class="fc-inner"><div class="fc-face" id="fc-front"><div class="tag">Question</div><div class="fc-text"></div><div class="hint">Clique pour retourner</div></div><div class="fc-face fc-back" id="fc-back"><div class="tag">Réponse</div><div class="fc-text"></div><div class="hint">Clique pour revenir</div></div></div></div><div class="fc-controls"><button class="btn" id="fc-prev">← Précédent</button><button class="btn" id="fc-shuffle">Mélanger</button><button class="btn primary" id="fc-next">Suivant →</button></div></div></div>
+
+<script src="assets/search-index.js"></script>
+<script src="assets/quiz-data.js"></script>
+<script src="assets/flashcards.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Plan de révision 5 jours — Cap sur le DE</title>
+<meta name="description" content="Plan de révision sur 5 jours pour les 5 DE ST2, avec sessions, priorités et méthode de révision active.">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap topbar-inner">
+    <a class="brand" href="index.html"><span class="brand-mark">DE</span><span>Cap sur le DE<small>ST2 · 5 matières</small></span></a>
+    <nav class="nav-links" aria-label="Navigation principale">
+      <a href="index.html">Accueil</a>
+      <a href="plan.html" class="active">Plan 5 jours</a>
+      <a href="eh.html">Ethical Hacking</a>
+      <a href="reseau.html">Réseaux</a>
+      <a href="os.html">OS</a>
+      <a href="si.html">Systèmes d'info</a>
+      <a href="vs.html">Virtualisation</a>
+      <a href="last-minute.html">Dernière minute</a>
+    </nav>
+    <div class="top-actions">
+      <button class="icon-btn" id="btn-search" aria-label="Rechercher"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></button>
+      <button class="icon-btn" id="btn-theme" aria-label="Changer de thème"></button>
+      <div class="progress-pill"><svg class="ring" id="top-ring" viewBox="0 0 24 24"><circle class="bg" cx="12" cy="12" r="9"/><circle class="fg" cx="12" cy="12" r="9" stroke-dasharray="56.5" stroke-dashoffset="56.5"/></svg><span class="pp-text" id="top-progress-text">0 %</span></div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="hero" style="padding-bottom:10px">
+    <div class="eyebrow">Plan de bataille</div>
+    <h1 style="font-size:clamp(1.9rem,3.6vw,2.8rem)">5 jours pour sécuriser<br>les 5 matières.</h1>
+    <p class="lead">Un plan réaliste : 3 h 30 à 4 h de travail actif par jour, pas 10 h de lecture. Les matières les plus prévisibles passent en premier ; les plus techniques ont leurs propres journées. Coche les étapes au fur et à mesure.</p>
+    <div class="hero-actions">
+      <a class="btn primary" href="last-minute.html">Voir la fiche dernière minute</a>
+      <button class="btn" data-action="print">Imprimer le plan</button>
+    </div>
+  </section>
+
+  <div class="box key mt-2">
+    <div class="box-title">Progression du plan</div>
+    <div class="card-progress" style="margin:8px 0 0"><div class="bar" style="height:9px"><i id="plan-progress"></i></div><span id="plan-progress-text">0/20 étapes</span></div>
+  </div>
+
+  <div class="section-head">
+    <div>
+      <div class="kicker">Le déroulé</div>
+      <h2>J-5 → J-1</h2>
+      <p>Chaque bloc indique la matière, la durée cible et l'action exacte. Le temps est indicatif : si tu bloques, réduis le bloc, ne supprime pas le quiz.</p>
+    </div>
+  </div>
+
+  <article class="day-card">
+    <div class="day-head"><div class="day-num">J-5</div><div><h3>Fondations : SI + Virtualisation</h3><div class="day-sub">Les deux matières les plus rentables. On installe le vocabulaire et les réflexes de copie.</div></div></div>
+    <label class="plan-item"><input type="checkbox" data-plan="d1-1"><div class="pi-body"><div class="pi-title">SI — Lire « Cas pratique : le cabinet médical » et la méthode d'audit</div><div class="pi-meta">60 min · Fiche SI, sections 1 à 3 + cas corrigé</div></div></label>
+    <label class="plan-item"><input type="checkbox" data-plan="d1-2"><div class="pi-body"><div class="pi-title">SI — RGPD, analyse de risques, ISO 27001/27005</div><div class="pi-meta">60 min · Apprendre les définitions et les 4 traitements du risque</div></div></label>
+    <label class="plan-item"><input type="checkbox" data-plan="d1-3"><div class="pi-body"><div class="pi-title">VS — Hyperviseurs, types de virtualisation, stockage</div><div class="pi-meta">60 min · Schémas type 1 / type 2 / conteneur à refaire au brouillon</div></div></label>
+    <label class="plan-item"><input type="checkbox" data-plan="d1-4"><div class="pi-body"><div class="pi-title">Quiz SI + VS, puis réciter 10 définitions</div><div class="pi-meta">30 min · Objectif : 7/10 minimum avant de passer à la suite</div></div></label>
+  </article>
+
+  <article class="day-card">
+    <div class="day-head"><div class="day-num">J-4</div><div><h3>Réseaux : architecture, DMZ, firewall</h3><div class="day-sub">La journée la plus « exam » : savoir lire un schéma et écrire des règles de filtrage.</div></div></div>
+    <label class="plan-item"><input type="checkbox" data-plan="d2-1"><div class="pi-body"><div class="pi-title">Réseaux — DMZ, segmentation, deux firewalls, proxies</div><div class="pi-meta">75 min · Fiche Réseaux, sections 1 à 4</div></div></label>
+    <label class="plan-item"><input type="checkbox" data-plan="d2-2"><div class="pi-body"><div class="pi-title">Réseaux — Refaire l'exercice firewall des annales</div><div class="pi-meta">60 min · Écrire le tableau FW2 sans regarder le corrigé</div></div></label>
+    <label class="plan-item"><input type="checkbox" data-plan="d2-3"><div class="pi-body"><div class="pi-title">Réseaux — IPsec, VPN, Wi-Fi, DDoS</div><div class="pi-meta">60 min · Tableaux de comparaison + NAT-T</div></div></label>
+    <label class="plan-item"><input type="checkbox" data-plan="d2-4"><div class="pi-body"><div class="pi-title">Quiz Réseaux + réciter les 7 principes firewall</div><div class="pi-meta">30 min · Objectif : 8/10</div></div></label>
+  </article>
+
+  <article class="day-card">
+    <div class="day-head"><div class="day-num">J-3</div><div><h3>OS : Linux puis Windows</h3><div class="day-sub">Deux blocs distincts. Ne mélange pas : le correcteur attend des mécanismes précis.</div></div></div>
+    <label class="plan-item"><input type="checkbox" data-plan="d3-1"><div class="pi-body"><div class="pi-title">OS — Permissions, umask, SUID/SGID, sudo, PAM</div><div class="pi-meta">75 min · Savoir calculer et expliquer chaque risque</div></div></label>
+    <label class="plan-item"><input type="checkbox" data-plan="d3-2"><div class="pi-body"><div class="pi-title">OS — Durcissement Linux, sysctl, journalisation, patch management</div><div class="pi-meta">50 min · Apprendre 6 paramètres sysctl + leur attaque évitée</div></div></label>
+    <label class="plan-item"><input type="checkbox" data-plan="d3-3"><div class="pi-body"><div class="pi-title">OS — Windows : architecture, LSASS, UAC, Credential Guard</div><div class="pi-meta">75 min · Fiche OS, sections Windows</div></div></label>
+    <label class="plan-item"><input type="checkbox" data-plan="d3-4"><div class="pi-body"><div class="pi-title">Quiz OS + expliquer LSASS à voix haute</div><div class="pi-meta">30 min · Objectif : 7/10</div></div></label>
+  </article>
+
+  <article class="day-card">
+    <div class="day-head"><div class="day-num">J-2</div><div><h3>Hacking : méthodes et outils</h3><div class="day-sub">Le QCM se joue sur les définitions et les commandes. Les questions ouvertes se jouent sur la structure.</div></div></div>
+    <label class="plan-item"><input type="checkbox" data-plan="d4-1"><div class="pi-body"><div class="pi-title">EH — Phases du pentest, reconnaissance passive/active, OSINT</div><div class="pi-meta">60 min · Tableau des outils + Nmap</div></div></label>
+    <label class="plan-item"><input type="checkbox" data-plan="d4-2"><div class="pi-body"><div class="pi-title">EH — Metasploit, msfvenom, brute force et défenses</div><div class="pi-meta">60 min · Workflow exact + commandes</div></div></label>
+    <label class="plan-item"><input type="checkbox" data-plan="d4-3"><div class="pi-body"><div class="pi-title">EH — Rédiger 2 questions ouvertes d'annales</div><div class="pi-meta">40 min · Footprinting + 5 phases du projet</div></div></label>
+    <label class="plan-item"><input type="checkbox" data-plan="d4-4"><div class="pi-body"><div class="pi-title">Réseaux — Relire Wi-Fi + IPsec (30 min), puis quiz EH</div><div class="pi-meta">40 min · Les deux sujets qui reviennent chaque année</div></div></label>
+  </article>
+
+  <article class="day-card">
+    <div class="day-head"><div class="day-num">J-1</div><div><h3>Restitution, pas découverte</h3><div class="day-sub">Aucune nouvelle notion. On consolide, on simule, on dort.</div></div></div>
+    <label class="plan-item"><input type="checkbox" data-plan="d5-1"><div class="pi-body"><div class="pi-title">Lire les 5 fiches « dernière minute »</div><div class="pi-meta">30 min · Une matière à la fois, à voix haute</div></div></label>
+    <label class="plan-item"><input type="checkbox" data-plan="d5-2"><div class="pi-body"><div class="pi-title">Faire les 5 quiz en mode examen</div><div class="pi-meta">60 min · Sans fiche, sans pause, noter les erreurs</div></div></label>
+    <label class="plan-item"><input type="checkbox" data-plan="d5-3"><div class="pi-body"><div class="pi-title">Refaire 2 questions ouvertes par matière au brouillon</div><div class="pi-meta">60 min · Plan en 3 lignes + mots-clés, pas de rédaction complète</div></div></label>
+    <label class="plan-item"><input type="checkbox" data-plan="d5-4"><div class="pi-body"><div class="pi-title">Relire uniquement les pièges et les tableaux de comparaison</div><div class="pi-meta">30 min · Puis écran off, 7 h de sommeil</div></div></label>
+  </article>
+
+  <div class="section-head">
+    <div>
+      <div class="kicker">Rituel de session</div>
+      <h2>Le format qui fait retenir</h2>
+      <p>Utilise ce cycle pour chaque bloc de 60 à 75 minutes. Il est plus efficace que 3 h de surlignage.</p>
+    </div>
+  </div>
+  <div class="timer-grid">
+    <div class="timer-card" style="--subject-color:var(--accent)"><b>5 min</b><strong>Rappel à froid</strong><p class="small muted">Sans fiche : écris tout ce dont tu te souviens sur la notion.</p></div>
+    <div class="timer-card" style="--subject-color:var(--accent)"><b>25 min</b><strong>Apprentissage</strong><p class="small muted">Lis une section, ferme-la, récite. Coche seulement si tu peux expliquer.</p></div>
+    <div class="timer-card" style="--subject-color:var(--accent)"><b>5 min</b><strong>Pause réelle</strong><p class="small muted">Loin de l'écran. Eau, mouvement, pas de téléphone.</p></div>
+    <div class="timer-card" style="--subject-color:var(--accent)"><b>15 min</b><strong>Quiz / restitution</strong><p class="small muted">Quiz, question ouverte ou schéma au brouillon.</p></div>
+    <div class="timer-card" style="--subject-color:var(--accent)"><b>5 min</b><strong>Bilan</strong><p class="small muted">Note les 3 erreurs et la notion à revoir demain matin.</p></div>
+  </div>
+
+  <div class="section-head">
+    <div>
+      <div class="kicker">Plan de secours</div>
+      <h2>Tu n'as que 48 h ?</h2>
+      <p>Version dégradée mais réaliste : on sacrifie la profondeur, pas les questions d'annales.</p>
+    </div>
+  </div>
+  <div class="grid-2">
+    <div class="box warn">
+      <div class="box-title">Jour 1 — 6 h</div>
+      <ul>
+        <li><strong>2 h SI :</strong> cas pratique + RGPD + risk. Lis le cas corrigé en entier.</li>
+        <li><strong>2 h VS :</strong> hyperviseurs, stockage, Docker. Fais le quiz.</li>
+        <li><strong>2 h Réseaux :</strong> DMZ, firewall, IPsec, Wi-Fi. Refaire le tableau FW2.</li>
+      </ul>
+    </div>
+    <div class="box warn">
+      <div class="box-title">Jour 2 — 6 h</div>
+      <ul>
+        <li><strong>2 h OS :</strong> Linux (SUID/sudo) + Windows (LSASS/UAC).</li>
+        <li><strong>2 h EH :</strong> phases, OSINT, Nmap, Metasploit, brute force.</li>
+        <li><strong>2 h :</strong> 5 quiz + 2 questions ouvertes par matière + dernière minute.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="box danger">
+    <div class="box-title">Ce qu'il ne faut pas faire</div>
+    <ul class="crosslist">
+      <li>Lire les 300 slides du cours une dernière fois « pour être sûr ».</li>
+      <li>Apprendre par cœur des corrigés sans comprendre la structure de réponse.</li>
+      <li>Passer 2 h sur une notion marginale qui n'est jamais tombée.</li>
+      <li>Faire une nuit blanche : tu perdras plus de points sur les QCM faciles que tu n'en gagneras sur le détail.</li>
+    </ul>
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="wrap"><span>Plan personnel — adapte les durées à ton énergie, garde les quiz.</span><span><a href="index.html">Accueil</a> · <a href="last-minute.html">Dernière minute</a></span></div>
+</footer>
+
+<nav class="mobile-nav" aria-label="Navigation mobile">
+  <a href="index.html"><span>⌂</span>Accueil</a>
+  <a href="plan.html" class="active"><span>▦</span>Plan</a>
+  <a href="eh.html"><span>EH</span>Hacking</a>
+  <a href="reseau.html"><span>SR</span>Réseaux</a>
+  <a href="os.html"><span>OS</span>OS</a>
+  <a href="si.html"><span>SI</span>SI</a>
+  <a href="vs.html"><span>VS</span>Virtu.</a>
+  <a href="last-minute.html"><span>⚡</span>J-1</a>
+</nav>
+
+<div class="search-overlay" id="search-overlay">
+  <div class="search-box">
+    <div class="search-input-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="search-input" type="search" placeholder="Rechercher une notion, un outil, une commande…" autocomplete="off">
+      <span class="kbd">Échap</span>
+    </div>
+    <div class="search-results" id="search-results"></div>
+  </div>
+</div>
+
+<script src="assets/search-index.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>

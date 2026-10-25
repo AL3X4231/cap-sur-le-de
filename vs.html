@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Virtualisation &amp; Stockage — Cap sur le DE</title>
+<meta name="description" content="Fiche Virtualisation et Stockage : hyperviseurs, stockage, VMware, Docker, Compose, annales corrigées.">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body style="--subject-color:var(--vs);--subject-soft:var(--vs-soft)">
+
+<header class="topbar">
+  <div class="wrap topbar-inner">
+    <a class="brand" href="index.html"><span class="brand-mark">DE</span><span>Cap sur le DE<small>ST2 · 5 matières</small></span></a>
+    <nav class="nav-links" aria-label="Navigation principale"><a href="index.html">Accueil</a><a href="plan.html">Plan</a><a href="eh.html">Hacking</a><a href="reseau.html">Réseaux</a><a href="os.html">OS</a><a href="si.html">SI</a><a href="vs.html" class="active">Virtualisation</a><a href="last-minute.html">J-1</a></nav>
+    <div class="top-actions">
+      <button class="icon-btn" id="btn-search" aria-label="Rechercher"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></button>
+      <button class="icon-btn" id="btn-theme" aria-label="Changer de thème"></button>
+      <div class="progress-pill"><svg class="ring" id="top-ring" viewBox="0 0 24 24"><circle class="bg" cx="12" cy="12" r="9"/><circle class="fg" cx="12" cy="12" r="9" stroke-dasharray="56.5" stroke-dashoffset="56.5"/></svg><span class="pp-text" id="top-progress-text">0 %</span></div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="subject-hero" data-watermark="VS">
+    <div class="kicker">Matière 5 · ST2VS</div>
+    <h1>Virtualisation &amp; Stockage</h1>
+    <p>La matière la plus rentable : les questions reviennent presque à l'identique. Définitions courtes, schémas, Docker et VMware. Si tu maîtrises cette fiche, tu sécurises une bonne note.</p>
+    <div class="subject-meta"><span class="chip">QCM + définitions</span><span class="chip">Docker</span><span class="chip">VMware</span><span class="chip">1 h à 1 h 50</span></div>
+    <div class="progress-line"><div class="bar"><i></i></div><span id="subject-progress-text">0/14 notions</span></div>
+  </section>
+
+  <div class="subject-layout">
+    <aside class="toc">
+      <h4>Dans cette fiche</h4>
+      <a href="#def">1 · Définition &amp; domaines</a>
+      <a href="#avantages">2 · Avantages &amp; consolidation</a>
+      <a href="#hyper">3 · Hyperviseurs &amp; types</a>
+      <a href="#reseau">4 · Réseau virtuel</a>
+      <a href="#stockage">5 · Architectures de stockage</a>
+      <a href="#vmware">6 · VMware vSphere</a>
+      <a href="#migrations">7 · Migrations &amp; snapshots</a>
+      <a href="#conteneurs">8 · Conteneurs &amp; Docker</a>
+      <a href="#docker">9 · Commandes Docker</a>
+      <a href="#dockerfile">10 · Dockerfile</a>
+      <a href="#compose">11 · Docker Compose</a>
+      <a href="#orchestration">12 · Orchestration &amp; sécurité</a>
+      <a href="#tp">13 · Questions de TP</a>
+      <a href="#annales">14 · Annales &amp; QCM corrigés</a>
+      <a href="#quiz">Quiz express</a>
+      <a href="#flashcards">Flashcards</a>
+      <div class="toc-tools"><button class="btn" data-action="expand">Déplier</button><button class="btn" data-action="collapse">Replier</button></div>
+    </aside>
+
+    <div class="content">
+      <div class="box exam">
+        <div class="box-title">Stratégie de copie</div>
+        <p>Réponses <strong>courtes, claires, précises</strong>. Une définition = une phrase + un exemple. Pour les schémas, fais trois colonnes : matériel → couche de virtualisation → invités. Les QCM sont souvent des questions de cours : ne cherche pas la nuance, choisis la réponse du cours.</p>
+      </div>
+
+      <section class="note" id="def" data-topic="vs-1">
+        <div class="note-head"><div class="note-num">1</div><h2>Définition &amp; domaines</h2><label class="topic-check"><input type="checkbox" data-topic="vs-1">Validé</label></div>
+        <p>La <strong>virtualisation</strong> est l'ensemble des techniques qui permettent de faire fonctionner plusieurs systèmes d'exploitation ou environnements sur une même machine physique, en abstraisant les ressources (CPU, mémoire, stockage, réseau).</p>
+        <p>Elle repose sur trois éléments : <strong>abstraction</strong> des ressources, <strong>répartition</strong> entre environnements, <strong>création</strong> d'environnements virtuels isolés.</p>
+        <div class="table-wrap"><table><thead><tr><th>Domaine</th><th>Principe</th><th>Exemple</th></tr></thead><tbody>
+          <tr><td><strong>Serveurs</strong></td><td>Plusieurs serveurs virtuels sur un serveur physique.</td><td>ESXi, Hyper-V, Proxmox.</td></tr>
+          <tr><td><strong>Postes de travail</strong></td><td>Bureau virtuel exécuté à distance.</td><td>VDI (Virtual Desktop Infrastructure), Citrix, Horizon.</td></tr>
+          <tr><td><strong>Applications</strong></td><td>Isoler une application de l'OS.</td><td>Wine, ThinApp, App-V, conteneurs applicatifs.</td></tr>
+          <tr><td><strong>Réseau</strong></td><td>Fonctions réseau en logiciel (SDN).</td><td>vSwitch, NSX, VLAN, VXLAN.</td></tr>
+          <tr><td><strong>Stockage</strong></td><td>Agréger et abstraire les ressources de stockage.</td><td>Datastore, vSAN, SAN, NAS.</td></tr>
+        </tbody></table></div>
+        <div class="box key"><div class="box-title">Vocabulaire</div><p><strong>Hôte</strong> : machine physique. <strong>Invité</strong> (<em>guest</em>) : OS installé dans la VM. <strong>VM</strong> : machine virtuelle. <strong>Hyperviseur</strong> : couche logicielle de virtualisation. <strong>VMM</strong> : Virtual Machine Monitor, synonyme d'hyperviseur.</p></div>
+        <p>La virtualisation a été popularisée par <strong>IBM</strong> dans les années 1960, puis relancée par VMware, Xen, KVM et les conteneurs.</p>
+      </section>
+
+      <section class="note" id="avantages" data-topic="vs-2">
+        <div class="note-head"><div class="note-num">2</div><h2>Avantages &amp; consolidation</h2><label class="topic-check"><input type="checkbox" data-topic="vs-2">Validé</label></div>
+        <div class="grid-2">
+          <div class="box tip"><div class="box-title">Avantages</div><ul><li>Consolidation et meilleure utilisation des ressources.</li><li>Réduction des coûts (matériel, énergie, climatisation, espace, personnel).</li><li>Déploiement rapide, agilité, automatisation.</li><li>Isolation des environnements.</li><li>Haute disponibilité, reprise après sinistre, PRA.</li><li>Tests, snapshots, clones, templates.</li><li>Support de systèmes legacy.</li><li>Green IT.</li></ul></div>
+          <div class="box warn"><div class="box-title">Inconvénients</div><ul><li>Surcoût de performance (couche d'abstraction).</li><li>Complexité de gestion et de compétences.</li><li>Point de défaillance unique (serveur, stockage, hyperviseur).</li><li>Licences et coûts cachés.</li><li>Sécurité : surface d'attaque et mouvements latéraux.</li><li>Dépendance au fournisseur.</li><li>Planification de capacité difficile.</li></ul></div>
+        </div>
+        <h3>Consolidation</h3>
+        <p><strong>Consolidation de serveurs :</strong> regrouper plusieurs serveurs physiques sous-utilisés sur moins de serveurs, grâce aux VM, pour optimiser les ressources et réduire les coûts.</p>
+        <p><strong>Consolidation du stockage :</strong> centraliser les capacités dispersées en une infrastructure partagée (SAN/NAS/vSAN), pour simplifier la gestion, améliorer l'efficacité et faciliter la protection des données.</p>
+        <p>Le taux de consolidation est le rapport entre le nombre de serveurs physiques initiaux et le nombre d'hôtes après virtualisation. On parle aussi de <em>P2V</em> pour la migration physique → virtuel.</p>
+      </section>
+
+      <section class="note" id="hyper" data-topic="vs-3">
+        <div class="note-head"><div class="note-num">3</div><h2>Hyperviseurs &amp; types de virtualisation</h2><label class="topic-check"><input type="checkbox" data-topic="vs-3">Validé</label></div>
+        <div class="table-wrap"><table><thead><tr><th></th><th>Type 1 (bare metal)</th><th>Type 2 (hosted)</th></tr></thead><tbody>
+          <tr><td>Installation</td><td>Directement sur le matériel.</td><td>Sur un OS hôte existant.</td></tr>
+          <tr><td>Performance</td><td>Meilleure, moins de couches.</td><td>Plus faible, dépend de l'OS hôte.</td></tr>
+          <tr><td>Usage</td><td>Datacenter, production.</td><td>Poste de travail, tests, développement.</td></tr>
+          <tr><td>Exemples</td><td>VMware ESXi, Hyper-V, Proxmox VE, Xen, KVM.</td><td>VirtualBox, VMware Workstation, QEMU, Parallels.</td></tr>
+          <tr><td>Natif ?</td><td>Oui.</td><td>Non.</td></tr>
+        </tbody></table></div>
+
+        <h3>Les techniques</h3>
+        <div class="table-wrap"><table><thead><tr><th>Technique</th><th>Principe</th><th>Avantages / limites</th><th>Exemples</th></tr></thead><tbody>
+          <tr><td><strong>Virtualisation complète</strong></td><td>Le matériel est émulé ; l'OS invité n'est pas modifié et croit être sur une machine physique.</td><td>Très compatible ; performance moindre sans assistance matérielle.</td><td>VirtualBox, VMware, QEMU.</td></tr>
+          <tr><td><strong>Paravirtualisation</strong></td><td>L'OS invité est modifié pour appeler l'hyperviseur (hypercalls).</td><td>Meilleures performances ; nécessite un OS adapté.</td><td>Xen, KVM, ESXi (assisté).</td></tr>
+          <tr><td><strong>Émulation</strong></td><td>Le logiciel simule complètement le matériel, instruction par instruction.</td><td>Permet d'exécuter une autre architecture ; très lent.</td><td>QEMU, Bochs.</td></tr>
+          <tr><td><strong>Isolation / conteneurs</strong></td><td>Partage du noyau de l'hôte ; isolation par namespaces et cgroups.</td><td>Léger, rapide ; isolation plus faible qu'une VM.</td><td>Docker, LXC, Podman.</td></tr>
+        </tbody></table></div>
+
+        <div class="box key"><div class="box-title">Les 3 schémas à savoir dessiner</div>
+          <pre><code>Type 1 : Matériel → Hyperviseur → VM1 | VM2 | VM3
+
+Type 2 : Matériel → OS hôte → Hyperviseur → VM1 | VM2
+
+Conteneur : Matériel → OS hôte (noyau partagé) → Moteur → C1 | C2 | C3</code></pre>
+          <p>Type 1 = natif, bare metal. Type 2 = hébergé, nécessite un OS. Conteneur = pas d'OS invité, un seul noyau partagé.</p>
+        </div>
+        <p><strong>Virtualisation imbriquée</strong> (<em>nested</em>) : faire tourner un hyperviseur dans une VM. Exemple : ESXi installé dans Proxmox ou VMware Workstation, pour un lab. Il faut exposer les extensions CPU (VT-x/AMD-V).</p>
+      </section>
+
+      <section class="note" id="reseau" data-topic="vs-4">
+        <div class="note-head"><div class="note-num">4</div><h2>Réseau virtuel</h2><label class="topic-check"><input type="checkbox" data-topic="vs-4">Validé</label></div>
+        <h3>Le vSwitch</h3>
+        <p>Un commutateur virtuel relie les VM entre elles et au réseau physique. Il fonctionne comme un switch : ports, VLAN, uplinks, port groups. Il est interne à l'hôte (vSwitch standard) ou distribué et centralisé par vCenter (vDS).</p>
+        <ul><li><strong>Port group</strong> : regroupement de ports avec une politique (VLAN, sécurité, teaming).</li><li><strong>Uplink</strong> : carte physique de l'hôte reliée au switch physique.</li><li><strong>VMkernel</strong> : interface du noyau ESXi pour la gestion, vMotion, iSCSI, NFS, vSAN.</li><li><strong>VLAN</strong> : segmentation logique du trafic.</li><li><strong>MTU</strong> : à aligner avec le switch physique pour les jumbo frames.</li></ul>
+        <h3>Les 3 types de réseau VMware</h3>
+        <div class="table-wrap"><table><thead><tr><th>Type</th><th>Fonctionnement</th><th>Accès</th><th>Usage</th></tr></thead><tbody>
+          <tr><td><strong>Bridged</strong></td><td>La VM est connectée directement au réseau physique, avec sa propre IP sur le même subnet que l'hôte.</td><td>Réseau local + Internet.</td><td>Serveur, tests réseau, visibilité directe.</td></tr>
+          <tr><td><strong>NAT</strong></td><td>La VM sort via l'hôte, qui fait la traduction d'adresse ; elle n'est pas visible directement de l'extérieur.</td><td>Internet, pas d'entrant sans redirection.</td><td>Poste de travail, tests, isolation.</td></tr>
+          <tr><td><strong>Host-only</strong></td><td>Réseau privé entre la VM et l'hôte uniquement.</td><td>Hôte ↔ VM, pas d'Internet.</td><td>Lab isolé, tests de sécurité.</td></tr>
+        </tbody></table></div>
+        <p><strong>Interne</strong> (VM-to-VM sans hôte) existe aussi selon les hyperviseurs ; VMware parle de <em>host-only</em> et de <em>LAN segments</em>.</p>
+        <h3>Dépannage réseau ESXi</h3>
+        <ol><li>Vérifier les cartes physiques et les uplinks (câble, switch, link).</li><li>Vérifier l'association au vSwitch et au port group (VLAN, MTU).</li><li>Vérifier que le port du switch physique est actif et autorise le VLAN.</li><li>Contrôler le VMkernel et la passerelle ; tester avec <code>vmkping</code>.</li><li>Consulter <code>esxcli network nic list</code>, <code>esxcli network vswitch standard list</code>, <code>esxcli network ip interface list</code>.</li></ol>
+      </section>
+
+      <section class="note" id="stockage" data-topic="vs-5">
+        <div class="note-head"><div class="note-num">5</div><h2>Architectures de stockage</h2><label class="topic-check"><input type="checkbox" data-topic="vs-5">Validé</label></div>
+        <div class="table-wrap"><table><thead><tr><th></th><th>DAS</th><th>NAS</th><th>SAN</th></tr></thead><tbody>
+          <tr><td>Signification</td><td>Direct Attached Storage</td><td>Network Attached Storage</td><td>Storage Area Network</td></tr>
+          <tr><td>Niveau</td><td>Bloc, directement attaché au serveur.</td><td>Fichier (NFS, SMB).</td><td>Bloc (FC, iSCSI, FCoE).</td></tr>
+          <tr><td>Réseau</td><td>Aucun réseau de stockage dédié.</td><td>Ethernet standard.</td><td>Réseau dédié haute performance.</td></tr>
+          <tr><td>Partage</td><td>Non partagé (ou limité).</td><td>Partagé entre clients.</td><td>Partagé entre serveurs.</td></tr>
+          <tr><td>Performance</td><td>Bonne, locale.</td><td>Moyenne, dépend du réseau.</td><td>Très bonne, faible latence.</td></tr>
+          <tr><td>Coût</td><td>Faible.</td><td>Moyen.</td><td>Élevé.</td></tr>
+          <tr><td>Usage</td><td>Serveur isolé, petit site.</td><td>Partage de fichiers, NFS datastore.</td><td>Datacenter, bases de données, VMFS.</td></tr>
+        </tbody></table></div>
+        <h3>Stockage VMware</h3>
+        <ul><li><strong>VMFS</strong> : système de fichiers cluster VMware pour le stockage bloc (FC/iSCSI). Permet à plusieurs hôtes d'accéder au même datastore.</li><li><strong>NFS</strong> : datastore fichier sur NAS, simple et partagé.</li><li><strong>vSAN</strong> : stockage hyperconvergé ; agrège les disques locaux des hôtes en un datastore distribué.</li><li><strong>iSCSI</strong> : SCSI sur IP, économique.</li><li><strong>Fibre Channel</strong> : réseau dédié, haute performance, zoning.</li><li><strong>vVols</strong> : gestion des volumes par VM (avancé).</li></ul>
+        <h3>Provisionnement</h3>
+        <div class="table-wrap"><table><thead><tr><th>Type</th><th>Allocation</th><th>Avantage</th><th>Inconvénient</th></tr></thead><tbody>
+          <tr><td><strong>Thin</strong></td><td>À la demande.</td><td>Économie d'espace.</td><td>Saturation possible, performance variable.</td></tr>
+          <tr><td><strong>Thick lazy zeroed</strong></td><td>Réservé immédiatement, zéroté à la première écriture.</td><td>Espace garanti.</td><td>Création plus lente, espace consommé.</td></tr>
+          <tr><td><strong>Thick eager zeroed</strong></td><td>Réservé et zéroté immédiatement.</td><td>Meilleures performances, sécurisé.</td><td>Création très lente, espace maximal.</td></tr>
+        </tbody></table></div>
+        <div class="box key"><div class="box-title">Fichiers VM</div><p><strong>VMDK</strong> : disque virtuel VMware. <strong>VHD/VHDX</strong> : Microsoft. <strong>VDI</strong> : VirtualBox. <strong>OVF/OVA</strong> : format portable d'appliance. <strong>VMX</strong> : configuration de la VM. <strong>VMSD</strong> : métadonnées de snapshot. <strong>VSWP</strong> : swap mémoire.</p></div>
+      </section>
+
+      <section class="note" id="vmware" data-topic="vs-6">
+        <div class="note-head"><div class="note-num">6</div><h2>VMware vSphere</h2><label class="topic-check"><input type="checkbox" data-topic="vs-6">Validé</label></div>
+        <div class="table-wrap"><table><thead><tr><th>Composant</th><th>Rôle</th></tr></thead><tbody>
+          <tr><td><strong>ESXi</strong></td><td>Hyperviseur type 1 bare metal. Exécute les VM.</td></tr>
+          <tr><td><strong>vCenter Server</strong></td><td>Gestion centralisée : hôtes, VM, clusters, stockage, réseau, alarmes, permissions.</td></tr>
+          <tr><td><strong>VCSA</strong></td><td>vCenter Server Appliance, VM pré-packagée.</td></tr>
+          <tr><td><strong>vSphere Client</strong></td><td>Interface HTML5 d'administration.</td></tr>
+          <tr><td><strong>DCUI</strong></td><td>Interface locale de configuration initiale d'ESXi.</td></tr>
+          <tr><td><strong>SSO</strong></td><td>Authentification unique VMware.</td></tr>
+          <tr><td><strong>RBAC</strong></td><td>Rôles et permissions sur les objets vSphere.</td></tr>
+          <tr><td><strong>vSwitch / vDS</strong></td><td>Switch virtuel local / distribué.</td></tr>
+          <tr><td><strong>VMkernel</strong></td><td>Interface réseau du noyau pour gestion, vMotion, stockage.</td></tr>
+          <tr><td><strong>Datastore</strong></td><td>Espace logique de stockage des fichiers VM.</td></tr>
+          <tr><td><strong>Cluster</strong></td><td>Ensemble d'hôtes partageant ressources et services (HA, DRS).</td></tr>
+          <tr><td><strong>HA</strong></td><td>Redémarrage automatique des VM sur un autre hôte après panne.</td></tr>
+          <tr><td><strong>DRS</strong></td><td>Rééquilibrage automatique des ressources CPU/mémoire.</td></tr>
+          <tr><td><strong>FT</strong></td><td>Redondance synchrone d'une VM (shadow VM), zéro downtime.</td></tr>
+          <tr><td><strong>vMotion</strong></td><td>Migration à chaud des CPU/mémoire entre hôtes.</td></tr>
+          <tr><td><strong>Storage vMotion</strong></td><td>Migration à chaud des fichiers disque entre datastores.</td></tr>
+          <tr><td><strong>Snapshot</strong></td><td>Point d'état temporaire (disque, mémoire, config).</td></tr>
+          <tr><td><strong>Template</strong></td><td>VM master non modifiable pour déployer rapidement.</td></tr>
+          <tr><td><strong>Content Library</strong></td><td>Bibliothèque centralisée de templates, ISOs, scripts.</td></tr>
+          <tr><td><strong>Host Profiles</strong></td><td>Standardisation et conformité de configuration des hôtes.</td></tr>
+          <tr><td><strong>Lifecycle Manager</strong></td><td>Gestion des mises à jour et de la conformité ESXi.</td></tr>
+          <tr><td><strong>EVC</strong></td><td>Masque les différences CPU entre hôtes pour permettre vMotion.</td></tr>
+          <tr><td><strong>Lockdown mode</strong></td><td>Restreint l'accès direct à l'hôte ; gestion via vCenter.</td></tr>
+          <tr><td><strong>Maintenance mode</strong></td><td>Évacuation des VM avant maintenance.</td></tr>
+        </tbody></table></div>
+        <div class="box key"><div class="box-title">HA vs DRS vs FT</div><p><strong>HA</strong> redémarre après panne (quelques minutes). <strong>DRS</strong> équilibre la charge (pas de panne). <strong>FT</strong> maintient une copie synchrone (zéro interruption, coût élevé).</p></div>
+      </section>
+
+      <section class="note" id="migrations" data-topic="vs-7">
+        <div class="note-head"><div class="note-num">7</div><h2>Migrations, snapshots, clones</h2><label class="topic-check"><input type="checkbox" data-topic="vs-7">Validé</label></div>
+        <div class="table-wrap"><table><thead><tr><th>Migration</th><th>De → vers</th><th>Objectif</th></tr></thead><tbody>
+          <tr><td><strong>P2V</strong></td><td>Physique → virtuel</td><td>Consolider, moderniser, réduire le matériel.</td></tr>
+          <tr><td><strong>V2V</strong></td><td>Virtuel → virtuel (autre hyperviseur)</td><td>Changer de plateforme, éviter le verrouillage.</td></tr>
+          <tr><td><strong>V2P</strong></td><td>Virtuel → physique</td><td>Repasser sur du matériel dédié (rare).</td></tr>
+          <tr><td><strong>P2P</strong></td><td>Physique → physique</td><td>Remplacement matériel.</td></tr>
+          <tr><td><strong>X2X</strong></td><td>Tout → tout</td><td>Terme générique pour les migrations.</td></tr>
+          <tr><td><strong>V2V / V2P / P2V</strong></td><td>—</td><td>Conversion de format et de pilotes.</td></tr>
+        </tbody></table></div>
+        <p><strong>Migration à chaud :</strong> VM allumée, sans interruption (vMotion). <strong>Migration à froid :</strong> VM arrêtée ou suspendue. <strong>vMotion :</strong> hôte à hôte. <strong>Storage vMotion :</strong> datastore à datastore. Les deux peuvent être combinés.</p>
+        <h3>Snapshot</h3>
+        <p>Capture l'état du disque, de la mémoire et de la configuration à un instant T. Utile avant une mise à jour ou un test. <strong>Ce n'est pas une sauvegarde</strong> : il dépend du datastore et de la VM ; une chaîne longue dégrade les performances et consomme de l'espace. Il faut <strong>consolider</strong> les snapshots après usage.</p>
+        <h3>Clone &amp; template</h3>
+        <ul><li><strong>Clone</strong> : copie complète d'une VM (peut être liée ou complète).</li><li><strong>Template</strong> : modèle non modifiable ; déploiement rapide et standardisé.</li><li><strong>OVF/OVA</strong> : format portable d'appliance virtuelle.</li></ul>
+        <div class="box warn"><div class="box-title">Pièges QCM</div><p>On peut migrer une VM allumée (vrai/faux : faux, on peut). Type 2 n'est pas natif. Un snapshot n'est pas une sauvegarde. Un datastore peut être étendu. Proxmox a une interface web, pas seulement CLI.</p></div>
+      </section>
+
+      <section class="note" id="conteneurs" data-topic="vs-8">
+        <div class="note-head"><div class="note-num">8</div><h2>Conteneurs &amp; Docker</h2><label class="topic-check"><input type="checkbox" data-topic="vs-8">Validé</label></div>
+        <p>Un <strong>conteneur</strong> est une unité logicielle isolée qui embarque l'application et ses dépendances, mais <strong>partage le noyau</strong> de l'hôte. Il est plus léger et démarre plus vite qu'une VM.</p>
+        <div class="table-wrap"><table><thead><tr><th></th><th>VM</th><th>Conteneur</th></tr></thead><tbody>
+          <tr><td>OS invité</td><td>Complet, par VM.</td><td>Aucun ; partage du noyau.</td></tr>
+          <tr><td>Isolation</td><td>Forte (matériel virtualisé).</td><td>Plus faible (processus isolé).</td></tr>
+          <tr><td>Poids</td><td>Go.</td><td>Mo.</td></tr>
+          <tr><td>Démarrage</td><td>Minutes.</td><td>Secondes.</td></tr>
+          <tr><td>Densité</td><td>Faible.</td><td>Élevée.</td></tr>
+          <tr><td>Usage</td><td>OS différents, isolation forte.</td><td>Microservices, CI/CD, applications portables.</td></tr>
+        </tbody></table></div>
+        <h3>Namespaces &amp; cgroups</h3>
+        <ul><li><strong>Namespaces</strong> : isolation de ce que le processus voit (PID, réseau, montages, UTS, IPC, utilisateurs).</li><li><strong>cgroups</strong> : limitation et répartition des ressources (CPU, mémoire, I/O).</li></ul>
+        <p>Docker n'est pas une technologie de virtualisation matérielle : c'est une plateforme de conteneurisation basée sur les primitives Linux (namespaces, cgroups, capabilities).</p>
+        <h3>Docker</h3>
+        <p>Docker est une plateforme open source pour créer, déployer et exécuter des applications dans des conteneurs. Architecture : client Docker → daemon Docker → containerd → runc → conteneur.</p>
+        <div class="table-wrap"><table><thead><tr><th>Terme</th><th>Définition</th></tr></thead><tbody>
+          <tr><td><strong>Image</strong></td><td>Modèle read-only composé de couches (code, dépendances, OS de base).</td></tr>
+          <tr><td><strong>Conteneur</strong></td><td>Instance exécutable d'une image, avec une couche writable.</td></tr>
+          <tr><td><strong>Dockerfile</strong></td><td>Fichier texte décrivant la construction d'une image.</td></tr>
+          <tr><td><strong>Registre</strong></td><td>Bibliothèque d'images (Docker Hub, GHCR, registre privé).</td></tr>
+          <tr><td><strong>Volume</strong></td><td>Stockage persistant géré par Docker, survit à la suppression du conteneur.</td></tr>
+          <tr><td><strong>Bind mount</strong></td><td>Répertoire de l'hôte monté dans le conteneur.</td></tr>
+          <tr><td><strong>Compose</strong></td><td>Définition multi-conteneurs en YAML.</td></tr>
+        </tbody></table></div>
+        <div class="box key"><div class="box-title">Cycle de vie d'un conteneur</div><p><code>docker run</code> : crée et démarre. <code>docker stop</code> : arrête (les données du volume persistent, la couche writable aussi tant que le conteneur existe). <code>docker rm</code> : supprime le conteneur → les données de la couche writable sont perdues, les volumes persistent.</p></div>
+      </section>
+
+      <section class="note" id="docker" data-topic="vs-9">
+        <div class="note-head"><div class="note-num">9</div><h2>Commandes Docker</h2><label class="topic-check"><input type="checkbox" data-topic="vs-9">Validé</label></div>
+        <div class="table-wrap"><table><thead><tr><th>Besoin</th><th>Commande</th></tr></thead><tbody>
+          <tr><td>Lister les images</td><td><code>docker images</code></td></tr>
+          <tr><td>Lister les conteneurs actifs</td><td><code>docker ps</code></td></tr>
+          <tr><td>Lister tous les conteneurs</td><td><code>docker ps -a</code></td></tr>
+          <tr><td>Télécharger une image</td><td><code>docker pull nginx:latest</code></td></tr>
+          <tr><td>Construire une image</td><td><code>docker build -t monapp:1.0 .</code></td></tr>
+          <tr><td>Lancer un conteneur</td><td><code>docker run -d -p 8080:80 --name web nginx</code></td></tr>
+          <tr><td>Exécuter une commande dans un conteneur</td><td><code>docker exec -it web bash</code></td></tr>
+          <tr><td>Voir les logs</td><td><code>docker logs -f web</code></td></tr>
+          <tr><td>Arrêter / démarrer</td><td><code>docker stop web</code> / <code>docker start web</code></td></tr>
+          <tr><td>Supprimer un conteneur</td><td><code>docker rm web</code></td></tr>
+          <tr><td>Supprimer une image</td><td><code>docker rmi monapp:1.0</code></td></tr>
+          <tr><td>Créer un volume</td><td><code>docker volume create data</code></td></tr>
+          <tr><td>Inspecter</td><td><code>docker inspect web</code></td></tr>
+          <tr><td>Nettoyer l'inutilisé</td><td><code>docker system prune -a</code></td></tr>
+          <tr><td>Supprimer tous les conteneurs (actifs/arrêtés)</td><td><code>docker rm -f $(docker ps -aq)</code></td></tr>
+        </tbody></table></div>
+        <div class="box key"><div class="box-title">Processus de <code>docker run</code></div><p>Le client envoie la requête au daemon. Le daemon vérifie si l'image existe localement ; sinon il la télécharge depuis le registre. Il crée un conteneur (couche writable), configure le réseau et les volumes, puis démarre le processus. Sans <code>-d</code>, le terminal reste attaché.</p></div>
+        <h3>Créer une image personnalisée</h3>
+        <ul><li><code>docker build -t monimage .</code> : construit à partir d'un Dockerfile.</li><li><code>docker commit conteneur monimage</code> : fige un conteneur modifié en image (rapide, mais moins reproductible).</li><li><code>docker pull</code> récupère une image existante ; il ne la crée pas. <code>docker run</code> ne crée pas une image.</li></ul>
+        <div class="box warn"><div class="box-title">Piège de correction</div><p>Le corrigé 2025 cite <code>docker build</code>, <code>docker pull</code> et <code>docker run</code> pour « créer une image ». La réponse rigoureuse est <strong><code>docker build</code></strong> (et <code>docker commit</code>). Si le correcteur attend deux commandes, cite <code>docker build</code> et <code>docker commit</code> en expliquant la différence.</p></div>
+        <h3>Réseaux Docker</h3>
+        <ul><li><strong>bridge</strong> (par défaut) : réseau privé, NAT vers l'hôte.</li><li><strong>host</strong> : le conteneur partage la stack réseau de l'hôte.</li><li><strong>none</strong> : pas de réseau.</li><li><strong>overlay</strong> : multi-hôtes (Swarm).</li><li><strong>macvlan</strong> : adresse MAC/IP propre sur le réseau physique.</li></ul>
+      </section>
+
+      <section class="note" id="dockerfile" data-topic="vs-10">
+        <div class="note-head"><div class="note-num">10</div><h2>Dockerfile</h2><label class="topic-check"><input type="checkbox" data-topic="vs-10">Validé</label></div>
+        <p>Un Dockerfile est un fichier texte contenant les instructions de construction d'une image. Chaque instruction crée une couche.</p>
+        <div class="table-wrap"><table><thead><tr><th>Instruction</th><th>Rôle</th><th>Exemple</th></tr></thead><tbody>
+          <tr><td><strong>FROM</strong></td><td>Image de base. <strong>Obligatoire</strong> (sauf cas avancé).</td><td><code>FROM ubuntu:22.04</code></td></tr>
+          <tr><td><strong>RUN</strong></td><td>Exécute une commande pendant la construction.</td><td><code>RUN apt-get update &amp;&amp; apt-get install -y nginx</code></td></tr>
+          <tr><td><strong>COPY</strong></td><td>Copie des fichiers locaux dans l'image.</td><td><code>COPY . /app</code></td></tr>
+          <tr><td><strong>ADD</strong></td><td>Comme COPY, avec support URL/tar et décompression.</td><td><code>ADD app.tar.gz /app</code></td></tr>
+          <tr><td><strong>WORKDIR</strong></td><td>Définit le répertoire de travail.</td><td><code>WORKDIR /app</code></td></tr>
+          <tr><td><strong>EXPOSE</strong></td><td>Déclare le port d'écoute (documentation, pas publication).</td><td><code>EXPOSE 80</code></td></tr>
+          <tr><td><strong>ENV</strong></td><td>Variable d'environnement persistante dans l'image.</td><td><code>ENV NODE_ENV=production</code></td></tr>
+          <tr><td><strong>ARG</strong></td><td>Variable de build, non persistante.</td><td><code>ARG VERSION=1.0</code></td></tr>
+          <tr><td><strong>CMD</strong></td><td>Commande par défaut au démarrage ; peut être remplacée.</td><td><code>CMD ["nginx", "-g", "daemon off;"]</code></td></tr>
+          <tr><td><strong>ENTRYPOINT</strong></td><td>Point d'entrée fixe ; les arguments de <code>docker run</code> s'y ajoutent.</td><td><code>ENTRYPOINT ["python", "app.py"]</code></td></tr>
+          <tr><td><strong>VOLUME</strong></td><td>Déclare un point de montage persistant.</td><td><code>VOLUME /data</code></td></tr>
+          <tr><td><strong>USER</strong></td><td>Utilisateur d'exécution (bonne pratique : non-root).</td><td><code>USER app</code></td></tr>
+          <tr><td><strong>HEALTHCHECK</strong></td><td>Test de santé du conteneur.</td><td><code>HEALTHCHECK CMD curl -f http://localhost/</code></td></tr>
+        </tbody></table></div>
+        <pre><code>FROM node:20-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm install --omit=dev
+COPY . .
+ENV PORT=3000
+EXPOSE 3000
+USER node
+CMD ["node", "server.js"]</code></pre>
+        <div class="box tip"><div class="box-title">Bonnes pratiques</div><p>Image de base minimale et épinglée, multi-stage build, utilisateur non-root, pas de secrets dans l'image, <code>.dockerignore</code>, instructions ordonnées pour profiter du cache, scan de vulnérabilités.</p></div>
+      </section>
+
+      <section class="note" id="compose" data-topic="vs-11">
+        <div class="note-head"><div class="note-num">11</div><h2>Docker Compose</h2><label class="topic-check"><input type="checkbox" data-topic="vs-11">Validé</label></div>
+        <p>Docker Compose décrit une application multi-conteneurs dans un fichier <code>docker-compose.yml</code>. Il crée un réseau commun, démarre les services dans l'ordre des dépendances et facilite le développement.</p>
+        <pre><code>version: "3.8"
+services:
+  db:
+    image: mysql:8
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+      MYSQL_DATABASE: wordpress
+    volumes:
+      - db_data:/var/lib/mysql
+  wordpress:
+    image: wordpress:latest
+    depends_on:
+      - db
+    ports:
+      - "8088:80"
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_PASSWORD: example
+volumes:
+  db_data:</code></pre>
+        <div class="table-wrap"><table><thead><tr><th>Clé</th><th>Rôle</th></tr></thead><tbody>
+          <tr><td><code>services</code></td><td>Liste des conteneurs.</td></tr>
+          <tr><td><code>image</code> / <code>build</code></td><td>Image à utiliser ou Dockerfile à construire.</td></tr>
+          <tr><td><code>ports</code></td><td>Mapping hôte:conteneur.</td></tr>
+          <tr><td><code>environment</code></td><td>Variables d'environnement.</td></tr>
+          <tr><td><code>volumes</code></td><td>Persistance des données.</td></tr>
+          <tr><td><code>depends_on</code></td><td>Ordre de démarrage (pas de healthcheck implicite).</td></tr>
+          <tr><td><code>networks</code></td><td>Réseaux partagés.</td></tr>
+          <tr><td><code>restart</code></td><td>Politique de redémarrage.</td></tr>
+        </tbody></table></div>
+        <p><strong>Commandes :</strong> <code>docker compose up -d</code> (démarre en arrière-plan), <code>docker compose down</code> (arrête et supprime), <code>docker compose ps</code>, <code>docker compose logs -f</code>, <code>docker compose exec service bash</code>, <code>docker compose build</code>.</p>
+        <div class="box key"><div class="box-title">Question type</div><p>« Expliquez la structure et le rôle du fichier docker-compose.yml. » Réponse : version, services, image/build, ports, volumes, environnement, dépendances ; il permet de décrire et lancer une application multi-conteneurs de façon reproductible. Commande : <code>docker compose up -d</code>.</p></div>
+      </section>
+
+      <section class="note" id="orchestration" data-topic="vs-12">
+        <div class="note-head"><div class="note-num">12</div><h2>Orchestration &amp; sécurité</h2><label class="topic-check"><input type="checkbox" data-topic="vs-12">Validé</label></div>
+        <h3>Orchestration</h3>
+        <p>À grande échelle, il faut gérer le placement, le scaling, la disponibilité, le réseau et les mises à jour des conteneurs.</p>
+        <div class="table-wrap"><table><thead><tr><th>Outil</th><th>Rôle</th></tr></thead><tbody>
+          <tr><td><strong>Kubernetes</strong></td><td>Standard de facto : pods, services, deployments, scaling, self-healing.</td></tr>
+          <tr><td><strong>Docker Swarm</strong></td><td>Orchestration native Docker, plus simple.</td></tr>
+          <tr><td><strong>Nomad</strong></td><td>Orchestrateur HashiCorp, multi-workloads.</td></tr>
+          <tr><td><strong>Portainer</strong></td><td>Interface de gestion Docker/Kubernetes.</td></tr>
+          <tr><td><strong>OpenShift</strong></td><td>Plateforme Kubernetes d'entreprise (Red Hat).</td></tr>
+        </tbody></table></div>
+        <h3>Sécurité des conteneurs</h3>
+        <ul><li>Image de base minimale, à jour, scannée (Trivy, Clair).</li><li>Utilisateur non-root, read-only filesystem, pas de <code>--privileged</code>.</li><li>Secrets gérés (Docker secrets, Vault), pas dans l'image.</li><li>Limites de ressources (cgroups), network policies.</li><li>Isolation : ne pas partager le socket Docker, namespaces utilisateur.</li><li>Noyau de l'hôte à jour : une faille noyau affecte tous les conteneurs.</li><li>Registry privé, signature d'images, scan CI/CD.</li></ul>
+        <div class="box warn"><div class="box-title">Isolation ≠ VM</div><p>Un conteneur partage le noyau : une évasion de conteneur peut compromettre l'hôte. Pour des charges de travail non fiables ou des OS différents, la VM reste plus isolée.</p></div>
+      </section>
+
+      <section class="note" id="tp" data-topic="vs-13">
+        <div class="note-head"><div class="note-num">13</div><h2>Questions de TP</h2><label class="topic-check"><input type="checkbox" data-topic="vs-13">Validé</label></div>
+        <details class="q-open"><summary>Créer une VM sur ESXi</summary><div class="details-body"><p>1) Uploader l'ISO sur un datastore. 2) Créer une VM : nom, guest OS, CPU/RAM, disque, réseau. 3) Monter l'ISO, démarrer, installer l'OS. 4) Installer VMware Tools. 5) Vérifier réseau, stockage, snapshots.</p></div></details>
+        <details class="q-open"><summary>Créer un commutateur virtuel</summary><div class="details-body"><p>Networking → Virtual switches → Add. Choisir les uplinks (NIC physiques), le MTU, les ports. Créer un port group, définir le VLAN et les politiques de sécurité. Vérifier la connectivité avec <code>vmkping</code>.</p></div></details>
+        <details class="q-open"><summary>Déployer une VM depuis un OVF</summary><div class="details-body"><p>File → Deploy OVF Template, choisir l'URL ou le fichier, nommer, sélectionner le datastore, le réseau, les options de disque (thin/thick), puis power on. Vérifier les VMware Tools et la configuration réseau.</p></div></details>
+        <details class="q-open"><summary>Intérêt d'un snapshot + exemple</summary><div class="details-body"><p>Point d'état temporaire avant une mise à jour ou un test. Exemple : snapshot avant un patch critique ; si l'application ne démarre plus, revert. Ce n'est pas une sauvegarde : il faut consolider et sauvegarder séparément.</p></div></details>
+        <details class="q-open"><summary>X2X : principe et exemples</summary><div class="details-body"><p>Terme générique pour toute migration : P2V (physique vers virtuel), V2V (virtuel vers virtuel), V2P (virtuel vers physique), P2P. On convertit le format de disque, les pilotes et la configuration. Outils : VMware Converter, virt-v2v.</p></div></details>
+        <details class="q-open"><summary>Virtualisation imbriquée</summary><div class="details-body"><p>Faire tourner un hyperviseur dans une VM. Exemple : ESXi dans Proxmox ou VMware Workstation. Nécessite d'exposer VT-x/AMD-V à la VM. Utile pour les labs, la formation, les tests de clusters.</p></div></details>
+        <details class="q-open"><summary>Copier un seul disque d'une banque de données</summary><div class="details-body"><p>Sélectionner le fichier <strong>VMDK</strong> de la VM. Pour un datastore bloc sous ESXi, le format est <strong>VMFS</strong>.</p></div></details>
+        <details class="q-open"><summary>Docker Compose WordPress / MySQL</summary><div class="details-body"><p>Voir le fichier de la section 11. Le service <code>db</code> utilise un volume <code>db_data</code> pour persister les données ; <code>wordpress</code> dépend de <code>db</code> et expose <code>8088:80</code>. Commande : <code>docker compose up -d</code>.</p></div></details>
+      </section>
+
+      <section class="note" id="annales" data-topic="vs-14">
+        <div class="note-head"><div class="note-num">14</div><h2>Annales &amp; QCM corrigés</h2><label class="topic-check"><input type="checkbox" data-topic="vs-14">Validé</label></div>
+        <h3>RAT 2025 — QCM</h3>
+        <div class="table-wrap"><table><thead><tr><th>#</th><th>Question</th><th>Réponse</th></tr></thead><tbody>
+          <tr><td>1</td><td>Hyperviseur type 1 bare metal VMware</td><td><strong>B. ESXi</strong></td></tr>
+          <tr><td>2</td><td>Éditeurs de solutions de virtualisation</td><td><strong>A, B, C, D</strong> (VMware, Oracle, Microsoft, Proxmox)</td></tr>
+          <tr><td>3</td><td>Virtualisation</td><td><strong>B. Représentation virtuelle d'un système matériel</strong></td></tr>
+          <tr><td>4</td><td>Applications de la virtualisation</td><td><strong>A, B, C, D</strong> (serveur, réseau, stockage, applications)</td></tr>
+          <tr><td>5</td><td>Intérêts de la virtualisation</td><td><strong>A, B, C</strong> (réponse attendue probable) ; nuance : le coût initial peut être élevé</td></tr>
+          <tr><td>6</td><td>L'hyperviseur est une couche de virtualisation</td><td><strong>A. Vrai</strong></td></tr>
+          <tr><td>7</td><td>Type 2 natif ?</td><td><strong>B. Non</strong></td></tr>
+          <tr><td>8</td><td>Virtualisation d'OS</td><td><strong>C. Les deux</strong> (serveur et poste de travail)</td></tr>
+          <tr><td>9</td><td>Forme principale de virtualisation de poste</td><td><strong>B. VDI</strong></td></tr>
+          <tr><td>10</td><td>Pourquoi moins de coûts</td><td><strong>A, B</strong> (moins d'espace/équipements, moins d'énergie) ; pas C</td></tr>
+          <tr><td>11</td><td>Type 2 installé sur un OS existant</td><td><strong>A. Vrai</strong></td></tr>
+          <tr><td>12</td><td>Principes de la virtualisation</td><td><strong>A, C, D</strong> (partitionnement, isolation, indépendance)</td></tr>
+          <tr><td>13</td><td>Inventeur dans les années 60</td><td><strong>B. IBM</strong></td></tr>
+          <tr><td>14</td><td>Outil pour plusieurs VM</td><td><strong>A. Hyperviseur</strong></td></tr>
+        </tbody></table></div>
+        <h3>RAT 2026 — questions courtes</h3>
+        <div class="table-wrap"><table><thead><tr><th>Question</th><th>Réponse</th></tr></thead><tbody>
+          <tr><td>Définir la virtualisation</td><td>Techniques permettant de faire tourner plusieurs OS/environnements sur une même machine physique, en abstraiant les ressources.</td></tr>
+          <tr><td>Avantages de l'isolation par rapport à la virtualisation</td><td>Le conteneur est plus léger, démarre plus vite, consomme moins ; mais l'isolation est plus faible qu'une VM (noyau partagé).</td></tr>
+          <tr><td>Schémas conteneur / type 1 / type 2</td><td>Voir section 3.</td></tr>
+          <tr><td>Architectures de stockage</td><td>DAS, NAS, SAN (+ vSAN, objet).</td></tr>
+          <tr><td>3 types de réseaux VMware</td><td>Bridged, NAT, host-only.</td></tr>
+          <tr><td>Processus de <code>docker run</code></td><td>Client → daemon → image locale ou pull → création → démarrage.</td></tr>
+          <tr><td>Deux commandes pour créer une image</td><td><code>docker build</code> et <code>docker commit</code> (le corrigé cite aussi <code>docker pull</code>).</td></tr>
+          <tr><td>Rôle des registres</td><td>Stockent et distribuent les images (ex. Docker Hub).</td></tr>
+          <tr><td>Supprimer tous les conteneurs</td><td><code>docker rm -f $(docker ps -aq)</code> ; <code>docker system prune -a</code> nettoie aussi images/réseaux inutilisés.</td></tr>
+          <tr><td>Instruction obligatoire Dockerfile</td><td><code>FROM</code>.</td></tr>
+        </tbody></table></div>
+        <h3>DE 2025 — vrai/faux</h3>
+        <div class="table-wrap"><table><thead><tr><th>Affirmation</th><th>Réponse</th></tr></thead><tbody>
+          <tr><td>Bridged : la VM obtient une IP sur le même réseau physique que l'hôte.</td><td><strong>Vrai</strong></td></tr>
+          <tr><td>L'hyperviseur de type 2 est natif.</td><td><strong>Faux</strong></td></tr>
+          <tr><td>Impossible de migrer une VM en cours d'exécution sans interrompre le service.</td><td><strong>Faux</strong> (vMotion)</td></tr>
+          <tr><td>On peut augmenter la taille d'un datastore.</td><td><strong>Vrai</strong></td></tr>
+          <tr><td>Proxmox VE est accessible uniquement en CLI.</td><td><strong>Faux</strong> (interface web)</td></tr>
+        </tbody></table></div>
+        <h3>DE 2025 — questions de cours</h3>
+        <details class="q-open"><summary>Terme pour l'OS dans une VM</summary><div class="details-body"><p><strong>Système invité</strong> (<em>guest</em>).</p></div></details>
+        <details class="q-open"><summary>Consolidation de serveurs et de stockage</summary><div class="details-body"><p>Serveurs : regrouper plusieurs serveurs physiques sur moins d'hôtes via la virtualisation. Stockage : centraliser les capacités dispersées en une infrastructure partagée (SAN/NAS/vSAN).</p></div></details>
+        <details class="q-open"><summary>Rôle du vSwitch</summary><div class="details-body"><p>Connecter les VM entre elles et au réseau physique, avec VLAN, port groups et politiques de sécurité.</p></div></details>
+        <details class="q-open"><summary>Dépannage réseau ESXi</summary><div class="details-body"><p>Vérifier les NIC/uplinks, l'association vSwitch/port group, les ports du switch physique, le VLAN/MTU, le VMkernel ; utiliser <code>esxcli network nic list</code> et <code>vmkping</code>.</p></div></details>
+        <details class="q-open"><summary>V2V, P2V, template, migration à froid</summary><div class="details-body"><p>V2V : VM d'un hyperviseur vers un autre. P2V : physique vers virtuel (consolidation). Template : modèle préconfiguré pour déployer rapidement. Migration à froid : VM arrêtée ou suspendue.</p></div></details>
+        <details class="q-open"><summary>Pourquoi perd-on les données d'un conteneur ?</summary><div class="details-body"><p>Lorsqu'on supprime le conteneur (<code>docker rm</code>), la couche writable est détruite. Les volumes persistent ; un bind mount persiste aussi.</p></div></details>
+        <details class="q-open"><summary>Objectif de la conteneurisation</summary><div class="details-body"><p>Accélérer le développement, les tests et le déploiement, garantir la portabilité et l'isolation des dépendances.</p></div></details>
+        <details class="q-open"><summary>Deux commandes pour créer une image</summary><div class="details-body"><p><code>docker build -t image .</code> et <code>docker commit conteneur image</code>. <code>docker pull</code> récupère une image existante.</p></div></details>
+        <details class="q-open"><summary>Orchestrateur de conteneurs</summary><div class="details-body"><p>Kubernetes (standard), Docker Swarm, Nomad, OpenShift ; Portainer pour la gestion.</p></div></details>
+        <details class="q-open"><summary>Quel fichier pour copier un disque VM ?</summary><div class="details-body"><p><strong>VMDK</strong>. Sous ESXi, le datastore bloc est en <strong>VMFS</strong>.</p></div></details>
+      </section>
+
+      <section class="note" id="quiz"><div class="note-head"><div class="note-num">?</div><h2>Quiz express</h2></div><p class="muted small">10 questions tirées au hasard. Objectif : 8/10.</p><div class="quiz-shell" data-quiz="vs" data-count="10"></div></section>
+      <section class="note" id="flashcards"><div class="note-head"><div class="note-num">⚡</div><h2>Flashcards</h2></div><button class="btn primary" data-flashcards="vs">Lancer les flashcards →</button><span class="small muted" style="margin-left:8px">Espace = retourner · ← → = naviguer</span></section>
+
+      <div class="box exam">
+        <div class="box-title">Dernière minute — Virtualisation</div>
+        <ul class="two-col-list">
+          <li>Type 1 = bare metal ; type 2 = hébergé.</li>
+          <li>Conteneur = noyau partagé ; VM = OS complet.</li>
+          <li>vSwitch = switch virtuel ; VMkernel = réseau infra.</li>
+          <li>Bridged / NAT / host-only.</li>
+          <li>DAS bloc local ; NAS fichier ; SAN bloc dédié.</li>
+          <li>VMFS = bloc VMware ; NFS = fichier ; vSAN = hyperconvergé.</li>
+          <li>vMotion = CPU/RAM ; Storage vMotion = disque.</li>
+          <li>Snapshot ≠ sauvegarde.</li>
+          <li>HA = redémarre ; DRS = équilibre ; FT = zéro downtime.</li>
+          <li>FROM obligatoire ; docker compose up -d.</li>
+          <li>Volume = persistant ; rm = perte de la couche writable.</li>
+          <li>Kubernetes = orchestration.</li>
+        </ul>
+      </div>
+
+      <div class="hero-actions no-print"><a class="btn" href="last-minute.html">Dernière minute →</a><a class="btn ghost" href="index.html">Accueil</a><button class="btn ghost" data-action="print">Imprimer la fiche</button></div>
+    </div>
+  </div>
+</main>
+
+<footer class="footer"><div class="wrap"><span>Virtualisation &amp; Stockage · synthèse cours + TP + RAT/DE.</span><span><a href="index.html">Accueil</a> · <a href="plan.html">Plan</a></span></div></footer>
+
+<nav class="mobile-nav" aria-label="Navigation mobile"><a href="index.html"><span>⌂</span>Accueil</a><a href="plan.html"><span>▦</span>Plan</a><a href="eh.html"><span>EH</span>Hacking</a><a href="reseau.html"><span>SR</span>Réseaux</a><a href="os.html"><span>OS</span>OS</a><a href="si.html"><span>SI</span>SI</a><a href="vs.html" class="active"><span>VS</span>Virtu.</a><a href="last-minute.html"><span>⚡</span>J-1</a></nav>
+
+<div class="search-overlay" id="search-overlay"><div class="search-box"><div class="search-input-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="search-input" type="search" placeholder="Rechercher une notion, un outil, une commande…" autocomplete="off"><span class="kbd">Échap</span></div><div class="search-results" id="search-results"></div></div></div>
+
+<div class="fc-overlay" id="fc-overlay"><div class="fc-modal"><div class="fc-head"><strong>Flashcards · Virtualisation</strong><span class="fc-count" id="fc-count">1 / 1</span><button class="icon-btn" id="fc-close" aria-label="Fermer">✕</button></div><div class="fc-card" id="fc-card"><div class="fc-inner"><div class="fc-face" id="fc-front"><div class="tag">Question</div><div class="fc-text"></div><div class="hint">Clique pour retourner</div></div><div class="fc-face fc-back" id="fc-back"><div class="tag">Réponse</div><div class="fc-text"></div><div class="hint">Clique pour revenir</div></div></div></div><div class="fc-controls"><button class="btn" id="fc-prev">← Précédent</button><button class="btn" id="fc-shuffle">Mélanger</button><button class="btn primary" id="fc-next">Suivant →</button></div></div></div>
+
+<script src="assets/search-index.js"></script>
+<script src="assets/quiz-data.js"></script>
+<script src="assets/flashcards.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>

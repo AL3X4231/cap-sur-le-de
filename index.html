@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Cap sur le DE — Fiches de révision ST2</title>
+<meta name="description" content="Fiches de révision condensées et interactives pour les 5 DE : Ethical Hacking, Sécurité Réseaux, Sécurité des OS, Sécurité des SI et Virtualisation & Stockage.">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap topbar-inner">
+    <a class="brand" href="index.html">
+      <span class="brand-mark">DE</span>
+      <span>Cap sur le DE<small>ST2 · 5 matières</small></span>
+    </a>
+    <nav class="nav-links" aria-label="Navigation principale">
+      <a href="index.html">Accueil</a>
+      <a href="plan.html">Plan 5 jours</a>
+      <a href="eh.html">Ethical Hacking</a>
+      <a href="reseau.html">Réseaux</a>
+      <a href="os.html">OS</a>
+      <a href="si.html">Systèmes d'info</a>
+      <a href="vs.html">Virtualisation</a>
+      <a href="last-minute.html">Dernière minute</a>
+    </nav>
+    <div class="top-actions">
+      <button class="icon-btn" id="btn-search" aria-label="Rechercher">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      </button>
+      <button class="icon-btn" id="btn-theme" aria-label="Changer de thème"></button>
+      <div class="progress-pill" title="Progression globale">
+        <svg class="ring" id="top-ring" viewBox="0 0 24 24"><circle class="bg" cx="12" cy="12" r="9"/><circle class="fg" cx="12" cy="12" r="9" stroke-dasharray="56.5" stroke-dashoffset="56.5"/></svg>
+        <span class="pp-text" id="top-progress-text">0 %</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <div class="eyebrow">Fiche de révision · Edition examens</div>
+        <h1>5 matières.<br>5 jours.<br><span style="background:linear-gradient(120deg,var(--accent),var(--accent-2));-webkit-background-clip:text;background-clip:text;color:transparent">Une seule fiche.</span></h1>
+        <p class="lead">Tout ce qui tombe, rien de plus. J'ai croisé les cours, les TP et les annales pour ne garder que les notions rentables : définitions, tableaux de comparaison, méthodes de réponse, quiz et questions ouvertes corrigées.</p>
+        <div class="hero-actions">
+          <a class="btn primary" href="plan.html">Ouvrir le plan 5 jours →</a>
+          <a class="btn" href="last-minute.html">Mode dernière minute</a>
+          <button class="btn ghost" data-search-open>Rechercher une notion</button>
+        </div>
+      </div>
+      <aside class="hero-panel">
+        <h3>Le brief en 10 secondes</h3>
+        <div class="quick-stats">
+          <div class="quick-stat"><b>5</b><span>matières</span></div>
+          <div class="quick-stat"><b>67</b><span>notions clés</span></div>
+          <div class="quick-stat"><b>100+</b><span>questions</span></div>
+        </div>
+        <div class="hero-note">
+          <strong style="color:var(--text)">Priorité n°1 :</strong> les questions d'annales. Chaque fiche contient les questions déjà tombées, avec un corrigé structuré.<br><br>
+          <strong style="color:var(--text)">Règle d'or :</strong> ne lis pas passivement. Coche, réponds, récite à voix haute, puis vérifie.
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <section class="wrap">
+    <div class="section-head">
+      <div>
+        <div class="kicker">Les 5 fiches</div>
+        <h2>Choisis ta matière</h2>
+        <p>Chaque fiche est autonome : l'essentiel, les pièges, un quiz et les questions ouvertes types.</p>
+      </div>
+      <a class="btn sm" href="last-minute.html">Tout revoir en 30 min</a>
+    </div>
+
+    <div class="cards">
+      <article class="subject-card" data-subject-card="eh" data-total="12" style="--card-color:var(--eh);--card-soft:var(--eh-soft)">
+        <div class="card-top">
+          <div class="subject-icon">EH</div>
+          <span class="chip color">Coeff. fort</span>
+        </div>
+        <h3>Ethical Hacking</h3>
+        <p class="sub">Reconnaissance, OSINT, Nmap, Metasploit, brute force, pentest web.</p>
+        <div class="meta">
+          <span class="chip">QCM + 5 questions ouvertes</span>
+          <span class="chip">1 h 50</span>
+        </div>
+        <div class="card-progress"><div class="bar"><i></i></div><span>0/12 · 0 %</span></div>
+        <div class="card-links">
+          <a class="btn sm primary" href="eh.html">Lire la fiche</a>
+          <a class="btn sm" href="eh.html#quiz">Quiz</a>
+          <a class="btn sm ghost" href="eh.html#annales">Annales</a>
+        </div>
+      </article>
+
+      <article class="subject-card" data-subject-card="reseau" data-total="12" style="--card-color:var(--res);--card-soft:var(--res-soft)">
+        <div class="card-top">
+          <div class="subject-icon">SR</div>
+          <span class="chip color">Architecture</span>
+        </div>
+        <h3>Sécurité Réseaux</h3>
+        <p class="sub">DMZ, firewalls, proxies, IPsec, Wi-Fi, IDS/IPS et règles de filtrage.</p>
+        <div class="meta">
+          <span class="chip">Étude de cas</span>
+          <span class="chip">1 A4 possible</span>
+        </div>
+        <div class="card-progress"><div class="bar"><i></i></div><span>0/12 · 0 %</span></div>
+        <div class="card-links">
+          <a class="btn sm primary" href="reseau.html">Lire la fiche</a>
+          <a class="btn sm" href="reseau.html#quiz">Quiz</a>
+          <a class="btn sm ghost" href="reseau.html#annales">Annales</a>
+        </div>
+      </article>
+
+      <article class="subject-card" data-subject-card="os" data-total="15" style="--card-color:var(--os);--card-soft:var(--os-soft)">
+        <div class="card-top">
+          <div class="subject-icon">OS</div>
+          <span class="chip color">Technique</span>
+        </div>
+        <h3>Sécurité des OS</h3>
+        <p class="sub">Linux, permissions, SUID/sudo, durcissement, buffer overflow, Windows.</p>
+        <div class="meta">
+          <span class="chip">QCM + questions longues</span>
+          <span class="chip">Linux + Windows</span>
+        </div>
+        <div class="card-progress"><div class="bar"><i></i></div><span>0/15 · 0 %</span></div>
+        <div class="card-links">
+          <a class="btn sm primary" href="os.html">Lire la fiche</a>
+          <a class="btn sm" href="os.html#quiz">Quiz</a>
+          <a class="btn sm ghost" href="os.html#annales">Annales</a>
+        </div>
+      </article>
+
+      <article class="subject-card" data-subject-card="si" data-total="14" style="--card-color:var(--si);--card-soft:var(--si-soft)">
+        <div class="card-top">
+          <div class="subject-icon">SI</div>
+          <span class="chip color">Étude de cas</span>
+        </div>
+        <h3>Sécurité des SI</h3>
+        <p class="sub">RGPD, analyse de risques, ISO 27001/27005, IAM, PCA/PRA, audit.</p>
+        <div class="meta">
+          <span class="chip">Cas pratique</span>
+          <span class="chip">Rédaction</span>
+        </div>
+        <div class="card-progress"><div class="bar"><i></i></div><span>0/14 · 0 %</span></div>
+        <div class="card-links">
+          <a class="btn sm primary" href="si.html">Lire la fiche</a>
+          <a class="btn sm" href="si.html#quiz">Quiz</a>
+          <a class="btn sm ghost" href="si.html#cas">Cas corrigé</a>
+        </div>
+      </article>
+
+      <article class="subject-card" data-subject-card="vs" data-total="14" style="--card-color:var(--vs);--card-soft:var(--vs-soft)">
+        <div class="card-top">
+          <div class="subject-icon">VS</div>
+          <span class="chip color">Rentable</span>
+        </div>
+        <h3>Virtualisation & Stockage</h3>
+        <p class="sub">Hyperviseurs, stockage, VMware, Docker, Compose et questions de TP.</p>
+        <div class="meta">
+          <span class="chip">QCM + définitions</span>
+          <span class="chip">Très prévisible</span>
+        </div>
+        <div class="card-progress"><div class="bar"><i></i></div><span>0/14 · 0 %</span></div>
+        <div class="card-links">
+          <a class="btn sm primary" href="vs.html">Lire la fiche</a>
+          <a class="btn sm" href="vs.html#quiz">Quiz</a>
+          <a class="btn sm ghost" href="vs.html#annales">Annales</a>
+        </div>
+      </article>
+
+      <article class="subject-card" data-subject-card="all" data-total="1" style="--card-color:var(--accent);--card-soft:rgba(124,156,255,.12)">
+        <div class="card-top">
+          <div class="subject-icon">30'</div>
+          <span class="chip color">Filet de sécurité</span>
+        </div>
+        <h3>Dernière minute</h3>
+        <p class="sub">Les 10 points indispensables par matière, à relire la veille et le matin.</p>
+        <div class="meta">
+          <span class="chip">5 fiches recto</span>
+          <span class="chip">Imprimable</span>
+        </div>
+        <div class="card-progress"><div class="bar"><i></i></div><span>À garder sous la main</span></div>
+        <div class="card-links">
+          <a class="btn sm primary" href="last-minute.html">Ouvrir</a>
+          <a class="btn sm ghost" href="plan.html">Voir le plan</a>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="wrap">
+    <div class="section-head">
+      <div>
+        <div class="kicker">Méthode</div>
+        <h2>Comment utiliser la fiche</h2>
+        <p>La fiche est conçue pour l'apprentissage actif, pas pour la lecture passive.</p>
+      </div>
+    </div>
+    <div class="grid-3">
+      <div class="box key">
+        <div class="box-title">1 · Diagnostiquer</div>
+        <p>Fais le quiz de chaque matière <strong>avant</strong> de lire la fiche. Tu sauras exactement ce qui manque et tu ne perdras pas de temps sur ce que tu connais déjà.</p>
+      </div>
+      <div class="box key">
+        <div class="box-title">2 · Apprendre</div>
+        <p>Lis une section, puis ferme-la et récite à voix haute. Coche la notion seulement quand tu peux l'expliquer sans regarder. Les tableaux sont là pour les distinctions que le correcteur attend.</p>
+      </div>
+      <div class="box key">
+        <div class="box-title">3 · Restituer</div>
+        <p>Réponds aux questions ouvertes d'annales sans regarder le corrigé, chronomètre en main. Compare ensuite avec la structure attendue : c'est ce qui fait la différence entre 8 et 15.</p>
+      </div>
+    </div>
+
+    <div class="box exam mt-2">
+      <div class="box-title">Le piège à éviter absolument</div>
+      <p>Ne réapprends pas tout le cours. Les annales montrent que les mêmes notions reviennent : <strong>DMZ et règles de filtrage</strong>, <strong>SUID/sudo</strong>, <strong>phases du pentest</strong>, <strong>RGPD et analyse de risques</strong>, <strong>hyperviseurs et Docker</strong>. La fiche est construite autour de ces récurrences.</p>
+    </div>
+  </section>
+
+  <section class="wrap">
+    <div class="section-head">
+      <div>
+        <div class="kicker">Avant de commencer</div>
+        <h2>Les 3 règles des 5 prochains jours</h2>
+      </div>
+    </div>
+    <div class="grid-3">
+      <div class="box">
+        <div class="box-title" style="color:var(--warning)">Règle 1 — Une seule ressource</div>
+        <p>Évite de zapper entre 12 PDF. Cette fiche + les annales suffisent. Si une notion manque, ouvre le cours uniquement pour ce point précis.</p>
+      </div>
+      <div class="box">
+        <div class="box-title" style="color:var(--warning)">Règle 2 — Restituer &gt; relire</div>
+        <p>Le cerveau retient ce qu'il récupère, pas ce qu'il relit. Chaque session doit finir par un quiz, un schéma au brouillon ou une réponse rédigée.</p>
+      </div>
+      <div class="box">
+        <div class="box-title" style="color:var(--warning)">Règle 3 — Dormir</div>
+        <p>Une nuit de 7 h vaut mieux que 3 h de révision supplémentaires. Les définitions et les commandes se consolident pendant le sommeil.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="wrap">
+    <span>Fiche personnelle de révision — synthèse des cours, TP et annales ST2. Vérifie toujours les consignes de ton examinateur.</span>
+    <span><a href="plan.html">Plan</a> · <a href="last-minute.html">Dernière minute</a> · <a href="#" data-search-open>Recherche</a></span>
+  </div>
+</footer>
+
+<nav class="mobile-nav" aria-label="Navigation mobile">
+  <a href="index.html"><span>⌂</span>Accueil</a>
+  <a href="plan.html"><span>▦</span>Plan</a>
+  <a href="eh.html"><span>EH</span>Hacking</a>
+  <a href="reseau.html"><span>SR</span>Réseaux</a>
+  <a href="os.html"><span>OS</span>OS</a>
+  <a href="si.html"><span>SI</span>SI</a>
+  <a href="vs.html"><span>VS</span>Virtu.</a>
+  <a href="last-minute.html"><span>⚡</span>J-1</a>
+</nav>
+
+<div class="search-overlay" id="search-overlay">
+  <div class="search-box">
+    <div class="search-input-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="search-input" type="search" placeholder="Rechercher une notion, un outil, une commande…" autocomplete="off">
+      <span class="kbd">Échap</span>
+    </div>
+    <div class="search-results" id="search-results"></div>
+  </div>
+</div>
+
+<script src="assets/search-index.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>

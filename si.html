@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Sécurité des Systèmes d'information — Cap sur le DE</title>
+<meta name="description" content="Fiche Sécurité des SI : RGPD, analyse de risques, ISO 27001/27005, IAM, PCA/PRA, audit, cas pratique corrigé.">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body style="--subject-color:var(--si);--subject-soft:var(--si-soft)">
+
+<header class="topbar">
+  <div class="wrap topbar-inner">
+    <a class="brand" href="index.html"><span class="brand-mark">DE</span><span>Cap sur le DE<small>ST2 · 5 matières</small></span></a>
+    <nav class="nav-links" aria-label="Navigation principale"><a href="index.html">Accueil</a><a href="plan.html">Plan</a><a href="eh.html">Hacking</a><a href="reseau.html">Réseaux</a><a href="os.html">OS</a><a href="si.html" class="active">SI</a><a href="vs.html">Virtualisation</a><a href="last-minute.html">J-1</a></nav>
+    <div class="top-actions">
+      <button class="icon-btn" id="btn-search" aria-label="Rechercher"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></button>
+      <button class="icon-btn" id="btn-theme" aria-label="Changer de thème"></button>
+      <div class="progress-pill"><svg class="ring" id="top-ring" viewBox="0 0 24 24"><circle class="bg" cx="12" cy="12" r="9"/><circle class="fg" cx="12" cy="12" r="9" stroke-dasharray="56.5" stroke-dashoffset="56.5"/></svg><span class="pp-text" id="top-progress-text">0 %</span></div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="subject-hero" data-watermark="SI">
+    <div class="kicker">Matière 4 · ST2SSI</div>
+    <h1>Sécurité des SI</h1>
+    <p>Le DE est un cas pratique : on te donne un schéma de SI et tu dois identifier les données, les menaces, les vulnérabilités, les impacts, puis proposer des mesures conformes RGPD/ISO. La méthode compte autant que le contenu.</p>
+    <div class="subject-meta"><span class="chip">Cas pratique</span><span class="chip">Rédaction structurée</span><span class="chip">RGPD + ISO 27005</span><span class="chip">Toutes les couches</span></div>
+    <div class="progress-line"><div class="bar"><i></i></div><span id="subject-progress-text">0/14 notions</span></div>
+  </section>
+
+  <div class="subject-layout">
+    <aside class="toc">
+      <h4>Dans cette fiche</h4>
+      <a href="#fond">1 · SI, SSI, DICP &amp; normes</a>
+      <a href="#rgpd">2 · RGPD &amp; données de santé</a>
+      <a href="#risque">3 · Analyse de risques</a>
+      <a href="#crypto">4 · Cryptographie</a>
+      <a href="#reseau">5 · Réseau &amp; cloud</a>
+      <a href="#iam">6 · IAM, LDAP, AD</a>
+      <a href="#web">7 · Sécurité applicative</a>
+      <a href="#durci">8 · Durcissement &amp; patch</a>
+      <a href="#supervision">9 · Supervision &amp; incidents</a>
+      <a href="#audit">10 · Audit vs pentest</a>
+      <a href="#pca">11 · PCA / PRA</a>
+      <a href="#methode">12 · Méthode du cas pratique</a>
+      <a href="#cas">13 · Cas corrigé : cabinet médical</a>
+      <a href="#annales">14 · Autres cas &amp; annales</a>
+      <a href="#quiz">Quiz express</a>
+      <a href="#flashcards">Flashcards</a>
+      <div class="toc-tools"><button class="btn" data-action="expand">Déplier</button><button class="btn" data-action="collapse">Replier</button></div>
+    </aside>
+
+    <div class="content">
+      <div class="box exam">
+        <div class="box-title">Stratégie de copie</div>
+        <p>Structure ta copie avec des titres visibles : <strong>1) Contexte et actifs</strong>, <strong>2) Données et conformité</strong>, <strong>3) Menaces / vulnérabilités</strong>, <strong>4) Impacts</strong>, <strong>5) Risques et priorisation</strong>, <strong>6) Recommandations</strong>, <strong>7) Normes et suivi</strong>. Une copie structurée gagne plusieurs points même si tu oublies un détail.</p>
+        <p>Phrase magique : « Cette mesure applique le principe de <strong>minimisation / moindre privilège / défense en profondeur</strong> et réduit le risque de <strong>…</strong> ».</p>
+      </div>
+
+      <section class="note" id="fond" data-topic="si-1">
+        <div class="note-head"><div class="note-num">1</div><h2>SI, SSI, DICP &amp; normes</h2><label class="topic-check"><input type="checkbox" data-topic="si-1">Validé</label></div>
+        <p>Un <strong>système d'information</strong> est l'ensemble des moyens (organisation, acteurs, procédures, systèmes informatiques) nécessaires au traitement et à l'exploitation des informations, dans le respect de la réglementation.</p>
+        <p>La <strong>SSI</strong> est l'ensemble des moyens techniques, organisationnels, juridiques et humains visant à empêcher l'utilisation ou l'accès non autorisé, le mauvais usage, la modification ou le détournement du SI.</p>
+        <div class="table-wrap"><table><thead><tr><th>Critère</th><th>Définition</th><th>Exemple</th></tr></thead><tbody>
+          <tr><td><strong>Confidentialité</strong></td><td>Seules les personnes autorisées accèdent à l'information.</td><td>Chiffrement, contrôle d'accès, cloisonnement.</td></tr>
+          <tr><td><strong>Intégrité</strong></td><td>L'information est exacte et complète ; toute modification est détectée.</td><td>Hash, signature, logs, contrôle de version.</td></tr>
+          <tr><td><strong>Disponibilité</strong></td><td>L'information est accessible au moment voulu.</td><td>Redondance, sauvegardes, PCA/PRA, anti-DDoS.</td></tr>
+          <tr><td><strong>Preuve / traçabilité</strong></td><td>On peut retrouver qui a fait quoi, quand et comment.</td><td>Logs, authentification, horodatage, audit.</td></tr>
+        </tbody></table></div>
+        <h3>Les acteurs français</h3>
+        <ul><li><strong>ANSSI</strong> : autorité nationale de sécurité des SI, publie les guides, qualifie les produits et prestataires (SecNumCloud, PASSI, PDIS, PRIS, PAMS).</li><li><strong>CNIL</strong> : protection des données personnelles, contrôle le RGPD.</li><li><strong>CERT-FR</strong> : veille et réponse aux incidents.</li><li><strong>Cybermalveillance.gouv.fr</strong> : assistance aux victimes.</li><li><strong>OFAC</strong> (ex-OCLCTIC) : lutte contre la cybercriminalité, PHAROS.</li></ul>
+        <h3>Les normes à citer</h3>
+        <div class="table-wrap"><table><thead><tr><th>Norme</th><th>Objet</th><th>À citer pour…</th></tr></thead><tbody>
+          <tr><td><strong>ISO/IEC 27001</strong></td><td>Exigences du SMSI (Système de Management de la Sécurité de l'Information).</td><td>Gouvernance, certification, amélioration continue (PDCA).</td></tr>
+          <tr><td><strong>ISO/IEC 27002</strong></td><td>Lignes directrices et contrôles de sécurité.</td><td>Mesures organisationnelles, humaines, physiques, technologiques.</td></tr>
+          <tr><td><strong>ISO/IEC 27005</strong></td><td>Gestion des risques liés à la sécurité de l'information.</td><td>Méthode d'analyse de risques.</td></tr>
+          <tr><td><strong>ISO 22301</strong></td><td>Système de management de la continuité d'activité.</td><td>PCA/PRA, BIA, RTO/RPO.</td></tr>
+          <tr><td><strong>ISO/IEC 15408</strong></td><td>Common Criteria (EAL1 à EAL7).</td><td>Évaluation de produits de sécurité.</td></tr>
+          <tr><td><strong>ISO/IEC 27701</strong></td><td>Management de la vie privée (extension RGPD).</td><td>Privacy by design, DPO.</td></tr>
+          <tr><td><strong>EBIOS RM</strong></td><td>Méthode ANSSI d'analyse de risques.</td><td>Scénarios stratégiques et opérationnels.</td></tr>
+        </tbody></table></div>
+        <div class="box key"><div class="box-title">SMSI &amp; PDCA</div><p>Le SMSI est un système de management : <strong>Plan</strong> (politique, risques), <strong>Do</strong> (mise en œuvre), <strong>Check</strong> (audit, indicateurs), <strong>Act</strong> (amélioration). ISO 27001 certifie le SMSI, pas la sécurité absolue.</p></div>
+      </section>
+
+      <section class="note" id="rgpd" data-topic="si-2">
+        <div class="note-head"><div class="note-num">2</div><h2>RGPD &amp; données de santé</h2><label class="topic-check"><input type="checkbox" data-topic="si-2">Validé</label></div>
+        <p>Le RGPD s'applique à toute donnée personnelle : information relative à une personne physique identifiée ou identifiable. Les <strong>données de santé</strong> et les <strong>données biométriques</strong> sont des données sensibles : leur traitement est interdit par principe, sauf exception (consentement explicite, soins, obligation légale, intérêt public).</p>
+        <h3>Les 7 principes</h3>
+        <ol>
+          <li><strong>Licéité, loyauté, transparence</strong> : base légale et information claire.</li>
+          <li><strong>Limitation des finalités</strong> : collecter pour un objectif déterminé, pas pour « plus tard ».</li>
+          <li><strong>Minimisation</strong> : uniquement les données nécessaires.</li>
+          <li><strong>Exactitude</strong> : données à jour, rectification possible.</li>
+          <li><strong>Limitation de conservation</strong> : durée définie, suppression ensuite.</li>
+          <li><strong>Intégrité et confidentialité</strong> : sécurité adaptée au risque.</li>
+          <li><strong>Responsabilité</strong> : pouvoir démontrer la conformité (registre, documentation, AIPD).</li>
+        </ol>
+        <h3>Les droits des personnes</h3>
+        <p>Information, accès, rectification, effacement (« droit à l'oubli »), limitation du traitement, opposition, portabilité, retrait du consentement, réclamation auprès de la CNIL. La personne doit pouvoir exercer ces droits facilement.</p>
+        <h3>Les acteurs et obligations</h3>
+        <ul><li><strong>Responsable de traitement</strong> : décide pourquoi et comment.</li><li><strong>Sous-traitant</strong> : traite pour le compte du responsable (hébergeur, prestataire).</li><li><strong>DPO</strong> : délégué à la protection des données, conseille et contrôle.</li><li><strong>Registre des traitements</strong> : inventaire des traitements et de leur conformité.</li><li><strong>AIPD</strong> : analyse d'impact pour les traitements à risque élevé (santé, surveillance systématique, grande échelle).</li><li><strong>Violation de données</strong> : notification à la CNIL sous <strong>72 h</strong> si risque ; information des personnes si risque élevé ; registre des violations.</li><li><strong>Privacy by design / by default</strong> : protection dès la conception et par défaut.</li><li><strong>HDS</strong> : certification des hébergeurs de données de santé en France.</li></ul>
+        <div class="box warn"><div class="box-title">Réflexes cas pratique « données de santé »</div>
+          <ul><li>Identifier les données personnelles et sensibles (nom, téléphone, photos, biométrie, dossiers patients).</li><li>Vérifier la base légale et l'information des patients.</li><li>Minimiser : ne collecter que le nécessaire ; éviter les photos si non indispensables.</li><li>Chiffrer au repos et en transit ; restreindre les accès ; tracer les consultations.</li><li>Ne pas exposer le serveur de dossiers patients sur Internet.</li><li>Prévoir la durée de conservation, l'effacement, la sauvegarde et la restauration.</li><li>Former le personnel ; désigner un référent/DPO ; documenter.</li></ul>
+        </div>
+        <div class="box danger"><div class="box-title">Erreur classique</div><p>Dire « on chiffre tout, donc on est conforme ». Le RGPD exige aussi une base légale, une finalité, une durée, une information, des droits, un registre et une sécurité proportionnée. La technique ne remplace pas la conformité.</p></div>
+      </section>
+
+      <section class="note" id="risque" data-topic="si-3">
+        <div class="note-head"><div class="note-num">3</div><h2>Analyse de risques</h2><label class="topic-check"><input type="checkbox" data-topic="si-3">Validé</label></div>
+        <p><strong>Risque = menace × vulnérabilité × impact.</strong> On parle aussi de <strong>vraisemblance × impact</strong>. Le risque est l'effet de l'incertitude sur l'atteinte des objectifs.</p>
+        <div class="table-wrap"><table><thead><tr><th>Concept</th><th>Définition</th><th>Exemple cabinet médical</th></tr></thead><tbody>
+          <tr><td><strong>Actif primaire</strong></td><td>Processus, information, donnée à forte valeur.</td><td>Dossier patient, rendez-vous, facturation.</td></tr>
+          <tr><td><strong>Actif secondaire</strong></td><td>Support : matériel, logiciel, réseau, personnel, site.</td><td>Serveur local, PC Windows 11, box, Wi-Fi, disque de sauvegarde.</td></tr>
+          <tr><td><strong>Menace</strong></td><td>Cause potentielle d'incident.</td><td>Hacker, ransomware, employé malveillant, vol, incendie, panne.</td></tr>
+          <tr><td><strong>Vulnérabilité</strong></td><td>Faiblesse exploitable.</td><td>Mots de passe partagés, Wi-Fi unique, données non chiffrées, pas de MFA.</td></tr>
+          <tr><td><strong>Impact</strong></td><td>Conséquence sur le DICP, le métier, le legal, l'image.</td><td>Fuite de données, soins retardés, sanction CNIL, perte de confiance.</td></tr>
+          <tr><td><strong>Risque résiduel</strong></td><td>Risque restant après mesures.</td><td>Risque accepté et documenté par la direction.</td></tr>
+        </tbody></table></div>
+        <h3>Les 4 traitements du risque</h3>
+        <div class="grid-2">
+          <div class="box"><div class="box-title">Réduire</div><p>Mettre en place des mesures : MFA, chiffrement, segmentation, sauvegardes, formation.</p></div>
+          <div class="box"><div class="box-title">Accepter</div><p>Le coût de la mesure est supérieur au risque, ou le risque est faible. Décision formelle et documentée.</p></div>
+          <div class="box"><div class="box-title">Éviter</div><p>Supprimer l'activité ou le service à risque (ex. ne pas exposer le serveur patients sur Internet).</p></div>
+          <div class="box"><div class="box-title">Transférer</div><p>Assurance cyber, externalisation avec garanties contractuelles, cloud conforme.</p></div>
+        </div>
+        <h3>ISO 27005 en 6 étapes</h3>
+        <ol><li>Établir le contexte (périmètre, critères, rôles).</li><li>Identifier les risques (actifs, menaces, vulnérabilités).</li><li>Analyser (vraisemblance, impact, criticité).</li><li>Évaluer (acceptable ou à traiter).</li><li>Traiter (plan, mesures, risque résiduel).</li><li>Communiquer, surveiller et revoir.</li></ol>
+        <h3>EBIOS RM en 5 ateliers</h3>
+        <ol><li><strong>Cadrage et socle</strong> : périmètre, valeurs métier, biens supports.</li><li><strong>Sources de risque</strong> : qui attaque, motivations, capacités.</li><li><strong>Scénarios stratégiques</strong> : chemins d'attaque de haut niveau.</li><li><strong>Scénarios opérationnels</strong> : modes opératoires techniques.</li><li><strong>Traitement</strong> : mesures, risques résiduels, validation.</li></ol>
+        <h3>Matrice 4×4</h3>
+        <div class="table-wrap"><table><thead><tr><th>Vraisemblance \ Impact</th><th>1 Faible</th><th>2</th><th>3</th><th>4 Critique</th></tr></thead><tbody>
+          <tr><td><strong>4 Très probable</strong></td><td>4</td><td>8</td><td>12</td><td>16</td></tr>
+          <tr><td><strong>3 Probable</strong></td><td>3</td><td>6</td><td>9</td><td>12</td></tr>
+          <tr><td><strong>2 Peu probable</strong></td><td>2</td><td>4</td><td>6</td><td>8</td></tr>
+          <tr><td><strong>1 Rare</strong></td><td>1</td><td>2</td><td>3</td><td>4</td></tr>
+        </tbody></table></div>
+        <p>Règle simple : 1–3 acceptable, 4–8 à traiter, 9–16 critique. Adapte les seuils au contexte et justifie.</p>
+        <div class="box key"><div class="box-title">RTAE</div><p>Registre de Traitement et Acceptation des Risques : identifiant, actif, menace, vulnérabilité, vraisemblance, impact, criticité, mesure, responsable, échéance, risque résiduel, décision d'acceptation.</p></div>
+      </section>
+
+      <section class="note" id="crypto" data-topic="si-4">
+        <div class="note-head"><div class="note-num">4</div><h2>Cryptographie</h2><label class="topic-check"><input type="checkbox" data-topic="si-4">Validé</label></div>
+        <p>La cryptologie comprend la <strong>cryptographie</strong> (écrire secret), la <strong>cryptanalyse</strong> (casser) et la <strong>stéganographie</strong> (dissimuler). On ne dit pas « crypter » mais <strong>chiffrer</strong>.</p>
+        <div class="table-wrap"><table><thead><tr><th></th><th>Symétrique</th><th>Asymétrique</th></tr></thead><tbody>
+          <tr><td>Clés</td><td>Une clé secrète partagée.</td><td>Une paire : publique / privée.</td></tr>
+          <tr><td>Vitesse</td><td>Rapide, adapté aux gros volumes.</td><td>Lent (100 à 1000× plus lent).</td></tr>
+          <tr><td>Exemples</td><td>AES, DES, 3DES, RC4, ChaCha20.</td><td>RSA, ECC, ElGamal.</td></tr>
+          <tr><td>Usage</td><td>Chiffrement des données, session TLS.</td><td>Échange de clés, signature, certificats.</td></tr>
+          <tr><td>Limite</td><td>Distribution de la clé : n(n−1)/2 clés.</td><td>Lenteur, authentification de la clé publique.</td></tr>
+        </tbody></table></div>
+        <h3>Chiffrement hybride</h3>
+        <p>On génère une clé de session symétrique, on la chiffre avec la clé publique du destinataire, puis on chiffre le message avec la clé de session. C'est le modèle de <strong>TLS</strong> : asymétrique pour l'échange de clés, symétrique pour les données.</p>
+        <h3>Hash, MAC, signature</h3>
+        <ul><li><strong>Hash</strong> : empreinte irréversible (SHA-256). Propriétés : déterminisme, effet avalanche, résistance aux collisions. Sert à l'intégrité et au stockage des mots de passe (avec sel et itérations).</li><li><strong>HMAC</strong> : hash + clé secrète, pour l'intégrité et l'authentification d'un message.</li><li><strong>Signature</strong> : on signe avec sa clé privée, on vérifie avec la clé publique. Garantit intégrité, authentification et non-répudiation.</li><li><strong>PKI</strong> : autorité de certification, certificats, révocation (CRL/OCSP), chaîne de confiance.</li></ul>
+        <div class="box key"><div class="box-title">Bonnes pratiques</div><p>AES-256 ou ChaCha20 pour les données, RSA ≥ 2048 bits (3072 recommandé) ou ECC 256+, SHA-256/384, TLS 1.2/1.3, rotation des clés, stockage HSM/TPM, ne jamais coder une clé en dur, ne pas inventer sa propre crypto.</p></div>
+        <h3>Chiffrement au repos et en transit</h3>
+        <p><strong>Au repos :</strong> disques (BitLocker, LUKS), bases de données, sauvegardes, fichiers. <strong>En transit :</strong> TLS, VPN, SSH, SMTPS/IMAPS. <strong>En usage :</strong> confidential computing, enclaves, moins courant.</p>
+      </section>
+
+      <section class="note" id="reseau" data-topic="si-5">
+        <div class="note-head"><div class="note-num">5</div><h2>Réseau &amp; cloud</h2><label class="topic-check"><input type="checkbox" data-topic="si-5">Validé</label></div>
+        <p>Les concepts réseau sont détaillés dans la fiche Réseaux ; ici, retiens les mesures à citer dans un audit SI.</p>
+        <ul><li><strong>Segmentation</strong> : VLAN, sous-réseaux, zones de confiance, DMZ.</li><li><strong>Firewall</strong> : deny all par défaut, règles explicites, logs.</li><li><strong>Proxy / reverse proxy</strong> : filtrage, rupture protocolaire, WAF.</li><li><strong>IDS/IPS</strong> : détection et blocage, placement aux points critiques.</li><li><strong>VPN</strong> : accès distant chiffré, IPsec ou SSL, MFA.</li><li><strong>802.1X / RADIUS</strong> : authentification des accès filaires et Wi-Fi.</li><li><strong>Wi-Fi</strong> : WPA2/3 Enterprise, SSID séparés, réseau invité isolé.</li><li><strong>DNSSEC, TLS, SSH</strong> : protocoles sécurisés.</li><li><strong>Administration</strong> : bastion, réseau dédié, MFA, pas d'admin exposé.</li></ul>
+        <h3>Cloud : les questions à poser</h3>
+        <ul><li>Qui a accès aux données ? Comment sont-elles isolées ?</li><li>Chiffrement au repos et en transit ? Gestion des clés ?</li><li>Localisation des données et régime juridique (RGPD, souveraineté).</li><li>Réversibilité, export, délais de restitution, destruction.</li><li>Supervision, gestion des incidents, correctifs, audit.</li><li>Conformité : SecNumCloud, ISO 27001, HDS, PCI-DSS.</li></ul>
+        <div class="box key"><div class="box-title">Responsabilité partagée</div><p>Le fournisseur sécurise l'infrastructure ; le client reste responsable de ses données, de ses configurations, de ses identités et de ses accès. « Le cloud est sécurisé » ne veut rien dire sans préciser qui fait quoi.</p></div>
+      </section>
+
+      <section class="note" id="iam" data-topic="si-6">
+        <div class="note-head"><div class="note-num">6</div><h2>IAM, LDAP &amp; Active Directory</h2><label class="topic-check"><input type="checkbox" data-topic="si-6">Validé</label></div>
+        <p><strong>IAM</strong> (Identity and Access Management) répond à « qui a accès à quoi ? ». Il couvre l'identification, l'authentification, l'autorisation et la gouvernance des identités.</p>
+        <div class="table-wrap"><table><thead><tr><th>Étape</th><th>Question</th><th>Exemple</th></tr></thead><tbody>
+          <tr><td><strong>Identification</strong></td><td>Qui demande l'accès ?</td><td>Login, email, certificat.</td></tr>
+          <tr><td><strong>Authentification</strong></td><td>Est-ce bien lui ?</td><td>Mot de passe + MFA, clé, biométrie.</td></tr>
+          <tr><td><strong>Autorisation</strong></td><td>A-t-il le droit ?</td><td>RBAC, ACL, politique.</td></tr>
+          <tr><td><strong>Traçabilité</strong></td><td>Qu'a-t-il fait ?</td><td>Logs, audit.</td></tr>
+        </tbody></table></div>
+        <h3>Modèles de contrôle d'accès</h3>
+        <ul><li><strong>DAC</strong> : le propriétaire décide (Unix).</li><li><strong>MAC</strong> : politique globale (SELinux, AppArmor).</li><li><strong>RBAC</strong> : rôles et permissions (le plus courant en entreprise).</li><li><strong>ABAC</strong> : attributs (contexte, heure, service, risque).</li></ul>
+        <h3>Bonnes pratiques IAM</h3>
+        <ul><li>Moindre privilège et séparation des tâches.</li><li>Cycle de vie : arrivée, mutation, départ (joiner/mover/leaver).</li><li>Revue périodique des accès, suppression des comptes orphelins.</li><li>MFA pour les accès sensibles et les administrateurs.</li><li>Comptes à privilèges dans un coffre (PAM), bastion, sessions enregistrées.</li><li>Pas de comptes partagés ; un compte par personne.</li><li>Politique de mots de passe : longueur, complexité, pas de réutilisation, hash fort, verrouillage.</li></ul>
+        <h3>LDAP</h3>
+        <p>Annuaire hiérarchique : <strong>DIT</strong>, <strong>DN</strong> ( Distinguished Name), <strong>RDN</strong>, <strong>DC</strong>, <strong>OU</strong>, <strong>CN</strong>. Exemple : <code>cn=msecurite,ou=People,dc=techmed,dc=local</code>.</p>
+        <ul><li><strong>Bind</strong> : authentification auprès de l'annuaire.</li><li><strong>LDIF</strong> : format d'import/export.</li><li><strong>ldapsearch</strong>, <strong>ldapadd</strong>, <strong>ldapmodify</strong>.</li><li><strong>Anonymous bind</strong> : à interdire ; sinon énumération des utilisateurs.</li><li><strong>LDAPS</strong> : LDAP sur TLS, port 636. Ne jamais transmettre un mot de passe en clair sur 389.</li><li><strong>Injection LDAP</strong> : filtrer les entrées (<code>*)(uid=*</code>) ; utiliser des requêtes paramétrées.</li></ul>
+        <h3>Active Directory</h3>
+        <p>Annuaire et service d'authentification Microsoft : domaine, forêt, contrôleurs de domaine, GPO, Kerberos, LDAP. À sécuriser : comptes admin dédiés, tiering, LAPS, Protected Users, désactivation NTLM, audit, sauvegarde du domaine, RODC pour les sites exposés.</p>
+        <div class="box warn"><div class="box-title">Erreur d'audit fréquente</div><p>« Il y a un AD, donc l'authentification est sécurisée. » Un AD mal configuré (comptes admin partagés, Kerberoasting, délégations excessives, mots de passe faibles) est une cible de choix. L'AD doit être durci et surveillé.</p></div>
+      </section>
+
+      <section class="note" id="web" data-topic="si-7">
+        <div class="note-head"><div class="note-num">7</div><h2>Sécurité applicative</h2><label class="topic-check"><input type="checkbox" data-topic="si-7">Validé</label></div>
+        <p>Une application est sûre si elle est conçue, développée, déployée et maintenue avec la sécurité. La sécurité n'est pas un module qu'on ajoute à la fin.</p>
+        <h3>Évaluation &amp; certification</h3>
+        <p><strong>Common Criteria</strong> (ISO/IEC 15408) définit les niveaux <strong>EAL1 à EAL7</strong> ; EAL4+ est courant pour les OS et produits grand public. L'ANSSI qualifie aussi des produits et des prestataires (PASSI, PDIS, PRIS, PAMS, SecNumCloud). Une certification prouve un niveau d'assurance dans un périmètre donné, pas l'absence de vulnérabilités.</p>
+        <h3>Security by design — les 10 principes</h3>
+        <ol><li>Minimiser la surface d'attaque.</li><li>Valeurs par défaut sécurisées.</li><li>Moindre privilège.</li><li>Défense en profondeur.</li><li>Échouer en sécurité (<em>fail securely</em>).</li><li>Ne pas faire confiance aux services externes.</li><li>Séparation des tâches.</li><li>Pas de sécurité par l'obscurité.</li><li>Garder la sécurité simple.</li><li>Résoudre correctement les problèmes de sécurité.</li></ol>
+        <h3>Privacy by design — 7 principes</h3>
+        <p>Proactif, protection par défaut, protection intégrée à la conception, sécurité de bout en bout, visibilité/transparence, respect de la vie privée, minimisation.</p>
+        <h3>OWASP Top 10 — 2021</h3>
+        <div class="table-wrap"><table><thead><tr><th>Risque</th><th>Défense</th></tr></thead><tbody>
+          <tr><td>A01 Broken Access Control</td><td>Contrôle serveur, deny by default, tests d'autorisation.</td></tr>
+          <tr><td>A02 Cryptographic Failures</td><td>TLS, hash fort, pas de secret en clair.</td></tr>
+          <tr><td>A03 Injection</td><td>Requêtes préparées, validation, encodage.</td></tr>
+          <tr><td>A04 Insecure Design</td><td>Threat modeling, principes de conception.</td></tr>
+          <tr><td>A05 Security Misconfiguration</td><td>Durcissement, suppression des services/comptes par défaut.</td></tr>
+          <tr><td>A06 Vulnerable Components</td><td>Inventaire, SCA, patch management.</td></tr>
+          <tr><td>A07 Auth Failures</td><td>MFA, rate limiting, sessions sécurisées.</td></tr>
+          <tr><td>A08 Integrity Failures</td><td>Signatures, SRI, pipeline sécurisé.</td></tr>
+          <tr><td>A09 Logging Failures</td><td>SIEM, alertes, plan d'incident.</td></tr>
+          <tr><td>A10 SSRF</td><td>Allowlist, blocage des IP internes/metadata.</td></tr>
+        </tbody></table></div>
+        <h3>Vulnérabilités et défenses</h3>
+        <ul><li><strong>SQLi</strong> : requêtes préparées, validation, moindre privilège DB, WAF.</li><li><strong>XSS</strong> : encodage de sortie, CSP, HttpOnly, validation.</li><li><strong>CSRF</strong> : token anti-CSRF, SameSite, vérification Origin.</li><li><strong>IDOR</strong> : contrôle d'accès côté serveur, IDs non devinables.</li><li><strong>SSRF</strong> : allowlist, blocage des adresses privées.</li><li><strong>LFI/RFI</strong> : allowlist, pas de chemins utilisateur.</li><li><strong>Command injection</strong> : éviter <code>system()</code>, valider, utiliser des API.</li></ul>
+        <p><strong>Outils :</strong> SAST (analyse statique), DAST (analyse dynamique), SCA (dépendances), IAST, fuzzing, WAF, Burp/ZAP, SonarQube, Dependabot. <strong>DevSecOps</strong> : intégrer la sécurité dans la CI/CD (revue de code, tests, secrets, images).</p>
+        <div class="box key"><div class="box-title">CVSS</div><p>Score 0–10 : None, Low, Medium, High, Critical. Il aide à prioriser mais ne remplace pas le contexte métier. Une faille critique sur un serveur isolé n'a pas le même impact qu'une faille moyenne sur le SI principal.</p></div>
+      </section>
+
+      <section class="note" id="durci" data-topic="si-8">
+        <div class="note-head"><div class="note-num">8</div><h2>Durcissement &amp; patch management</h2><label class="topic-check"><input type="checkbox" data-topic="si-8">Validé</label></div>
+        <p>Le durcissement réduit la surface d'attaque : moins de services, moins de comptes, moins de ports, moins de logiciels, des configurations sûres.</p>
+        <h3>Checklist</h3>
+        <ul class="two-col-list">
+          <li>Inventaire des actifs et des versions.</li>
+          <li>Système minimal, pas de GUI inutile.</li>
+          <li>Suppression des comptes et services par défaut.</li>
+          <li>Mots de passe forts + MFA.</li>
+          <li>Moindre privilège, sudo, RBAC.</li>
+          <li>Pare-feu local + segmentation.</li>
+          <li>Chiffrement des disques et des sauvegardes.</li>
+          <li>Journalisation et audit.</li>
+          <li>Mises à jour et patch management.</li>
+          <li>Antivirus / EPP / EDR.</li>
+          <li>Contrôle des USB et des logiciels.</li>
+          <li>Sauvegardes testées.</li>
+          <li>Documentation et baseline.</li>
+          <li>Revue périodique.</li>
+        </ul>
+        <p><strong>Référentiels :</strong> CIS Benchmarks, ANSSI, Microsoft Security Baselines, STIG, BSI. <strong>Patch management :</strong> veille, inventaire, test, pilote, déploiement, vérification, rollback. Une fenêtre de vulnérabilité est la période entre la publication de la faille et l'application du correctif.</p>
+        <h3>Protection des terminaux</h3>
+        <div class="table-wrap"><table><thead><tr><th>Solution</th><th>Rôle</th></tr></thead><tbody>
+          <tr><td><strong>Antivirus / anti-malware</strong></td><td>Détection par signatures et/ou comportement. Scanne disque, mémoire et échanges.</td></tr>
+          <tr><td><strong>HIPS</strong></td><td>Host Intrusion Prevention System : contrôle les comportements, les logs, l'intégrité des fichiers.</td></tr>
+          <tr><td><strong>EPP</strong></td><td>Endpoint Protection Platform : antivirus + HIPS + firewall + gestion centralisée.</td></tr>
+          <tr><td><strong>EDR</strong></td><td>Endpoint Detection and Response : détection, investigation, remédiation par comportement/IA.</td></tr>
+          <tr><td><strong>XDR</strong></td><td>EDR étendu au cloud, à l'hyperviseur et aux différentes sources ; rapproche du SIEM.</td></tr>
+          <tr><td><strong>SIEM / SOC</strong></td><td>Corrélation des logs et supervision centralisée ; le SOC analyse et répond.</td></tr>
+        </tbody></table></div>
+        <div class="box tip"><div class="box-title">Lien avec l'audit</div><p>Le durcissement se prouve : capture d'écran de la GPO, sortie de <code>auditpol</code>, liste des services, résultat d'un scan de conformité. Dans une copie, cite le référentiel et le contrôle vérifié.</p></div>
+      </section>
+
+      <section class="note" id="supervision" data-topic="si-9">
+        <div class="note-head"><div class="note-num">9</div><h2>Supervision &amp; gestion d'incidents</h2><label class="topic-check"><input type="checkbox" data-topic="si-9">Validé</label></div>
+        <p>La supervision ne se limite pas à collecter des logs : il faut <strong>analyser</strong>, <strong>corréler</strong>, <strong>investiguer</strong> et <strong>déclencher</strong> des actions.</p>
+        <ul><li><strong>SIEM</strong> : collecte, normalisation, corrélation, alertes, tableaux de bord.</li><li><strong>SOC</strong> : équipe qui surveille et répond 24/7.</li><li><strong>SOAR</strong> : automatisation des réponses (playbooks).</li><li><strong>IDS/IPS</strong> : détection réseau, signatures/anomalies.</li><li><strong>EDR/XDR</strong> : détection endpoint et étendue.</li><li><strong>VDS</strong> : scanner de vulnérabilités.</li></ul>
+        <h3>Gestion d'incident — 6 phases</h3>
+        <ol><li><strong>Préparation</strong> : plans, contacts, outils, exercices.</li><li><strong>Détection &amp; qualification</strong> : alerte, gravité, périmètre.</li><li><strong>Confinement</strong> : isoler les systèmes, bloquer les comptes, préserver les preuves.</li><li><strong>Éradication</strong> : supprimer la cause (malware, accès).</li><li><strong>Rétablissement</strong> : restaurer, vérifier, surveiller.</li><li><strong>Retour d'expérience</strong> : cause racine, mesures, mise à jour du plan.</li></ol>
+        <p><strong>Ransomware :</strong> isoler, ne pas payer, identifier le périmètre, restaurer depuis une sauvegarde saine, notifier (CNIL si données personnelles), porter plainte, communiquer. <strong>Crise :</strong> cellule de crise, décisions, communication interne/externe, continuité.</p>
+        <div class="box key"><div class="box-title">Événement vs incident</div><p>Un <strong>événement de sécurité</strong> est une occurrence observable. Un <strong>incident</strong> est un ou plusieurs événements indésirables qui compromettent probablement l'activité ou la sécurité. Tout événement n'est pas un incident.</p></div>
+        <h3>Prestataires ANSSI</h3>
+        <p><strong>PASSI</strong> (audit), <strong>PDIS</strong> (détection), <strong>PRIS</strong> (réponse), <strong>PAMS</strong> (administration/maintenance), <strong>SecNumCloud</strong> (cloud). Les citer montre que tu connais l'écosystème français.</p>
+      </section>
+
+      <section class="note" id="audit" data-topic="si-10">
+        <div class="note-head"><div class="note-num">10</div><h2>Audit vs pentest</h2><label class="topic-check"><input type="checkbox" data-topic="si-10">Validé</label></div>
+        <div class="table-wrap"><table><thead><tr><th></th><th>Audit</th><th>Pentest</th></tr></thead><tbody>
+          <tr><td>Objectif</td><td>Vérifier la conformité à un référentiel.</td><td>Éprouver l'efficacité réelle des protections.</td></tr>
+          <tr><td>Approche</td><td>Documentaire, organisationnelle, technique.</td><td>Offensive, par scénarios d'attaque.</td></tr>
+          <tr><td>Résultat</td><td>Écarts, note de conformité, recommandations.</td><td>Preuves d'exploitation, impact, CVSS, remédiation.</td></tr>
+          <tr><td>Limite</td><td>Ne prouve pas qu'une attaque réussirait.</td><td>Une intrusion non réussie ne prouve pas la sécurité parfaite.</td></tr>
+        </tbody></table></div>
+        <p><strong>Types d'audit :</strong> organisationnel, physique, politique de sécurité, mise en œuvre, projet, efficacité, architecture, configuration, code, vulnérabilités. <strong>Modes de pentest :</strong> black-box, grey-box, white-box. <strong>Démarche :</strong> préparation, réalisation, restitution.</p>
+        <p><strong>VDS</strong> : pour chaque port ouvert, identifie le service, le logiciel, la version, puis interroge une base de CVE. Produit un rapport mais beaucoup de faux positifs. <strong>Pentest :</strong> confirme l'exploitabilité et l'impact.</p>
+        <div class="box warn"><div class="box-title">Cadre légal</div><p>Autorisation écrite, périmètre, règles d'engagement, protection des données, restitution confidentielle. Les vulnérabilités non publiques peuvent être transmises à l'ANSSI (CERT-FR).</p></div>
+      </section>
+
+      <section class="note" id="pca" data-topic="si-11">
+        <div class="note-head"><div class="note-num">11</div><h2>PCA / PRA &amp; continuité</h2><label class="topic-check"><input type="checkbox" data-topic="si-11">Validé</label></div>
+        <div class="table-wrap"><table><thead><tr><th>Plan</th><th>Objectif</th><th>Exemple</th></tr></thead><tbody>
+          <tr><td><strong>PCA</strong></td><td>Continuer l'activité en mode dégradé pendant un sinistre.</td><td>Télétravail, site de repli, procédures manuelles.</td></tr>
+          <tr><td><strong>PRA</strong></td><td>Restaurer ou basculer le SI sur un site de secours dans un délai défini.</td><td>Bascule d'un datacenter sur un site de secours.</td></tr>
+          <tr><td><strong>PSI</strong></td><td>Plan de secours informatique : restauration des services IT.</td><td>Restauration des serveurs, données, réseau.</td></tr>
+          <tr><td><strong>PGC</strong></td><td>Gestion de crise pour les situations non anticipées.</td><td>Cellule de crise, communication, décisions.</td></tr>
+        </tbody></table></div>
+        <h3>BIA &amp; métriques</h3>
+        <ul><li><strong>BIA</strong> (Business Impact Analysis) : identifier les processus critiques, leurs dépendances et l'impact d'une interruption.</li><li><strong>RTO</strong> : durée maximale d'interruption acceptable avant restauration.</li><li><strong>RPO</strong> : perte de données maximale acceptable (fréquence des sauvegardes).</li><li><strong>MTPD</strong> : durée maximale de perturbation tolérable.</li></ul>
+        <p>Exemple : dossier patient — RTO 4 h, RPO 15 min ; facturation — RTO 24 h, RPO 1 h ; site web — RTO 8 h, RPO 24 h. Justifie par l'impact métier, pas par la technique.</p>
+        <h3>Sites de secours &amp; sauvegardes</h3>
+        <ul><li><strong>Site chaud</strong> : tout est prêt et à jour, bascule rapide.</li><li><strong>Site tiède</strong> : matériel prêt, données à restaurer.</li><li><strong>Site froid</strong> : locaux et matériel de base, tout à installer.</li><li><strong>Sauvegardes 3-2-1</strong> : 3 copies, 2 supports, 1 hors site ; ajouter une copie immuable/offline contre le ransomware.</li><li><strong>Tester la restauration</strong> : une sauvegarde non testée n'est pas une sauvegarde.</li></ul>
+        <div class="box key"><div class="box-title">ISO 22301</div><p>Norme de management de la continuité d'activité : analyse d'impact, stratégies, plans, exercices, amélioration continue. Elle complète ISO 27001 (sécurité) et ISO 27005 (risques).</p></div>
+      </section>
+
+      <section class="note" id="methode" data-topic="si-12">
+        <div class="note-head"><div class="note-num">12</div><h2>Méthode du cas pratique</h2><label class="topic-check"><input type="checkbox" data-topic="si-12">Validé</label></div>
+        <p>Quel que soit le schéma, applique cette grille. Elle marche pour un cabinet médical, un interphone connecté, une PME, une mairie.</p>
+        <div class="table-wrap"><table><thead><tr><th>Étape</th><th>Questions à te poser</th><th>Livrable dans la copie</th></tr></thead><tbody>
+          <tr><td><strong>1. Contexte</strong></td><td>Quelle activité ? Quelles données ? Qui accède ? Quelles contraintes légales ?</td><td>2–3 phrases + périmètre.</td></tr>
+          <tr><td><strong>2. Actifs</strong></td><td>Quels processus, données, serveurs, postes, réseaux, personnes, locaux ?</td><td>Tableau actifs primaires / supports.</td></tr>
+          <tr><td><strong>3. Données &amp; conformité</strong></td><td>Données personnelles ? sensibles ? base légale ? durée ? droits ?</td><td>Paragraphe RGPD + mesures.</td></tr>
+          <tr><td><strong>4. Menaces</strong></td><td>Internes/externes, accidentelles/malveillantes, environnementales.</td><td>Liste classée.</td></tr>
+          <tr><td><strong>5. Vulnérabilités</strong></td><td>Techniques, organisationnelles, humaines, physiques.</td><td>Liste reliée aux actifs.</td></tr>
+          <tr><td><strong>6. Impacts</strong></td><td>CIA, légal, financier, réputation, sécurité des patients.</td><td>Tableau impact / gravité.</td></tr>
+          <tr><td><strong>7. Risques</strong></td><td>Vraisemblance × impact ; quels sont les risques critiques ?</td><td>Matrice ou tableau + priorisation.</td></tr>
+          <tr><td><strong>8. Recommandations</strong></td><td>Gouvernance, organisation, technique, juridique ; quick wins et long terme.</td><td>Plan d'action priorisé.</td></tr>
+          <tr><td><strong>9. Normes &amp; suivi</strong></td><td>RGPD, ISO 27001, ISO 27005, ISO 22301, ANSSI, HDS.</td><td>Conformité + indicateurs.</td></tr>
+          <tr><td><strong>10. Conclusion</strong></td><td>Les 3 risques majeurs et les 3 mesures prioritaires.</td><td>Synthèse de 5 lignes.</td></tr>
+        </tbody></table></div>
+        <div class="box tip"><div class="box-title">Astuce de rédaction</div><p>Relie toujours une vulnérabilité à une menace et un impact : « Le Wi-Fi partagé (vulnérabilité) permet à un patient malveillant d'intercepter le trafic (menace) et de compromettre la confidentialité des dossiers (impact). » C'est cette chaîne que le correcteur attend.</p></div>
+      </section>
+
+      <section class="note" id="cas" data-topic="si-13">
+        <div class="note-head"><div class="note-num">13</div><h2>Cas corrigé : cabinet médical</h2><label class="topic-check"><input type="checkbox" data-topic="si-13">Validé</label></div>
+        <p><strong>Schéma type :</strong> site web vitrine hébergé chez un prestataire ; messagerie professionnelle non déléguée ; logiciel de gestion des dossiers patients installé sur un serveur local ; box Internet ; Wi-Fi partagé entre patients et personnel ; postes Windows 11 ; disque dur externe de sauvegarde.</p>
+
+        <h3>1. Contexte &amp; actifs</h3>
+        <p>Cabinet médical traitant des données de santé. Actifs primaires : dossiers patients, rendez-vous, ordonnances, facturation, site vitrine. Actifs supports : serveur local, postes Windows 11, box, Wi-Fi, disque de sauvegarde, prestataire web, messagerie, personnel.</p>
+
+        <h3>2. Données &amp; RGPD</h3>
+        <p>Les données sont personnelles et sensibles (santé, identité, coordonnées, éventuellement photos/biométrie). Il faut : base légale (soins), information des patients, minimisation, durée de conservation, droits d'accès/rectification/effacement, registre, AIPD si nécessaire, sécurité proportionnée, pas de partage avec des tiers non autorisés. Le serveur de dossiers ne doit pas être exposé directement sur Internet.</p>
+
+        <h3>3. Menaces</h3>
+        <div class="grid-2">
+          <div class="box"><div class="box-title">Internes</div><p>Employé malveillant, erreur de manipulation, patient dans la salle d'attente, prestataire avec accès physique, mot de passe partagé, départ d'un salarié.</p></div>
+          <div class="box"><div class="box-title">Externes</div><p>Hacker, ransomware, phishing, vol du disque de sauvegarde, attaque du site vitrine, compromission du prestataire, usurpation d'identité.</p></div>
+          <div class="box"><div class="box-title">Environnementales</div><p>Incendie, dégât des eaux, coupure électrique, panne du serveur, sinistre dans les locaux.</p></div>
+          <div class="box"><div class="box-title">Techniques</div><p>Panne, corruption de données, défaut de sauvegarde, vulnérabilité non patchée, configuration faible.</p></div>
+        </div>
+
+        <h3>4. Vulnérabilités</h3>
+        <ul>
+          <li><strong>Mots de passe simples et partagés</strong> entre utilisateurs, pas de MFA.</li>
+          <li><strong>Wi-Fi unique</strong> patients/personnel, pas d'isolation, WPA2 PSK peut-être faible.</li>
+          <li><strong>Données non chiffrées</strong> sur le serveur et le disque de sauvegarde.</li>
+          <li><strong>Messagerie non sécurisée</strong> / pas de VPN pour les échanges.</li>
+          <li><strong>Serveur local</strong> mal segmenté, peut-être accessible depuis le Wi-Fi.</li>
+          <li><strong>Pas de firewall/IDS/IPS</strong> ou configuration par défaut.</li>
+          <li><strong>Pas de politique de sécurité</strong>, pas de formation du personnel.</li>
+          <li><strong>Sauvegarde sur disque externe</strong> non chiffré, non testée, stockée sur site.</li>
+          <li><strong>Postes Windows 11</strong> non patchés ou sans EDR.</li>
+          <li><strong>Site vitrine</strong> chez un prestataire sans audit ni clauses de sécurité.</li>
+          <li><strong>Pas de gestion des accès</strong> (comptes génériques, anciens comptes).</li>
+          <li><strong>Pas de plan de continuité</strong> ni de procédure d'incident.</li>
+        </ul>
+
+        <h3>5. Impacts</h3>
+        <ul><li><strong>Confidentialité :</strong> fuite de dossiers patients, atteinte à la vie privée, chantage.</li><li><strong>Intégrité :</strong> dossier modifié, erreur de prescription, perte de confiance.</li><li><strong>Disponibilité :</strong> soins retardés, facturation bloquée, fermeture temporaire.</li><li><strong>Légal :</strong> sanction CNIL, notification, responsabilité.</li><li><strong>Financier :</strong> rançon, restauration, perte d'activité, assurance.</li><li><strong>Réputation :</strong> perte de patients, image du cabinet.</li></ul>
+
+        <h3>6. Risques prioritaires</h3>
+        <div class="table-wrap"><table><thead><tr><th>Risque</th><th>V</th><th>I</th><th>Criticité</th><th>Traitement</th></tr></thead><tbody>
+          <tr><td>Fuite des dossiers patients via Wi-Fi partagé / mot de passe faible</td><td>4</td><td>4</td><td>16</td><td>Réduire : WPA3/Enterprise, SSID séparés, MFA, chiffrement, segmentation.</td></tr>
+          <tr><td>Ransomware sur le serveur local, sauvegarde compromise</td><td>3</td><td>4</td><td>12</td><td>Réduire : EDR, patch, sauvegarde 3-2-1 offline, test de restauration.</td></tr>
+          <tr><td>Vol du disque de sauvegarde</td><td>3</td><td>4</td><td>12</td><td>Réduire : chiffrement, coffre, site distant.</td></tr>
+          <tr><td>Compromission du site vitrine / prestataire</td><td>3</td><td>3</td><td>9</td><td>Réduire : audit, clauses, WAF, mises à jour.</td></tr>
+          <tr><td>Erreur humaine / phishing</td><td>4</td><td>3</td><td>12</td><td>Réduire : formation, sensibilisation, MFA, procédures.</td></tr>
+        </tbody></table></div>
+
+        <h3>7. Recommandations</h3>
+        <div class="grid-2">
+          <div class="box"><div class="box-title">Gouvernance</div><ul><li>Politique de sécurité, charte, procédures.</li><li>RSSI/référent sécurité ou DPO externalisé.</li><li>Registre RGPD, AIPD, revue des accès.</li><li>Plan de continuité et d'incident.</li></ul></div>
+          <div class="box"><div class="box-title">Technique</div><ul><li>MFA, mots de passe forts, coffre.</li><li>Chiffrement au repos et en transit.</li><li>Segmentation VLAN, Wi-Fi invité isolé.</li><li>Firewall, IDS/IPS, EDR, patch.</li><li>Sauvegarde 3-2-1 testée.</li><li>Serveur non exposé sur Internet.</li></ul></div>
+          <div class="box"><div class="box-title">Organisation</div><ul><li>Formation et sensibilisation du personnel.</li><li>Gestion des arrivées/départs.</li><li>Procédure de sauvegarde et de restauration.</li><li>Tests d'intrusion et audits réguliers.</li><li>Clauses de sécurité avec le prestataire.</li></ul></div>
+          <div class="box"><div class="box-title">Juridique</div><ul><li>Conformité RGPD, information des patients.</li><li>Contrats de sous-traitance, HDS si hébergement de santé.</li><li>Assurance cyber.</li><li>Notification CNIL en cas de violation.</li></ul></div>
+        </div>
+
+        <div class="box key"><div class="box-title">Conclusion type</div><p>Les trois risques majeurs sont la fuite de données via le Wi-Fi partagé, le ransomware/sauvegarde compromise et l'erreur humaine. Les priorités sont : séparation des réseaux et MFA, sauvegarde chiffrée hors site testée, formation du personnel, puis durcissement du serveur et audit du prestataire. Ces mesures appliquent la minimisation, le moindre privilège, la défense en profondeur et la conformité RGPD.</p></div>
+      </section>
+
+      <section class="note" id="annales" data-topic="si-14">
+        <div class="note-head"><div class="note-num">14</div><h2>Autres cas &amp; annales</h2><label class="topic-check"><input type="checkbox" data-topic="si-14">Validé</label></div>
+        <details class="q-open"><summary>Cas « interphone connecté » — points de vigilance</summary><div class="details-body"><p><strong>Données :</strong> numéro d'appartement + nom + prénom + téléphone = données personnelles ; photos en cas d'absence = données biométriques potentielles → RGPD, minimisation, droit à l'effacement, information des visiteurs.</p><p><strong>Vulnérabilités :</strong> base non chiffrée, pas de mise à jour, pas de firewall/IDS, services inutiles, accès physique à l'interphone, Wi-Fi partagé, mots de passe faibles.</p><p><strong>Recommandations :</strong> chiffrement, durcissement, firewall + IDS/IPS, VLAN/hyperviseur avec VM firewall et VM web, reverse proxy, désactivation des services, MFA, formation, sauvegardes, conformité RGPD/ISO 27001.</p></div></details>
+        <details class="q-open"><summary>Question type — « Analysez les risques du SI »</summary><div class="details-body"><p>Utilise la grille de la section 12. Commence par les actifs, puis les couples menace/vulnérabilité, puis les impacts. Termine par une matrice et 3 risques majeurs. Ne liste pas des outils sans les relier à un risque.</p></div></details>
+        <details class="q-open"><summary>Question type — « Quelles mesures pour se conformer au RGPD ? »</summary><div class="details-body"><p>Base légale, information, minimisation, durée, droits, registre, AIPD, DPO, sécurité (chiffrement, accès, logs), contrats sous-traitants, notification 72 h, privacy by design. Donne un exemple concret pour chaque mesure.</p></div></details>
+        <details class="q-open"><summary>Question type — « Différence PCA / PRA / PSI / PGC »</summary><div class="details-body"><p>PCA = maintenir l'activité en mode dégradé ; PRA = restaurer/basculer le SI ; PSI = plan de secours informatique ; PGC = gestion de crise. Ajoute RTO/RPO et un exemple.</p></div></details>
+        <details class="q-open"><summary>Question type — « Rôle du RSSI »</summary><div class="details-body"><p>Conseil, assistance, information, formation, alerte ; veille, gestion des risques, politique de sécurité, audits, sensibilisation, gestion des incidents, continuité, conformité. Il ne fait pas seulement de la technique : il anime la gouvernance.</p></div></details>
+        <details class="q-open"><summary>Question type — « Pourquoi ISO 27001 n'est pas une garantie absolue ? »</summary><div class="details-body"><p>ISO 27001 certifie un SMSI et une démarche d'amélioration continue, pas l'absence de vulnérabilités. Le périmètre, la mise en œuvre, les hommes et les évolutions du SI déterminent le niveau réel. Il faut compléter par des audits techniques, des pentests et une surveillance continue.</p></div></details>
+        <details class="q-open"><summary>Question type — « Cloud et souveraineté »</summary><div class="details-body"><p>Localisation des données, régime juridique, accès extraterritorial, chiffrement, réversibilité, SecNumCloud, HDS, clauses contractuelles, audit. Le cloud n'est pas interdit : il doit être encadré.</p></div></details>
+      </section>
+
+      <section class="note" id="quiz"><div class="note-head"><div class="note-num">?</div><h2>Quiz express</h2></div><p class="muted small">10 questions tirées au hasard. Objectif : 8/10.</p><div class="quiz-shell" data-quiz="si" data-count="10"></div></section>
+      <section class="note" id="flashcards"><div class="note-head"><div class="note-num">⚡</div><h2>Flashcards</h2></div><button class="btn primary" data-flashcards="si">Lancer les flashcards →</button><span class="small muted" style="margin-left:8px">Espace = retourner · ← → = naviguer</span></section>
+
+      <div class="box exam">
+        <div class="box-title">Dernière minute — SI</div>
+        <ul class="two-col-list">
+          <li>DICP + preuve.</li>
+          <li>RGPD : finalité, minimisation, durée, droits, sécurité, responsabilité.</li>
+          <li>Données de santé = sensibles ; AIPD ; CNIL 72 h.</li>
+          <li>Risque = V × I ; réduire/accepter/éviter/transférer.</li>
+          <li>ISO 27001 = SMSI ; 27005 = risques ; 22301 = continuité.</li>
+          <li>EBIOS RM = 5 ateliers.</li>
+          <li>IAM = identifier, authentifier, autoriser, tracer.</li>
+          <li>Moindre privilège + revue des accès + MFA.</li>
+          <li>PCA = activité ; PRA = SI ; RTO/RPO.</li>
+          <li>Sauvegarde 3-2-1 + test de restauration.</li>
+          <li>OWASP : A01 accès, A03 injection.</li>
+          <li>Cas : actifs → données → menaces → vulns → impacts → risques → mesures.</li>
+        </ul>
+      </div>
+
+      <div class="hero-actions no-print"><a class="btn" href="vs.html">Matière suivante : Virtualisation →</a><a class="btn ghost" href="last-minute.html">Dernière minute</a><button class="btn ghost" data-action="print">Imprimer la fiche</button></div>
+    </div>
+  </div>
+</main>
+
+<footer class="footer"><div class="wrap"><span>Sécurité des SI · synthèse cours + TP + cas d'annales.</span><span><a href="index.html">Accueil</a> · <a href="plan.html">Plan</a></span></div></footer>
+
+<nav class="mobile-nav" aria-label="Navigation mobile"><a href="index.html"><span>⌂</span>Accueil</a><a href="plan.html"><span>▦</span>Plan</a><a href="eh.html"><span>EH</span>Hacking</a><a href="reseau.html"><span>SR</span>Réseaux</a><a href="os.html"><span>OS</span>OS</a><a href="si.html" class="active"><span>SI</span>SI</a><a href="vs.html"><span>VS</span>Virtu.</a><a href="last-minute.html"><span>⚡</span>J-1</a></nav>
+
+<div class="search-overlay" id="search-overlay"><div class="search-box"><div class="search-input-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="search-input" type="search" placeholder="Rechercher une notion, un outil, une commande…" autocomplete="off"><span class="kbd">Échap</span></div><div class="search-results" id="search-results"></div></div></div>
+
+<div class="fc-overlay" id="fc-overlay"><div class="fc-modal"><div class="fc-head"><strong>Flashcards · SI</strong><span class="fc-count" id="fc-count">1 / 1</span><button class="icon-btn" id="fc-close" aria-label="Fermer">✕</button></div><div class="fc-card" id="fc-card"><div class="fc-inner"><div class="fc-face" id="fc-front"><div class="tag">Question</div><div class="fc-text"></div><div class="hint">Clique pour retourner</div></div><div class="fc-face fc-back" id="fc-back"><div class="tag">Réponse</div><div class="fc-text"></div><div class="hint">Clique pour revenir</div></div></div></div><div class="fc-controls"><button class="btn" id="fc-prev">← Précédent</button><button class="btn" id="fc-shuffle">Mélanger</button><button class="btn primary" id="fc-next">Suivant →</button></div></div></div>
+
+<script src="assets/search-index.js"></script>
+<script src="assets/quiz-data.js"></script>
+<script src="assets/flashcards.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Sécurité Réseaux — Cap sur le DE</title>
+<meta name="description" content="Fiche Sécurité Réseaux : DMZ, firewalls, règles de filtrage, proxies, IPsec, Wi-Fi, IDS/IPS, annales corrigées.">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body style="--subject-color:var(--res);--subject-soft:var(--res-soft)">
+
+<header class="topbar">
+  <div class="wrap topbar-inner">
+    <a class="brand" href="index.html"><span class="brand-mark">DE</span><span>Cap sur le DE<small>ST2 · 5 matières</small></span></a>
+    <nav class="nav-links" aria-label="Navigation principale"><a href="index.html">Accueil</a><a href="plan.html">Plan</a><a href="eh.html">Hacking</a><a href="reseau.html" class="active">Réseaux</a><a href="os.html">OS</a><a href="si.html">SI</a><a href="vs.html">Virtualisation</a><a href="last-minute.html">J-1</a></nav>
+    <div class="top-actions">
+      <button class="icon-btn" id="btn-search" aria-label="Rechercher"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></button>
+      <button class="icon-btn" id="btn-theme" aria-label="Changer de thème"></button>
+      <div class="progress-pill"><svg class="ring" id="top-ring" viewBox="0 0 24 24"><circle class="bg" cx="12" cy="12" r="9"/><circle class="fg" cx="12" cy="12" r="9" stroke-dasharray="56.5" stroke-dashoffset="56.5"/></svg><span class="pp-text" id="top-progress-text">0 %</span></div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="subject-hero" data-watermark="SR">
+    <div class="kicker">Matière 2 · ST2SR</div>
+    <h1>Sécurité Réseaux</h1>
+    <p>Le DE est une étude de cas d'architecture : il faut nommer les zones, expliquer les choix et écrire des règles de filtrage. Cette fiche donne les réponses-types et un modèle de tableau réutilisable.</p>
+    <div class="subject-meta"><span class="chip">Étude de cas</span><span class="chip">Sans documents / 1 A4</span><span class="chip">DMZ + firewall + Wi-Fi</span><span class="chip">Réponses courtes et précises</span></div>
+    <div class="progress-line"><div class="bar"><i></i></div><span id="subject-progress-text">0/12 notions</span></div>
+  </section>
+
+  <div class="subject-layout">
+    <aside class="toc">
+      <h4>Dans cette fiche</h4>
+      <a href="#fond">1 · DICP &amp; principes</a>
+      <a href="#attaques">2 · Attaques &amp; contre-mesures</a>
+      <a href="#segmentation">3 · Segmentation, VLAN, DMZ</a>
+      <a href="#firewalls">4 · Firewalls</a>
+      <a href="#regles">5 · Règles de filtrage</a>
+      <a href="#proxy">6 · Proxies</a>
+      <a href="#ids">7 · IDS/IPS</a>
+      <a href="#ipsec">8 · IPsec &amp; VPN</a>
+      <a href="#wifi">9 · Wi-Fi &amp; 802.1X</a>
+      <a href="#ddos">10 · DDoS &amp; périmètre</a>
+      <a href="#archi">11 · Architectures-types</a>
+      <a href="#annales">12 · Annales corrigées</a>
+      <a href="#quiz">Quiz express</a>
+      <a href="#flashcards">Flashcards</a>
+      <div class="toc-tools"><button class="btn" data-action="expand">Déplier</button><button class="btn" data-action="collapse">Replier</button></div>
+    </aside>
+
+    <div class="content">
+      <div class="box exam">
+        <div class="box-title">Stratégie de copie</div>
+        <p>Pour chaque question : <strong>définir</strong>, puis <strong>justifier par un principe</strong> (moindre privilège, défense en profondeur, rupture protocolaire, segmentation), puis <strong>donner un exemple concret</strong>. Les correcteurs valorisent les mots-clés et la cohérence avec le schéma.</p>
+        <p>Pour les règles de filtrage : regroupe par zone, du plus sûr vers le moins sûr, explicite source/destination/port/protocole, termine par <code>DENY ALL</code> et journalise.</p>
+      </div>
+
+      <section class="note" id="fond" data-topic="reseau-1">
+        <div class="note-head"><div class="note-num">1</div><h2>DICP &amp; principes de sécurité réseau</h2><label class="topic-check"><input type="checkbox" data-topic="reseau-1">Validé</label></div>
+        <p>La SSI garantit que les ressources sont utilisées dans le cadre prévu. On évalue un bien selon <strong>DICP</strong> :</p>
+        <div class="table-wrap"><table><thead><tr><th>Critère</th><th>Définition</th><th>Exemple réseau</th></tr></thead><tbody>
+          <tr><td><strong>Disponibilité</strong></td><td>Accessible au moment voulu par les personnes autorisées.</td><td>Redondance, anti-DDoS, HA.</td></tr>
+          <tr><td><strong>Intégrité</strong></td><td>Exactitude et complétude ; toute modification illégitime est détectée.</td><td>Hash, signature, TLS, contrôle d'intégrité.</td></tr>
+          <tr><td><strong>Confidentialité</strong></td><td>Accessible uniquement aux personnes autorisées.</td><td>Chiffrement, VPN, segmentation.</td></tr>
+          <tr><td><strong>Preuve</strong></td><td>Traçabilité, authentification, imputabilité.</td><td>Logs, horodatage, certificats, audit.</td></tr>
+        </tbody></table></div>
+
+        <h3>Vulnérabilité, menace, attaque, risque</h3>
+        <p><strong>Vulnérabilité</strong> = faiblesse de conception, d'implémentation, d'installation, de configuration ou d'usage. <strong>Menace</strong> = cause potentielle d'incident. <strong>Attaque</strong> = concrétisation d'une menace exploitant une vulnérabilité. <strong>Risque</strong> = probabilité × impact.</p>
+        <div class="box key"><div class="box-title">Les 7 principes firewall</div><ol><li>Moindre privilège.</li><li>Défense en profondeur.</li><li>Goulot d'étranglement (un seul point de passage).</li><li>Maillon le plus faible.</li><li>Interdiction par défaut (<em>deny all</em>).</li><li>Participation des utilisateurs.</li><li>Simplicité.</li></ol></div>
+        <p>Le <strong>goulot d'étranglement</strong> impose que tout le trafic passe par un point contrôlé ; il faut chasser les accès Internet pirates (modems 4G, VPN personnels) et les interconnexions non maîtrisées. Le <strong>maillon le plus faible</strong> rappelle qu'une architecture est aussi solide que son point le plus faible : inutile de déployer SSH si Telnet reste ouvert.</p>
+      </section>
+
+      <section class="note" id="attaques" data-topic="reseau-2">
+        <div class="note-head"><div class="note-num">2</div><h2>Attaques réseau &amp; contre-mesures</h2><label class="topic-check"><input type="checkbox" data-topic="reseau-2">Validé</label></div>
+        <p>On classe les attaques selon l'effet sur le DICP : <strong>interruption</strong> (disponibilité), <strong>interception</strong> (confidentialité), <strong>modification</strong> (intégrité), <strong>fabrication</strong> (authenticité).</p>
+        <div class="table-wrap"><table><thead><tr><th>Attaque</th><th>Principe</th><th>Contre-mesures</th></tr></thead><tbody>
+          <tr><td><strong>Sniffing</strong></td><td>Écoute du trafic. Sur switch, l'unicast n'est pas diffusé : il faut ARP spoofing, MAC flooding, port mirror ou accès physique.</td><td>Chiffrement (TLS, VPN, MACsec), 802.1X, ports sécurisés, détection ARP.</td></tr>
+          <tr><td><strong>MAC spoofing</strong></td><td>Usurper une adresse MAC pour se faire passer pour un équipement légitime.</td><td>802.1X, port security, contrôle d'accès physique, DAI.</td></tr>
+          <tr><td><strong>ARP poisoning</strong></td><td>Fausses réponses ARP pour rediriger le trafic (MITM).</td><td>Dynamic ARP Inspection, ARP statique, chiffrement, segmentation.</td></tr>
+          <tr><td><strong>VLAN hopping</strong></td><td>Passer d'un VLAN à un autre via double tagging ou switch spoofing.</td><td>Désactiver le trunk sur les ports utilisateurs, VLAN natif dédié, port security.</td></tr>
+          <tr><td><strong>DHCP spoofing</strong></td><td>Faux serveur DHCP qui distribue une passerelle malveillante.</td><td>DHCP snooping, trusted ports, segmentation.</td></tr>
+          <tr><td><strong>STP attack</strong></td><td>Prendre la racine Spanning Tree et détourner le trafic.</td><td>BPDU Guard, Root Guard, désactiver STP sur les ports utilisateurs.</td></tr>
+          <tr><td><strong>MITM</strong></td><td>S'intercaler entre deux parties pour lire/modifier.</td><td>VPN, TLS avec validation de certificat, MACsec, 802.1X.</td></tr>
+          <tr><td><strong>Replay</strong></td><td>Réinjecter un message authentique capturé.</td><td>Nonce, timestamp, numéro de séquence, TLS.</td></tr>
+          <tr><td><strong>DoS / DDoS</strong></td><td>Saturer une ressource pour la rendre indisponible.</td><td>Anti-DDoS amont, rate limiting, SYN cookies, redondance.</td></tr>
+          <tr><td><strong>APT</strong></td><td>Attaque persistante, ciblée, multi-étapes, souvent avec ingénierie sociale.</td><td>Défense en profondeur, EDR, SIEM, threat hunting, segmentation.</td></tr>
+          <tr><td><strong>Supply chain</strong></td><td>Compromettre un fournisseur ou un logiciel (ex. SolarWinds).</td><td>Vérification des fournisseurs, signatures, SBOM, cloisonnement.</td></tr>
+        </tbody></table></div>
+        <div class="box warn"><div class="box-title">Cas des feux de circulation (annale)</div><p>Un intrus qui ouvre l'armoire de rue et accède au switch peut faire du sniffing, du MAC spoofing, du MITM, du VLAN hopping, de l'ARP poisoning, du DoS ou injecter de fausses commandes. Solutions : sécurisation physique (alarme, scellés, caméras), 802.1X, chiffrement IPsec/MACsec, segmentation VLAN + ACL, port security, désactivation des ports inutilisés, IDS/IPS, DAI.</p></div>
+      </section>
+
+      <section class="note" id="segmentation" data-topic="reseau-3">
+        <div class="note-head"><div class="note-num">3</div><h2>Segmentation, VLAN &amp; DMZ</h2><label class="topic-check"><input type="checkbox" data-topic="reseau-3">Validé</label></div>
+        <h3>Pourquoi segmenter ?</h3>
+        <ul><li>Limiter la propagation d'une attaque (compartmentation).</li><li>Appliquer des politiques différenciées par zone.</li><li>Réduire les domaines de broadcast et améliorer les performances.</li><li>Faciliter l'audit et la traçabilité.</li></ul>
+        <p>La démarche s'appelle <strong>segmentation réseau</strong> ou <strong>cloisonnement</strong>. Elle s'appuie sur des sous-réseaux IP, des VLAN (802.1Q), des ACL et des firewalls.</p>
+        <div class="grid-2">
+          <div class="box"><div class="box-title">VLAN</div><p>Réseau local virtuel : sépare logiquement des machines sur une même infrastructure physique. Les communications inter-VLAN passent par un routeur ou un firewall. Affectation statique (port) ou dynamique (MAC, 802.1X).</p></div>
+          <div class="box"><div class="box-title">DMZ</div><p>Zone démilitarisée entre Internet et le réseau interne. Elle héberge les services accessibles depuis l'extérieur (web, mail, DNS, reverse proxy). C'est une zone « perdable » : si elle tombe, le LAN reste protégé.</p></div>
+        </div>
+        <h3>DMZ : définition et avantages</h3>
+        <p>Une DMZ est un sous-réseau isolé, ni totalement interne ni totalement externe, protégé par des pare-feux périmétriques. Elle sert à la <strong>rupture protocolaire</strong> et à l'analyse du trafic.</p>
+        <ul><li><strong>Isolation</strong> des serveurs exposés.</li><li><strong>Défense en profondeur</strong> : deux niveaux de filtrage.</li><li><strong>Limitation des dégâts</strong> : un serveur compromis ne donne pas accès au LAN.</li><li><strong>Contrôle granulaire</strong> des flux par service.</li><li><strong>Séparation des rôles</strong> entre services publics et ressources internes.</li></ul>
+        <div class="box key"><div class="box-title">Architecture recommandée</div><p><strong>Internet → FW externe → DMZ → FW interne → LAN.</strong> Les serveurs publics sont en DMZ ; le LAN n'est jamais directement accessible depuis Internet. Les flux sont explicitement autorisés, le reste est refusé.</p></div>
+        <h3>Règles d'or ANSSI (à citer)</h3>
+        <ul><li>Déployer un pare-feu entre la DMZ et le routeur Internet, et un autre entre la DMZ et le SI.</li><li>Rendre la passerelle Internet <strong>incontournable</strong>.</li><li>Cloisonner les flux par chaîne de traitement homogène.</li><li>Assurer une <strong>rupture protocolaire</strong>.</li><li>Ne pas exposer l'annuaire interne (AD) en DMZ.</li><li>Proscrire la mutualisation des pare-feux interne et externe.</li><li>Administrer la passerelle de manière sécurisée (bastion, VPN).</li><li>Mettre en place des contre-mesures DDoS.</li></ul>
+      </section>
+
+      <section class="note" id="firewalls" data-topic="reseau-4">
+        <div class="note-head"><div class="note-num">4</div><h2>Firewalls : types &amp; fonctionnement</h2><label class="topic-check"><input type="checkbox" data-topic="reseau-4">Validé</label></div>
+        <p>Un firewall contrôle ce qui passe entre deux zones et applique une politique de sécurité. Il ne sert pas seulement à bloquer : il <strong>autorise le trafic utile</strong> et journalise.</p>
+        <div class="table-wrap"><table><thead><tr><th>Type</th><th>Fonctionnement</th><th>Avantages</th><th>Limites</th></tr></thead><tbody>
+          <tr><td><strong>Filtre de paquets</strong> (sans état)</td><td>Examine chaque paquet isolément : IP source/destination, ports, protocole.</td><td>Simple, rapide, peu coûteux.</td><td>Pas de contexte ; vulnérable au spoofing, fragmentation, SYN flood ; règles complexes.</td></tr>
+          <tr><td><strong>Firewall avec état</strong> (stateful)</td><td>Maintient une table des connexions et autorise les paquets <em>established/related</em>.</td><td>Plus sûr, gère le retour, protège contre certains scans et SYN floods.</td><td>Consomme de la mémoire ; table d'état à protéger.</td></tr>
+          <tr><td><strong>Proxy applicatif</strong></td><td>Termine la connexion et en ouvre une autre (couche 7).</td><td>Rupture protocolaire, inspection du contenu, authentification.</td><td>Plus lent, un proxy par protocole, point de défaillance.</td></tr>
+          <tr><td><strong>NGFW / UTM</strong></td><td>Firewall + IPS + antivirus + filtrage URL + identité utilisateur.</td><td>Vision applicative, protection avancée.</td><td>Complexité, coût, fausses alertes, performance.</td></tr>
+        </tbody></table></div>
+        <div class="box key"><div class="box-title">Avec ou sans mémoire ?</div><p>Sans état : chaque paquet est jugé seul, donc il faut autoriser le retour explicitement (ou de façon large, ce qui est dangereux). Avec état : le retour d'une connexion légitime est automatiquement accepté, ce qui permet une politique <em>deny all</em> en entrée beaucoup plus stricte.</p></div>
+        <h3>Deux firewalls en cascade</h3>
+        <div class="grid-2">
+          <div class="box"><div class="box-title">Avantages</div><ul><li>Double filtrage, défense en profondeur.</li><li>Si le premier est compromis, le second protège encore.</li><li>Séparation nette DMZ / LAN.</li><li>Politiques différentes par niveau.</li></ul></div>
+          <div class="box"><div class="box-title">Même marque ou marques différentes ?</div><p><strong>Même marque :</strong> gestion centralisée, homogénéité, formation unique, cohérence. <strong>Marques différentes :</strong> diversité de défense, pas de vulnérabilité commune, pas de point de défaillance unique. À citer selon la question.</p></div>
+        </div>
+        <p><strong>NAT :</strong> traduit les adresses (NAT dynamique sortant, NAT statique pour les serveurs exposés, PAT). Le NAT masque l'architecture interne mais ne remplace pas un firewall. Il complique IPsec (voir section 8).</p>
+      </section>
+
+      <section class="note" id="regles" data-topic="reseau-5">
+        <div class="note-head"><div class="note-num">5</div><h2>Règles de filtrage : méthode &amp; exercice</h2><label class="topic-check"><input type="checkbox" data-topic="reseau-5">Validé</label></div>
+        <p>C'est la question qui rapporte le plus de points. Une règle se lit <strong>dans un sens</strong> : source → destination, protocole, port destination, action. Le retour est géré par l'état (<em>established</em>) ou par une règle explicite.</p>
+        <h3>Méthode en 5 étapes</h3>
+        <ol>
+          <li><strong>Identifier les zones</strong> et leur niveau de confiance : Internet, DMZ, LAN, admin.</li>
+          <li><strong>Lister les flux nécessaires</strong> : qui consomme quel service, dans quel sens.</li>
+          <li><strong>Écrire du plus sûr au moins sûr</strong> : admin → LAN → DMZ → Internet.</li>
+          <li><strong>Être explicite</strong> : jamais <code>ANY</code> en source/destination si ce n'est pas nécessaire ; préciser les ports.</li>
+          <li><strong>Terminer par <code>DENY ALL</code></strong> et journaliser les refus.</li>
+        </ol>
+        <div class="box warn"><div class="box-title">Pièges classiques</div><ul><li>Oublier le retour (si firewall sans état).</li><li>Mettre une règle générale avant une règle spécifique : le premier match gagne.</li><li>Ouvrir l'administration (SSH/RDP) à tout Internet.</li><li>Autoriser <code>ANY → ANY</code> « pour que ça marche ».</li><li>Ne pas autoriser le serveur web depuis le LAN alors que le besoin existe.</li></ul></div>
+
+        <h3>Exercice type — FW2 (pare-feu interne avec mémoire)</h3>
+        <p>Hypothèses : serveur web <code>10.0.0.2</code> ; proxys SMTP/HTTP/DNS <code>192.168.10.25/.80/.53</code> ; admin <code>192.168.1.1</code> ; FW2 sépare le LAN de la DMZ ; le serveur web doit aussi être accessible depuis le LAN ; l'admin accède en SSH aux deux firewalls et à tous les serveurs.</p>
+        <div class="table-wrap"><table><thead><tr><th>#</th><th>Zone source</th><th>IP source</th><th>IP destination</th><th>Proto</th><th>Port dest.</th><th>Action</th><th>Commentaire</th></tr></thead><tbody>
+          <tr><td>1</td><td>LAN</td><td>LAN</td><td>192.168.10.80</td><td>TCP</td><td>80, 443</td><td>ACCEPT</td><td>HTTP/HTTPS vers proxy</td></tr>
+          <tr><td>2</td><td>LAN</td><td>LAN</td><td>192.168.10.25</td><td>TCP</td><td>25, 587</td><td>ACCEPT</td><td>SMTP vers proxy</td></tr>
+          <tr><td>3</td><td>LAN</td><td>LAN</td><td>192.168.10.53</td><td>TCP/UDP</td><td>53</td><td>ACCEPT</td><td>DNS vers proxy</td></tr>
+          <tr><td>4</td><td>LAN</td><td>LAN</td><td>10.0.0.2</td><td>TCP</td><td>80, 443</td><td>ACCEPT</td><td>Accès interne au serveur web</td></tr>
+          <tr><td>5</td><td>Admin</td><td>192.168.1.1</td><td>DMZ_Proxy</td><td>TCP</td><td>22</td><td>ACCEPT</td><td>SSH administration proxys</td></tr>
+          <tr><td>6</td><td>Admin</td><td>192.168.1.1</td><td>10.0.0.2</td><td>TCP</td><td>22</td><td>ACCEPT</td><td>SSH serveur web</td></tr>
+          <tr><td>7</td><td>Admin</td><td>192.168.1.1</td><td>FW2</td><td>TCP</td><td>22</td><td>ACCEPT</td><td>SSH firewall</td></tr>
+          <tr><td>8</td><td>—</td><td>ANY</td><td>ANY</td><td>—</td><td>—</td><td>ACCEPT</td><td>Établished / related (retour)</td></tr>
+          <tr><td>9</td><td>—</td><td>ANY</td><td>ANY</td><td>ANY</td><td>ANY</td><td>DENY + LOG</td><td>Deny all par défaut</td></tr>
+        </tbody></table></div>
+        <p class="small muted">Variante : si le proxy et le serveur web sont dans la même DMZ et que FW2 ne voit pas le trafic proxy → Internet, ces flux sont traités par FW1. Ne recopie pas des règles inutiles : adapte au schéma.</p>
+
+        <h3>Exercice type — FW1 (pare-feu externe)</h3>
+        <div class="table-wrap"><table><thead><tr><th>#</th><th>Source</th><th>Destination</th><th>Proto</th><th>Port</th><th>Action</th><th>Commentaire</th></tr></thead><tbody>
+          <tr><td>1</td><td>Internet</td><td>192.168.10.80</td><td>TCP</td><td>80, 443</td><td>ACCEPT</td><td>Proxy HTTP inverse</td></tr>
+          <tr><td>2</td><td>Internet</td><td>192.168.10.25</td><td>TCP</td><td>25, 587</td><td>ACCEPT</td><td>Proxy SMTP inverse</td></tr>
+          <tr><td>3</td><td>Internet</td><td>192.168.10.53</td><td>TCP/UDP</td><td>53</td><td>ACCEPT</td><td>DNS autoritaire</td></tr>
+          <tr><td>4</td><td>DMZ_Proxy</td><td>Internet</td><td>TCP</td><td>80, 443, 25, 587, 53</td><td>ACCEPT</td><td>Mode direct des proxys</td></tr>
+          <tr><td>5</td><td>Internet</td><td>10.0.0.2</td><td>TCP</td><td>80, 443</td><td>ACCEPT</td><td>Serveur web public (si exposé)</td></tr>
+          <tr><td>6</td><td>Admin</td><td>FW1</td><td>TCP</td><td>22</td><td>ACCEPT</td><td>Administration</td></tr>
+          <tr><td>7</td><td>—</td><td>—</td><td>—</td><td>—</td><td>ACCEPT</td><td>Established / related</td></tr>
+          <tr><td>8</td><td>ANY</td><td>ANY</td><td>ANY</td><td>ANY</td><td>DENY + LOG</td><td>Deny all</td></tr>
+        </tbody></table></div>
+        <div class="box tip"><div class="box-title">Astuce copie</div><p>Même si tu n'es pas sûr de l'architecture, écris les règles de bon sens et justifie : « le LAN ne doit jamais être joignable directement depuis Internet ; le proxy est le seul point de sortie ; l'admin passe par un bastion ». Tu gagnes des points sur la logique.</p></div>
+      </section>
+
+      <section class="note" id="proxy" data-topic="reseau-6">
+        <div class="note-head"><div class="note-num">6</div><h2>Proxies &amp; reverse proxies</h2><label class="topic-check"><input type="checkbox" data-topic="reseau-6">Validé</label></div>
+        <div class="grid-2">
+          <div class="box"><div class="box-title">Proxy forward (sortant)</div><p>Le client se connecte explicitement au proxy, qui se connecte à Internet à sa place. Le proxy <strong>termine</strong> la connexion et en ouvre une nouvelle : c'est la <strong>rupture protocolaire</strong>.</p><ul><li>Filtrage d'URL et de contenu.</li><li>Cache.</li><li>Anonymisation des IP internes.</li><li>Authentification et journalisation.</li><li>Antivirus / analyse de contenu.</li></ul></div>
+          <div class="box"><div class="box-title">Reverse proxy (entrant)</div><p>Les utilisateurs Internet accèdent indirectement aux serveurs internes. Il masque les serveurs, termine TLS, filtre et répartit la charge.</p><ul><li>Protection des serveurs (WAF).</li><li>Load balancing.</li><li>Cache.</li><li>Terminaison SSL/TLS.</li><li>Masquage de l'architecture.</li></ul></div>
+        </div>
+        <h3>Rupture protocolaire : attention au piège</h3>
+        <p>Un proxy ne garantit la rupture que si <strong>tout</strong> le trafic est obligé de passer par lui. Si le serveur web est accessible directement depuis Internet via FW1, un attaquant peut contourner le proxy. Il faut des règles de firewall qui interdisent les connexions directes et forcent le passage par le proxy.</p>
+        <h3>Pourquoi « proxy HTTP » mais « serveur DNS/SMTP » ?</h3>
+        <p>Le proxy HTTP est un véritable intermédiaire applicatif : le client s'adresse à lui, il agit en son nom. Pour DNS et SMTP, on parle plutôt de <strong>relais</strong> ou de <strong>serveur</strong> (résolveur DNS, relais SMTP, passerelle de messagerie) car le modèle de connexion et la terminologie historique diffèrent. On peut techniquement parler de proxy, mais l'usage consacré est différent.</p>
+        <div class="box danger"><div class="box-title">Pourquoi ne pas tout regrouper sur une machine ?</div><p>Une seule compromission donne accès à tous les services ; surface d'attaque élargie ; pas d'isolation ; durcissement impossible à optimiser par service ; un redémarrage affecte tout ; difficultés d'audit et de traçabilité ; escalade facilitée. C'est une violation du moindre privilège et de la séparation des rôles.</p></div>
+        <h3>Placement du proxy et du DNS</h3>
+        <p>Le proxy est placé dans une <strong>DMZ dédiée</strong>, entre le firewall externe et le firewall interne. Le DNS autoritaire du domaine est en DMZ (accessible depuis Internet) ; le résolveur DNS interne reste dans le LAN. On sépare ainsi les rôles et on évite d'exposer l'annuaire interne.</p>
+      </section>
+
+      <section class="note" id="ids" data-topic="reseau-7">
+        <div class="note-head"><div class="note-num">7</div><h2>IDS/IPS &amp; placement</h2><label class="topic-check"><input type="checkbox" data-topic="reseau-7">Validé</label></div>
+        <div class="table-wrap"><table><thead><tr><th></th><th>IDS</th><th>IPS</th></tr></thead><tbody>
+          <tr><td>Mode</td><td>Passif (miroir, TAP), détecte et alerte.</td><td>Inline, détecte et bloque.</td></tr>
+          <tr><td>Impact</td><td>N'arrête pas l'attaque.</td><td>Peut bloquer, mais peut créer un goulot ou des faux positifs bloquants.</td></tr>
+          <tr><td>Types</td><td>NIDS (réseau), HIDS (hôte).</td><td>NIPS, HIPS.</td></tr>
+          <tr><td>Détection</td><td>Signatures, anomalies, comportement.</td><td>Idem + actions de blocage.</td></tr>
+        </tbody></table></div>
+        <h3>Où placer l'IDS ?</h3>
+        <ul>
+          <li><strong>Entre FW1 et la DMZ</strong> : voit les attaques qui ont passé le premier filtre ; priorité n°1.</li>
+          <li><strong>Entre FW2 et le LAN</strong> : détecte les mouvements latéraux et les compromissions depuis la DMZ.</li>
+          <li><strong>Dans chaque DMZ</strong> : surveillance spécifique des serveurs exposés.</li>
+          <li><strong>En amont de FW1</strong> : visibilité sur toutes les attaques, mais beaucoup de bruit.</li>
+        </ul>
+        <div class="box key"><div class="box-title">Réponse type</div><p>Un IDS se place en sortie de firewall, sur le segment qu'il surveille, idéalement entre le firewall externe et la DMZ, puis entre le firewall interne et le LAN. Il doit voir le trafic réellement dirigé vers les actifs critiques. Un IPS s'insère inline au même endroit mais doit être dimensionné pour ne pas devenir un goulot d'étranglement.</p></div>
+        <p><strong>Limites :</strong> chiffrement (TLS) qui masque le contenu, faux positifs/négatifs, saturation par volume, nécessité de mise à jour des signatures, compétences d'analyse.</p>
+      </section>
+
+      <section class="note" id="ipsec" data-topic="reseau-8">
+        <div class="note-head"><div class="note-num">8</div><h2>IPsec &amp; VPN</h2><label class="topic-check"><input type="checkbox" data-topic="reseau-8">Validé</label></div>
+        <p>Un VPN étend un réseau privé sur un réseau public. Il sert à interconnecter des sites ou à donner un accès distant au réseau d'entreprise. Le tunnel encapsule un paquet non routable dans un paquet routable.</p>
+        <h3>Services assurés par IPsec</h3>
+        <ul><li><strong>Confidentialité</strong> (ESP).</li><li><strong>Intégrité</strong> (AH ou ESP).</li><li><strong>Authentification</strong> des correspondants.</li><li><strong>Anti-rejeu</strong> (numéro de séquence).</li><li><strong>Gestion des clés</strong> (IKE).</li></ul>
+        <div class="table-wrap"><table><thead><tr><th></th><th>AH</th><th>ESP</th></tr></thead><tbody>
+          <tr><td>Confidentialité</td><td>Non</td><td>Oui (chiffrement)</td></tr>
+          <tr><td>Intégrité / authenticité</td><td>Oui, sur tout le paquet IP</td><td>Oui, sur la charge utile</td></tr>
+          <tr><td> NAT</td><td>Incompatible (hash de l'en-tête IP)</td><td>Problème en mode transport (ports chiffrés) → NAT-T</td></tr>
+          <tr><td>Usage</td><td>Authentification sans chiffrement</td><td>VPN, confidentialité</td></tr>
+        </tbody></table></div>
+        <h3>Modes transport et tunnel</h3>
+        <div class="grid-2">
+          <div class="box"><div class="box-title">Transport</div><p>Protège la charge utile (TCP/UDP) mais conserve l'en-tête IP d'origine. Adapté à une communication <strong>hôte à hôte</strong>.</p></div>
+          <div class="box"><div class="box-title">Tunnel</div><p>Encapsule tout le paquet IP dans un nouveau paquet IP. Adapté aux <strong>VPN site-à-site</strong> et à l'accès distant : les adresses internes sont préservées.</p></div>
+        </div>
+        <h3>SPD et SAD</h3>
+        <div class="grid-2">
+          <div class="box"><div class="box-title">SPD — Security Policy Database</div><p>Définit <strong>quel trafic protéger et comment</strong>. Elle associe des sélecteurs (IP source/destination, protocole, ports) à une action : protéger par IPsec, laisser passer, bloquer.</p></div>
+          <div class="box"><div class="box-title">SAD — Security Association Database</div><p>Contient les <strong>associations de sécurité actives</strong> : clés, algorithmes, SPI, numéros de séquence, durée de vie. C'est la base consultée pour traiter chaque paquet IPsec.</p></div>
+        </div>
+        <h3>IKE et NAT-T</h3>
+        <p><strong>IKE</strong> (Internet Key Exchange, généralement IKEv2) négocie et renouvelle les SA : authentification, algorithmes, échange de clés Diffie-Hellman. Port UDP 500, puis 4500 avec NAT-T.</p>
+        <p><strong>IPsec et NAT :</strong> AH est incompatible car le NAT modifie l'adresse IP incluse dans le hash. ESP en mode transport chiffre les ports, donc le NAT ne peut pas les traduire. Solution : <strong>NAT-T</strong>, qui encapsule IPsec dans UDP 4500.</p>
+        <div class="box key"><div class="box-title">Quel mode pour la messagerie distante ?</div><p>Un accès distant complet au réseau d'entreprise → <strong>IPsec en mode tunnel</strong> (ou VPN SSL). Si l'on veut seulement sécuriser SMTP/IMAP, SMTPS/IMAPS suffisent. Le mode tunnel est justifié par le besoin d'accéder à tous les services internes, pas seulement à la messagerie.</p></div>
+        <h3>OpenVPN vs WireGuard</h3>
+        <div class="table-wrap"><table><thead><tr><th>Critère</th><th>OpenVPN</th><th>WireGuard</th></tr></thead><tbody>
+          <tr><td>Couche</td><td>3 (TUN) ou 2 (TAP)</td><td>3</td></tr>
+          <tr><td>Transport</td><td>UDP ou TCP</td><td>UDP uniquement</td></tr>
+          <tr><td>Crypto</td><td>Très configurable via TLS</td><td>Suite moderne fixe et limitée</td></tr>
+          <tr><td>Complexité</td><td>Plus complexe</td><td>Très simple</td></tr>
+          <tr><td>Performance</td><td>Bonne, plus lourd</td><td>Très élevée, faible latence</td></tr>
+          <tr><td>Cas d'usage</td><td>Entreprise, PKI/MFA, compatibilité</td><td>Site-à-site, cloud, mobile, conteneurs</td></tr>
+        </tbody></table></div>
+      </section>
+
+      <section class="note" id="wifi" data-topic="reseau-9">
+        <div class="note-head"><div class="note-num">9</div><h2>Wi-Fi &amp; 802.1X</h2><label class="topic-check"><input type="checkbox" data-topic="reseau-9">Validé</label></div>
+        <p>Le Wi-Fi est un canal de diffusion : toute personne à portée peut écouter. La sécurité repose sur le chiffrement, l'authentification et la séparation des flux.</p>
+        <div class="table-wrap"><table><thead><tr><th>Protocole</th><th>Chiffrement</th><th>Authentification</th><th>Verdict</th></tr></thead><tbody>
+          <tr><td><strong>WEP</strong></td><td>RC4, IV 24 bits</td><td>Clé partagée</td><td>Totalement cassé : IV réutilisés, CRC-32 faible, bit-flipping. Ne jamais utiliser.</td></tr>
+          <tr><td><strong>WPA</strong></td><td>TKIP</td><td>PSK / 802.1X</td><td>Obsolète, à remplacer.</td></tr>
+          <tr><td><strong>WPA2 Personal</strong></td><td>CCMP/AES</td><td>PSK (phrase de passe)</td><td>Correct si phrase longue ; un secret partagé pour tous.</td></tr>
+          <tr><td><strong>WPA2 Enterprise</strong></td><td>CCMP/AES</td><td>802.1X + RADIUS</td><td>Recommandé en entreprise : identité par utilisateur.</td></tr>
+          <tr><td><strong>WPA3</strong></td><td>AES-GCMP</td><td>SAE / 802.1X</td><td>Le plus robuste : résiste mieux au offline guessing, PMF.</td></tr>
+        </tbody></table></div>
+        <h3>Failles du WEP (question d'annale)</h3>
+        <ul><li><strong>Confidentialité :</strong> RC4 avec IV de 24 bits, réutilisation fréquente des IV, attaques statistiques permettant de retrouver la clé en quelques minutes.</li><li><strong>Intégrité :</strong> CRC-32 linéaire et faible, falsifiable ; pas de protection contre le bit-flipping ; injection et modification de paquets possibles.</li><li><strong>Authentification :</strong> clé partagée statique, aucun utilisateur identifiable.</li></ul>
+        <h3>802.1X / WPA2-Enterprise</h3>
+        <p>Trois rôles : <strong>supplicant</strong> (client), <strong>authenticator</strong> (AP ou switch), <strong>authentication server</strong> (RADIUS, souvent FreeRADIUS). Le client s'authentifie via EAP ; le serveur RADIUS applique la politique et renvoie accept/reject.</p>
+        <ul><li><strong>EAP-TLS :</strong> certificats côté client et serveur, très fort, plus lourd à déployer.</li><li><strong>PEAP :</strong> tunnel TLS avec certificat serveur, puis authentification interne (souvent MSCHAPv2). Très supporté par Windows.</li><li><strong>EAP-TTLS :</strong> tunnel TLS avec certificat serveur, méthodes internes variées (PAP, CHAP, MS-CHAP…). Standard ouvert, flexible, bonne interopérabilité.</li></ul>
+        <div class="box key"><div class="box-title">PEAP vs TTLS : que choisir ?</div><p><strong>TTLS</strong> est généralement recommandé : standard ouvert, plus flexible, meilleure interopérabilité multi-constructeurs. <strong>PEAP</strong> est très répandu et bien intégré à Windows. Dans les deux cas, il faut <strong>valider le certificat serveur</strong> pour éviter un evil twin, et placer le RADIUS dans une zone interne sécurisée.</p></div>
+        <h3>RADIUS et SSID multiples</h3>
+        <ul><li><strong>Placement du RADIUS :</strong> zone serveurs métier ou DMZ interne dédiée, jamais exposé à Internet ; accessible uniquement par les AP ; VLAN de management dédié.</li><li><strong>Sécurisation AP–RADIUS :</strong> RadSec (RADIUS over TLS), IPsec, certificats, secret partagé fort, VLAN dédié.</li><li><strong>SSID multiples :</strong> possible sur un même AP. Chaque SSID est mappé à un VLAN différent (SSID-to-VLAN), ce qui sépare les flux invités, employés, IoT.</li></ul>
+        <div class="box danger"><div class="box-title">Modems 4G personnels</div><p>Ils créent une <strong>backdoor</strong> dans le réseau, contournent le firewall et les politiques, exposent le SI à Internet et font perdre le contrôle des accès. C'est du <strong>Shadow IT</strong> et une violation du périmètre de sécurité. À proscrire et à détecter (WIDS, inventaire, NAC).</p></div>
+        <h3>Autres attaques Wi-Fi</h3>
+        <p>Evil twin (faux AP), deauth (déconnexion forcée), rogue AP, KRACK, WPS brute force, PMKID, capture de handshake pour cracking hors ligne. Défenses : WPA3, 802.1X, PMF, WIPS, désactivation WPS, validation des certificats, sensibilisation.</p>
+      </section>
+
+      <section class="note" id="ddos" data-topic="reseau-10">
+        <div class="note-head"><div class="note-num">10</div><h2>DDoS &amp; sécurité périmétrique</h2><label class="topic-check"><input type="checkbox" data-topic="reseau-10">Validé</label></div>
+        <p>Un DDoS sature une ressource (bande passante, connexions, CPU, application) depuis de nombreuses sources, souvent un botnet. Il est difficile à arrêter avec le seul firewall d'entreprise.</p>
+        <div class="box danger"><div class="box-title">Pourquoi le firewall ne suffit pas</div><ul><li>La bande passante est saturée <strong>en amont</strong> : le firewall ne voit même pas le trafic.</li><li>Les équipements ont une capacité limitée (table d'état, CPU).</li><li>Le trafic peut ressembler à du trafic légitime (requêtes HTTP valides).</li><li>Quand le trafic atteint le firewall, une partie des dégâts est déjà faite.</li><li>Un firewall mal dimensionné devient lui-même le goulot.</li></ul></div>
+        <h3>Où placer l'anti-DDoS ?</h3>
+        <ul><li><strong>Chez le FAI / ISP</strong> : filtrage en amont, avant la liaison de l'entreprise.</li><li><strong>Services cloud de scrubbing</strong> (Cloudflare, Akamai) : absorption et nettoyage du trafic.</li><li><strong>Points d'échange Internet (IXP)</strong> : protection très en amont.</li><li><strong>CDN / anycast</strong> : répartition géographique et absorption.</li></ul>
+        <p>Compléments : rate limiting, SYN cookies, timeouts, CAPTCHA, listes de blocage, geo-filtrage, plan de réponse et communication de crise.</p>
+        <h3>Sécurité du cloud (à citer)</h3>
+        <p>Responsabilité partagée, localisation des données, chiffrement, IAM, journalisation, conformité (RGPD, SecNumCloud), gestion des accès fournisseur, réversibilité, destruction des données.</p>
+      </section>
+
+      <section class="note" id="archi" data-topic="reseau-11">
+        <div class="note-head"><div class="note-num">11</div><h2>Architectures-types &amp; cas d'entreprise</h2><label class="topic-check"><input type="checkbox" data-topic="reseau-11">Validé</label></div>
+        <h3>Intégrer un serveur Active Directory</h3>
+        <p>Un AD ne doit <strong>jamais</strong> être exposé directement à Internet. Deux options :</p>
+        <ul><li><strong>AD interne uniquement</strong> + accès distant par VPN.</li><li><strong>RODC en DMZ</strong> (Read-Only Domain Controller) pour les authentifications externes, avec LDAPS, MFA, filtrage strict et synchronisation sécurisée. L'AD principal reste dans le LAN.</li></ul>
+        <p>Ports à filtrer : 389/636 (LDAP/LDAPS), 88 (Kerberos), 3268/3269 (catalogue global). Ne jamais ouvrir tout l'AD ; passer par un reverse proxy ou une passerelle d'authentification.</p>
+        <h3>DNS interne vs autoritaire</h3>
+        <p>Le <strong>résolveur interne</strong> répond aux postes du LAN et ne doit pas être exposé. Le <strong>DNS autoritaire</strong> du domaine public est en DMZ, accessible depuis Internet. On peut utiliser le <strong>split DNS</strong> pour que le même nom resolve différemment à l'intérieur et à l'extérieur.</p>
+        <h3>Messagerie sécurisée : 4 solutions</h3>
+        <div class="table-wrap"><table><thead><tr><th>Solution</th><th>Avantage</th><th>Inconvénient</th></tr></thead><tbody>
+          <tr><td><strong>IPsec tunnel</strong></td><td>Sécurité maximale, accès complet au réseau comme en interne.</td><td>Configuration complexe, client VPN, compatibilité, maintenance.</td></tr>
+          <tr><td><strong>SMTPS + IMAPS</strong></td><td>Protocoles standards, compatibles tous clients, bonne performance.</td><td>Configuration client, certificats, plusieurs ports (465, 993).</td></tr>
+          <tr><td><strong>Webmail HTTPS</strong></td><td>Simplicité, aucun client à configurer, un seul port 443.</td><td>Fonctionnalités limitées, dépendance navigateur, connexion permanente.</td></tr>
+          <tr><td><strong>Cloud</strong></td><td>Pas de maintenance, haute disponibilité, mises à jour automatiques.</td><td>Perte de contrôle, dépendance, coûts, conformité et localisation.</td></tr>
+        </tbody></table></div>
+        <p><strong>Choix :</strong> pour un accès distant complet, IPsec tunnel ; pour la messagerie seule, SMTPS/IMAPS ou webmail ; pour une PME sans infrastructure, cloud avec chiffrement et clauses RGPD.</p>
+        <h3>Méthode d'analyse d'une architecture</h3>
+        <ol>
+          <li>Identifier les zones et les niveaux de confiance.</li>
+          <li>Repérer les services exposés et les flux autorisés.</li>
+          <li>Chercher le maillon faible : accès direct, service mutualisé, admin exposé, Wi-Fi partagé.</li>
+          <li>Proposer : segmentation, DMZ, filtrage, proxy, IDS/IPS, authentification, chiffrement, logs.</li>
+          <li>Justifier chaque choix par un principe et un risque.</li>
+        </ol>
+      </section>
+
+      <section class="note" id="annales" data-topic="reseau-12">
+        <div class="note-head"><div class="note-num">12</div><h2>Annales corrigées</h2><label class="topic-check"><input type="checkbox" data-topic="reseau-12">Validé</label></div>
+        <details class="q-open"><summary>2023 · Avantages de plusieurs sous-réseaux</summary><div class="details-body"><p>Meilleure sécurité par segmentation, isolation des services, limitation de la propagation des attaques, réduction des domaines de broadcast, politiques différenciées, meilleure gestion du trafic. La démarche s'appelle <strong>segmentation</strong> ou <strong>cloisonnement réseau</strong>.</p></div></details>
+        <details class="q-open"><summary>2023 · DMZ : définition et principe</summary><div class="details-body"><p>Zone isolée entre Internet et le LAN, hébergeant les services publics. Principe : <strong>défense en profondeur</strong> ; on ajoute l'isolation, la limitation des dégâts et le moindre privilège.</p></div></details>
+        <details class="q-open"><summary>2023 · Deux firewalls : avantages, même marque, marques différentes</summary><div class="details-body"><p><strong>Cascade :</strong> double filtrage, protection supplémentaire, séparation DMZ/LAN. <strong>Même marque :</strong> gestion centralisée, homogénéité, formation unique. <strong>Marques différentes :</strong> diversité de défense, pas de faille commune, pas de SPOF. Les principes : défense en profondeur et diversité.</p></div></details>
+        <details class="q-open"><summary>2023 · Proxy / reverse proxy : avantages et placement</summary><div class="details-body"><p><strong>Proxy :</strong> filtrage sortant, cache, anonymisation, contrôle d'accès, journalisation. <strong>Reverse proxy :</strong> protection des serveurs, load balancing, cache, terminaison TLS, filtrage. <strong>Placement :</strong> DMZ dédiée, entre FW externe et FW interne. Le DNS autoritaire va en DMZ ; le résolveur interne reste au LAN.</p></div></details>
+        <details class="q-open"><summary>2023 · Wi-Fi : SSID multiples, 4G, WEP, RADIUS, PEAP/TTLS</summary><div class="details-body"><p><strong>SSID multiples :</strong> oui, via VLAN mapping. <strong>Modems 4G :</strong> backdoor, contournement, Shadow IT, violation du périmètre. <strong>WEP :</strong> RC4/IV 24 bits, CRC-32, bit-flipping, clé retrouvée rapidement. <strong>RADIUS :</strong> zone serveurs/DMZ interne, accessible seulement aux AP, RadSec/TLS, certificats. <strong>PEAP vs TTLS :</strong> TTLS recommandé (standard ouvert, flexible) ; PEAP très compatible Windows. Les deux exigent un certificat serveur.</p></div></details>
+        <details class="q-open"><summary>2023 · Messagerie : IPsec, SMTPS/IMAPS, webmail, cloud</summary><div class="details-body"><p>Voir le tableau de la section 11. Mode IPsec adapté : <strong>tunnel</strong>, car accès distant complet. Donne un avantage et un inconvénient de chaque solution, puis une recommandation argumentée.</p></div></details>
+        <details class="q-open"><summary>2025 · Feux de circulation : attaques et solution</summary><div class="details-body"><p><strong>Attaques :</strong> sniffing, MAC spoofing, MITM, VLAN hopping, DoS, ARP poisoning, injection de fausses commandes. <strong>Solution :</strong> sécurisation physique (armoires, alarmes, scellés), 802.1X, chiffrement IPsec/MACsec, segmentation VLAN + ACL, port security, désactivation des ports inutilisés, IDS/IPS, DAI.</p></div></details>
+        <details class="q-open"><summary>2025 · IPsec : services, SPD/SAD, NAT</summary><div class="details-body"><p>Services : confidentialité, intégrité, authentification, anti-rejeu. SPD = politique (quel trafic protéger, comment) ; SAD = associations actives (clés, algorithmes, SPI). NAT : AH incompatible (hash de l'IP), ESP transport gêné (ports chiffrés) → NAT-T en UDP 4500.</p></div></details>
+        <details class="q-open"><summary>2025 · DDoS : pourquoi le firewall ne suffit pas</summary><div class="details-body"><p>Saturation en amont, ressources limitées, trafic légitime en apparence, dégâts déjà faits. Anti-DDoS chez le FAI, cloud scrubbing, IXP, CDN/anycast, rate limiting, SYN cookies, plan de crise.</p></div></details>
+        <details class="q-open"><summary>2025 · IDS : placement idéal</summary><div class="details-body"><p>Entre FW1 et la DMZ (priorité), entre FW2 et le LAN, dans chaque DMZ. En amont de FW1 pour la veille, mais beaucoup de bruit. IDS passif vs IPS inline.</p></div></details>
+        <details class="q-open"><summary>2025 · Ajouter un AD accessible de l'intérieur et de l'extérieur</summary><div class="details-body"><p>AD interne + RODC en DMZ dédiée, LDAPS, MFA, filtrage des ports 389/636/88/3268/3269, synchronisation sécurisée, monitoring. Alternative : VPN pour les accès externes, ou identité cloud. Ne jamais exposer l'AD principal.</p></div></details>
+      </section>
+
+      <section class="note" id="quiz">
+        <div class="note-head"><div class="note-num">?</div><h2>Quiz express</h2></div>
+        <p class="muted small">10 questions tirées au hasard. Objectif : 8/10.</p>
+        <div class="quiz-shell" data-quiz="reseau" data-count="10"></div>
+      </section>
+
+      <section class="note" id="flashcards">
+        <div class="note-head"><div class="note-num">⚡</div><h2>Flashcards</h2></div>
+        <button class="btn primary" data-flashcards="reseau">Lancer les flashcards →</button>
+        <span class="small muted" style="margin-left:8px">Espace = retourner · ← → = naviguer</span>
+      </section>
+
+      <div class="box exam">
+        <div class="box-title">Dernière minute — Réseaux</div>
+        <ul class="two-col-list">
+          <li>DMZ = zone tampon, défense en profondeur.</li>
+          <li>Deux FW : double filtrage ; marques différentes = diversité.</li>
+          <li>Règles : par zone, explicites, deny all, log.</li>
+          <li>Proxy = rupture protocolaire + filtrage + cache.</li>
+          <li>IPsec : AH sans chiffrement, ESP avec ; tunnel pour VPN.</li>
+          <li>SPD = politique ; SAD = SA actives.</li>
+          <li>NAT-T = UDP 4500.</li>
+          <li>WEP = RC4 + IV 24 bits + CRC-32 → cassé.</li>
+          <li>WPA2-Enterprise = 802.1X + RADIUS.</li>
+          <li>TTLS = ouvert/flexible ; PEAP = très Windows.</li>
+          <li>IDS = alerte ; IPS = bloque.</li>
+          <li>Anti-DDoS = amont (FAI/cloud/IXP).</li>
+        </ul>
+      </div>
+
+      <div class="hero-actions no-print">
+        <a class="btn" href="os.html">Matière suivante : OS →</a>
+        <a class="btn ghost" href="last-minute.html">Dernière minute</a>
+        <button class="btn ghost" data-action="print">Imprimer la fiche</button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer class="footer"><div class="wrap"><span>Sécurité Réseaux · synthèse cours + exercices + annales.</span><span><a href="index.html">Accueil</a> · <a href="plan.html">Plan</a></span></div></footer>
+
+<nav class="mobile-nav" aria-label="Navigation mobile"><a href="index.html"><span>⌂</span>Accueil</a><a href="plan.html"><span>▦</span>Plan</a><a href="eh.html"><span>EH</span>Hacking</a><a href="reseau.html" class="active"><span>SR</span>Réseaux</a><a href="os.html"><span>OS</span>OS</a><a href="si.html"><span>SI</span>SI</a><a href="vs.html"><span>VS</span>Virtu.</a><a href="last-minute.html"><span>⚡</span>J-1</a></nav>
+
+<div class="search-overlay" id="search-overlay"><div class="search-box"><div class="search-input-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="search-input" type="search" placeholder="Rechercher une notion, un outil, une commande…" autocomplete="off"><span class="kbd">Échap</span></div><div class="search-results" id="search-results"></div></div></div>
+
+<div class="fc-overlay" id="fc-overlay"><div class="fc-modal"><div class="fc-head"><strong>Flashcards · Réseaux</strong><span class="fc-count" id="fc-count">1 / 1</span><button class="icon-btn" id="fc-close" aria-label="Fermer">✕</button></div><div class="fc-card" id="fc-card"><div class="fc-inner"><div class="fc-face" id="fc-front"><div class="tag">Question</div><div class="fc-text"></div><div class="hint">Clique pour retourner</div></div><div class="fc-face fc-back" id="fc-back"><div class="tag">Réponse</div><div class="fc-text"></div><div class="hint">Clique pour revenir</div></div></div></div><div class="fc-controls"><button class="btn" id="fc-prev">← Précédent</button><button class="btn" id="fc-shuffle">Mélanger</button><button class="btn primary" id="fc-next">Suivant →</button></div></div></div>
+
+<script src="assets/search-index.js"></script>
+<script src="assets/quiz-data.js"></script>
+<script src="assets/flashcards.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>

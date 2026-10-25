@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Dernière minute — Cap sur le DE</title>
+<meta name="description" content="Les 10 points indispensables par matière, à relire la veille et le matin de l'examen.">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap topbar-inner">
+    <a class="brand" href="index.html"><span class="brand-mark">DE</span><span>Cap sur le DE<small>ST2 · 5 matières</small></span></a>
+    <nav class="nav-links" aria-label="Navigation principale"><a href="index.html">Accueil</a><a href="plan.html">Plan</a><a href="eh.html">Hacking</a><a href="reseau.html">Réseaux</a><a href="os.html">OS</a><a href="si.html">SI</a><a href="vs.html">Virtualisation</a><a href="last-minute.html" class="active">J-1</a></nav>
+    <div class="top-actions">
+      <button class="icon-btn" id="btn-search" aria-label="Rechercher"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></button>
+      <button class="icon-btn" id="btn-theme" aria-label="Changer de thème"></button>
+      <div class="progress-pill"><svg class="ring" id="top-ring" viewBox="0 0 24 24"><circle class="bg" cx="12" cy="12" r="9"/><circle class="fg" cx="12" cy="12" r="9" stroke-dasharray="56.5" stroke-dashoffset="56.5"/></svg><span class="pp-text" id="top-progress-text">0 %</span></div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="hero" style="padding-bottom:14px">
+    <div class="eyebrow">La veille et le matin</div>
+    <h1 style="font-size:clamp(1.9rem,3.6vw,2.8rem)">Dernière minute.</h1>
+    <p class="lead">Les 10 à 12 points qui doivent être dans ta tête avant d'entrer. Une page par matière, pas de nouveau contenu. Lis, récite, coche mentalement.</p>
+    <div class="hero-actions">
+      <button class="btn primary" data-action="print">Imprimer / PDF</button>
+      <a class="btn" href="plan.html">Revoir le plan</a>
+    </div>
+  </section>
+
+  <div class="box warn">
+    <div class="box-title">Mode d'emploi</div>
+    <p>Ne lis pas tout d'un coup. Prends une carte, lis-la, ferme l'écran, récite les points à voix haute, puis vérifie. Si un point ne sort pas, ouvre la fiche complète uniquement pour celui-là. Le matin : 15 minutes maximum, pas de nouvelle notion.</p>
+  </div>
+
+  <div class="lastminute-grid">
+    <article class="lm-card" style="--lm-color:var(--eh)">
+      <h3>Ethical Hacking</h3>
+      <ul>
+        <li><strong>5 phases :</strong> recon → scan/énumération → accès → persistance → effacement des traces (+ rapport).</li>
+        <li><strong>Passif</strong> = pas d'interaction (OSINT, WHOIS, Shodan, Google Dorks). <strong>Actif</strong> = Nmap, scan, connexion.</li>
+        <li><strong>Nmap :</strong> <code>-sV</code> version, <code>-O</code> OS, <code>-sS</code> SYN, <code>-p-</code> tous les ports, <code>--script</code> NSE.</li>
+        <li><strong>NSE :</strong> scripts Lua, catégories safe/auth/vuln/exploit, détection de CVE.</li>
+        <li><strong>Metasploit :</strong> <code>search</code>, <code>use</code>, <code>set RHOSTS</code>, <code>set LHOST</code>, <code>run</code>, <code>sessions -i</code>.</li>
+        <li><strong>Meterpreter :</strong> shell en mémoire, <code>hashdump</code>, <code>migrate</code>, <code>getuid</code>.</li>
+        <li><strong>msfvenom :</strong> <code>-p</code>, <code>LHOST</code>, <code>LPORT</code>, <code>-f</code>, <code>-o</code>.</li>
+        <li><strong>Reverse shell</strong> = cible → attaquant ; traverse mieux les NAT.</li>
+        <li><strong>Brute force</strong> = toutes les combinaisons ; <strong>dictionnaire</strong> = liste de mots.</li>
+        <li><strong>Défenses :</strong> MFA, hash bcrypt/Argon2, verrouillage, rate limiting, Fail2ban, logs 4625.</li>
+        <li><strong>OWASP :</strong> A01 accès, A03 injection, A07 auth, A10 SSRF.</li>
+        <li><strong>Rapport :</strong> synthèse, méthode, constats + CVSS, remédiation, annexes.</li>
+      </ul>
+      <div class="lm-must"><strong>Si tu ne retiens qu'une chose :</strong> les 5 phases et les commandes Metasploit/Nmap. C'est le cœur du QCM et des questions ouvertes.</div>
+    </article>
+
+    <article class="lm-card" style="--lm-color:var(--res)">
+      <h3>Sécurité Réseaux</h3>
+      <ul>
+        <li><strong>DICP :</strong> disponibilité, intégrité, confidentialité, preuve.</li>
+        <li><strong>DMZ :</strong> zone tampon entre Internet et LAN, défense en profondeur, services exposés.</li>
+        <li><strong>Deux FW :</strong> double filtrage ; même marque = homogénéité ; marques différentes = diversité.</li>
+        <li><strong>Règles :</strong> par zone, source/destination/port explicites, premier match, deny all + log.</li>
+        <li><strong>Stateful :</strong> table de connexions, autorise established/related ; stateless : chaque paquet seul.</li>
+        <li><strong>Proxy :</strong> rupture protocolaire, cache, filtrage, anonymisation. <strong>Reverse proxy :</strong> protection, load balancing, TLS.</li>
+        <li><strong>IPsec :</strong> AH = intégrité sans chiffrement ; ESP = confidentialité + intégrité ; tunnel = VPN.</li>
+        <li><strong>SPD</strong> = politique ; <strong>SAD</strong> = SA actives ; <strong>NAT-T</strong> = UDP 4500.</li>
+        <li><strong>WEP</strong> = RC4 + IV 24 bits + CRC-32 → cassé. <strong>WPA2-Enterprise</strong> = 802.1X + RADIUS.</li>
+        <li><strong>PEAP vs TTLS :</strong> TTLS ouvert/flexible ; PEAP très Windows ; certificat serveur obligatoire.</li>
+        <li><strong>IDS</strong> alerte (passif) ; <strong>IPS</strong> bloque (inline). Placement : entre FW1 et DMZ, puis avant le LAN.</li>
+        <li><strong>DDoS :</strong> le firewall ne suffit pas ; protection en amont (FAI, cloud scrubbing, IXP).</li>
+      </ul>
+      <div class="lm-must"><strong>Si tu ne retiens qu'une chose :</strong> savoir écrire un tableau de règles de filtrage et justifier DMZ + deux firewalls.</div>
+    </article>
+
+    <article class="lm-card" style="--lm-color:var(--os)">
+      <h3>Sécurité des OS</h3>
+      <ul>
+        <li><strong>4 principes :</strong> minimisation, moindre privilège, défense en profondeur, veille/maintenance.</li>
+        <li><strong>umask 0027</strong> → fichier 640, répertoire 750. Fichier par défaut 666, répertoire 777.</li>
+        <li><strong>SUID</strong> = EUID du propriétaire ; <code>find / -perm -4000 -type f</code>. <strong>Sticky</strong> = /tmp.</li>
+        <li><strong>SUID root :</strong> risque d'escalade ; surfaces = entrées, environnement, TOCTOU, shell. Réduire, auditer, capabilities.</li>
+        <li><strong>Sudo :</strong> use_pty, requiretty, noexec, umask 0027, ignore_dot, env_reset. Wildcards = dangereux.</li>
+        <li><strong>PAM</strong> = auth centralisée + politique mdp. <strong>SELinux/AppArmor</strong> = MAC + cloisonnement.</li>
+        <li><strong>Sysctl :</strong> ASLR=2, kptr_restrict, dmesg_restrict, suid_dumpable=0, syncookies=1, rp_filter=1.</li>
+        <li><strong>Buffer overflow :</strong> ASLR, NX/DEP, canary, PIE, RELRO ; Windows /GS, CFG, SafeSEH.</li>
+        <li><strong>Windows :</strong> Winlogon = session ; LSASS = auth/token/secrets ; SRM = accès/audit.</li>
+        <li><strong>UAC</strong> = token filtré + élévation ; <strong>MIC</strong> = niveaux Low/Medium/High/System.</li>
+        <li><strong>Credential Guard</strong> = VBS ; <strong>LSA Protection</strong> = PPL ; désactiver WDigest.</li>
+        <li><strong>EAL4+</strong> = Common Criteria ; <strong>C2</strong> = TCSEC. 4625 = échec logon.</li>
+      </ul>
+      <div class="lm-must"><strong>Si tu ne retiens qu'une chose :</strong> la chaîne « mécanisme → attaque → conséquence → mesure » pour SUID, sudo, LSASS et buffer overflow.</div>
+    </article>
+
+    <article class="lm-card" style="--lm-color:var(--si)">
+      <h3>Sécurité des SI</h3>
+      <ul>
+        <li><strong>DICP + preuve.</strong></li>
+        <li><strong>RGPD :</strong> finalité, minimisation, durée, exactitude, intégrité/confidentialité, responsabilité.</li>
+        <li><strong>Données de santé</strong> = sensibles ; AIPD ; CNIL 72 h ; droits des personnes.</li>
+        <li><strong>Risque = V × I</strong> ; traitements : réduire, accepter, éviter, transférer.</li>
+        <li><strong>ISO 27001</strong> = SMSI ; <strong>27002</strong> = contrôles ; <strong>27005</strong> = risques ; <strong>22301</strong> = continuité.</li>
+        <li><strong>EBIOS RM</strong> = 5 ateliers (cadrage, sources, scénarios stratégiques, opérationnels, traitement).</li>
+        <li><strong>IAM :</strong> identifier, authentifier, autoriser, tracer ; RBAC, moindre privilège, revue des accès, MFA.</li>
+        <li><strong>LDAP :</strong> DN/OU/CN, bind, LDAPS 636, pas d'anonymous bind.</li>
+        <li><strong>PCA</strong> = activité en mode dégradé ; <strong>PRA</strong> = restauration du SI ; <strong>RTO/RPO</strong>.</li>
+        <li><strong>Sauvegarde 3-2-1</strong> + test de restauration + copie offline/immuable.</li>
+        <li><strong>Cas :</strong> actifs → données/RGPD → menaces → vulnérabilités → impacts → risques → recommandations.</li>
+        <li><strong>Phrase :</strong> « mesure X → principe Y → risque Z réduit ».</li>
+      </ul>
+      <div class="lm-must"><strong>Si tu ne retiens qu'une chose :</strong> la grille d'audit en 8 étapes et la chaîne menace → vulnérabilité → impact → mesure.</div>
+    </article>
+
+    <article class="lm-card" style="--lm-color:var(--vs)">
+      <h3>Virtualisation &amp; Stockage</h3>
+      <ul>
+        <li><strong>Type 1</strong> = bare metal (ESXi, Hyper-V, Proxmox, Xen, KVM) ; <strong>type 2</strong> = hébergé (VirtualBox, Workstation).</li>
+        <li><strong>Conteneur</strong> = noyau partagé, léger, isolation plus faible ; <strong>VM</strong> = OS complet, isolation forte.</li>
+        <li><strong>vSwitch</strong> = switch virtuel ; <strong>VMkernel</strong> = réseau infra (vMotion, iSCSI, NFS).</li>
+        <li><strong>3 réseaux VMware :</strong> bridged, NAT, host-only.</li>
+        <li><strong>Stockage :</strong> DAS bloc local, NAS fichier, SAN bloc dédié ; vSAN hyperconvergé.</li>
+        <li><strong>VMFS</strong> = bloc VMware ; <strong>NFS</strong> = fichier ; <strong>VMDK</strong> = disque virtuel.</li>
+        <li><strong>vMotion</strong> = CPU/RAM ; <strong>Storage vMotion</strong> = disque ; <strong>snapshot ≠ backup</strong>.</li>
+        <li><strong>HA</strong> = redémarre ; <strong>DRS</strong> = équilibre ; <strong>FT</strong> = zéro downtime.</li>
+        <li><strong>Docker :</strong> image (read-only), conteneur (writable), registry (Docker Hub).</li>
+        <li><strong>Dockerfile :</strong> FROM obligatoire ; RUN, COPY, WORKDIR, EXPOSE, ENV, CMD.</li>
+        <li><strong>Compose :</strong> services, image/build, ports, volumes, depends_on ; <code>docker compose up -d</code>.</li>
+        <li><strong>Supprimer tous les conteneurs :</strong> <code>docker rm -f $(docker ps -aq)</code>.</li>
+      </ul>
+      <div class="lm-must"><strong>Si tu ne retiens qu'une chose :</strong> les 3 schémas type 1 / type 2 / conteneur et les définitions Docker. C'est tombé presque à l'identique.</div>
+    </article>
+
+    <article class="lm-card" style="--lm-color:var(--accent)">
+      <h3>Le matin de l'examen</h3>
+      <ul>
+        <li>Relis uniquement cette page, pas les fiches complètes.</li>
+        <li>Prépare ta convocation, carte d'identité, stylos, montre (sans montre connectée).</li>
+        <li>Arrive en avance, coupe le téléphone, range-le.</li>
+        <li>Lis tout le sujet avant de commencer : repère les questions faciles.</li>
+        <li>Commence par ce que tu maîtrises, garde 10 minutes de relecture.</li>
+        <li>QCM : réponds à tout, aucune case vide.</li>
+        <li>Questions ouvertes : structure en titres, mots-clés, exemples.</li>
+        <li>Si tu bloques : écris la définition, puis un exemple, puis une mesure. Ça débloque.</li>
+        <li>Ne réécris pas le cours : réponds à la question posée.</li>
+        <li>Garde ton calme : une question ratée ne coule pas l'examen.</li>
+      </ul>
+      <div class="lm-must"><strong>Rappel :</strong> la note se gagne d'abord sur les questions faciles et les définitions. Ne commence pas par la question à 5 points qui te bloque.</div>
+    </article>
+  </div>
+
+  <div class="section-head">
+    <div>
+      <div class="kicker">Formules &amp; réflexes</div>
+      <h2>Les 8 choses à ne pas confondre</h2>
+    </div>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Ne pas confondre</th><th>La bonne distinction</th></tr></thead>
+      <tbody>
+        <tr><td>Reconnaissance passive / active</td><td>Passive = aucune interaction avec la cible ; active = trafic envoyé (Nmap).</td></tr>
+        <tr><td>IDS / IPS</td><td>IDS = détecte et alerte ; IPS = détecte et bloque (inline).</td></tr>
+        <tr><td>AH / ESP</td><td>AH = intégrité/authentification sans chiffrement ; ESP = confidentialité + intégrité.</td></tr>
+        <tr><td>SUID / SGID / sticky</td><td>SUID = EUID propriétaire ; SGID = GID/héritage ; sticky = suppression limitée dans /tmp.</td></tr>
+        <tr><td>DAC / MAC</td><td>DAC = propriétaire décide ; MAC = politique globale (SELinux/AppArmor).</td></tr>
+        <tr><td>PCA / PRA</td><td>PCA = maintenir l'activité ; PRA = restaurer le SI.</td></tr>
+        <tr><td>VM / conteneur</td><td>VM = OS complet + isolation forte ; conteneur = noyau partagé + léger.</td></tr>
+        <tr><td>Snapshot / sauvegarde</td><td>Snapshot = point d'état temporaire ; sauvegarde = copie indépendante, testée, hors site.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="box tip">
+    <div class="box-title">Le mot de la fin</div>
+    <p>Tu n'as pas besoin de tout savoir. Tu as besoin de savoir <strong>ce qui tombe</strong>, de le <strong>restituer clairement</strong> et de <strong>relier les notions</strong>. Les fiches sont construites pour ça. Maintenant, ferme l'écran et récite : c'est là que ça rentre.</p>
+  </div>
+
+  <div class="hero-actions no-print">
+    <a class="btn primary" href="index.html">Retour à l'accueil</a>
+    <a class="btn" href="plan.html">Plan 5 jours</a>
+    <button class="btn ghost" data-action="print">Imprimer</button>
+  </div>
+</main>
+
+<footer class="footer"><div class="wrap"><span>Dernière minute · 5 matières · à relire la veille et le matin.</span><span><a href="index.html">Accueil</a></span></div></footer>
+
+<nav class="mobile-nav" aria-label="Navigation mobile"><a href="index.html"><span>⌂</span>Accueil</a><a href="plan.html"><span>▦</span>Plan</a><a href="eh.html"><span>EH</span>Hacking</a><a href="reseau.html"><span>SR</span>Réseaux</a><a href="os.html"><span>OS</span>OS</a><a href="si.html"><span>SI</span>SI</a><a href="vs.html"><span>VS</span>Virtu.</a><a href="last-minute.html" class="active"><span>⚡</span>J-1</a></nav>
+
+<div class="search-overlay" id="search-overlay"><div class="search-box"><div class="search-input-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="search-input" type="search" placeholder="Rechercher une notion, un outil, une commande…" autocomplete="off"><span class="kbd">Échap</span></div><div class="search-results" id="search-results"></div></div></div>
+
+<script src="assets/search-index.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>
