@@ -16,10 +16,23 @@ PAGES = {
     "plan.html": "Plan de révision",
     "index.html": "Accueil",
 }
+SKIP_SECTIONS = {"quiz", "flashcards"}
+SKIP_TAGS = [".topic-check", ".note-num", ".toc-tools", ".day-num", "script", "style"]
+
 
 def clean(text: str) -> str:
-    text = re.sub(r"\s+", " ", text).strip()
-    return text
+    return re.sub(r"\s+", " ", text).strip()
+
+
+def body_text(el, heading_selector="h2") -> str:
+    clone = BeautifulSoup(str(el), "html.parser").find()
+    for sel in SKIP_TAGS:
+        for node in clone.select(sel):
+            node.decompose()
+    for node in clone.select(heading_selector):
+        node.decompose()
+    return clean(clone.get_text(" ", strip=True))
+
 
 def main():
     entries = []
@@ -28,24 +41,20 @@ def main():
         if not path.exists():
             continue
         soup = BeautifulSoup(path.read_text(encoding="utf-8"), "html.parser")
-        page_title = clean(soup.title.get_text()) if soup.title else page
 
         # Main note sections
         for sec in soup.select("section.note[id]"):
+            if sec.get("id") in SKIP_SECTIONS:
+                continue
             h2 = sec.find("h2")
             if not h2:
                 continue
-            title = clean(h2.get_text())
-            body = clean(sec.get_text(" ", strip=True))
-            # remove the title repetition at the start
-            if body.startswith(title):
-                body = body[len(title):].strip()
             entries.append({
                 "page": page,
                 "url": f"{page}#{sec.get('id')}",
                 "subject": subject,
-                "title": title,
-                "text": body[:900],
+                "title": clean(h2.get_text()),
+                "text": body_text(sec)[:900],
             })
 
         # Last-minute cards
@@ -53,16 +62,12 @@ def main():
             h3 = card.find("h3")
             if not h3:
                 continue
-            title = clean(h3.get_text())
-            body = clean(card.get_text(" ", strip=True))
-            if body.startswith(title):
-                body = body[len(title):].strip()
             entries.append({
                 "page": page,
-                "url": f"{page}",
+                "url": page,
                 "subject": subject,
-                "title": title,
-                "text": body[:900],
+                "title": clean(h3.get_text()),
+                "text": body_text(card, "h3")[:900],
             })
 
         # Plan day cards
@@ -70,36 +75,28 @@ def main():
             h3 = card.find("h3")
             if not h3:
                 continue
-            title = clean(h3.get_text())
-            body = clean(card.get_text(" ", strip=True))
-            if body.startswith(title):
-                body = body[len(title):].strip()
             entries.append({
                 "page": page,
-                "url": f"{page}",
+                "url": page,
                 "subject": subject,
-                "title": title,
-                "text": body[:700],
+                "title": clean(h3.get_text()),
+                "text": body_text(card, "h3")[:700],
             })
 
-        # Home / generic sections with an id and a heading
+        # Home / generic sections with an id and a heading (skip notes, already handled)
         for sec in soup.select("section[id]"):
-            if sec.select_one("section.note[id]") is sec:
+            classes = sec.get("class") or []
+            if "note" in classes:
                 continue
             heading = sec.find(["h1", "h2"])
             if not heading:
                 continue
-            sid = sec.get("id")
-            title = clean(heading.get_text())
-            body = clean(sec.get_text(" ", strip=True))
-            if body.startswith(title):
-                body = body[len(title):].strip()
             entries.append({
                 "page": page,
-                "url": f"{page}#{sid}" if sid else page,
+                "url": f"{page}#{sec.get('id')}" if sec.get("id") else page,
                 "subject": subject,
-                "title": title,
-                "text": body[:700],
+                "title": clean(heading.get_text()),
+                "text": body_text(sec, "h1, h2")[:700],
             })
 
     # Deduplicate by url + title
@@ -118,6 +115,7 @@ def main():
         encoding="utf-8",
     )
     print(f"Wrote {len(unique)} entries to {out}")
+
 
 if __name__ == "__main__":
     main()

@@ -251,6 +251,7 @@
       else if (pct >= 60) verdict = "Bien, mais sécurise les notions ratées avant l'examen.";
       shell.innerHTML =
         '<div class="quiz-result"><div class="big">' + score + "/" + deck.length + "</div>" +
+        '<div class="small muted">bonnes réponses</div>' +
         '<p class="mt-2"><strong>' + pct + "%</strong> — " + verdict + "</p>" +
         '<div class="hero-actions" style="justify-content:center"><button class="btn primary" id="quiz-restart">Refaire un tirage</button><button class="btn ghost" id="quiz-review">Revoir la fiche</button></div></div>';
       $("#quiz-restart").addEventListener("click", start);
@@ -473,6 +474,16 @@
     // Ensure all answers are visible when printing
     window.addEventListener("beforeprint", () => $$("details").forEach((d) => (d.open = true)));
   }
+  function initReset() {
+    $$("[data-reset]").forEach((b) =>
+      b.addEventListener("click", () => {
+        if (!window.confirm("Réinitialiser toute la progression (notions et plan) ?")) return;
+        localStorage.removeItem(LS_PROGRESS);
+        localStorage.removeItem(LS_PLAN);
+        window.location.reload();
+      })
+    );
+  }
 
   document.addEventListener("DOMContentLoaded", () => {
     initTheme();
@@ -487,5 +498,6 @@
     initSearch();
     initPlan();
     initPrint();
+    initReset();
   });
 })();
